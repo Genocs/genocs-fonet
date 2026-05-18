@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11806.211
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genocs.Fonet", "src\Genocs.Fonet\Genocs.Fonet.csproj", "{C7059D54-5F20-A93C-305E-06B2058C5A68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genocs.Fonet.Tests", "src\tests\Genocs.Fonet.Tests\Genocs.Fonet.Tests.csproj", "{7F04A2CD-D33C-456B-86F8-214EBA8811BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C7059D54-5F20-A93C-305E-06B2058C5A68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7059D54-5F20-A93C-305E-06B2058C5A68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7059D54-5F20-A93C-305E-06B2058C5A68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7059D54-5F20-A93C-305E-06B2058C5A68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F04A2CD-D33C-456B-86F8-214EBA8811BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F04A2CD-D33C-456B-86F8-214EBA8811BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F04A2CD-D33C-456B-86F8-214EBA8811BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F04A2CD-D33C-456B-86F8-214EBA8811BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AE94436-D033-4DA8-AC13-4E8BF98DA8A1}
+	EndGlobalSection
+EndGlobal
