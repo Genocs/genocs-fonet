@@ -1,86 +1,69 @@
-using System;
+using Genocs.Fonet.Pdf.Gdi;
+using SkiaSharp;
 using System.Collections;
 
-namespace Fonet.Pdf.Gdi {
-    /// <summary>
-    ///     Custom collection that maintains a list of Unicode ranges 
-    ///     a font supports and the glyph indices of each character.
-    ///     The list of ranges is obtained by invoking GetFontUnicodeRanges,
-    ///     however the associated glyph indices are lazily instantiated as 
-    ///     required to save memory.
-    /// </summary>
-    public class GdiUnicodeRanges {
-        private static readonly IComparer SearchComparer =
-            new UnicodeRangeComparer();
+namespace Genocs.Fonet.Pdf.Gdi;
 
-        /// <summary>
-        ///     List of unicode ranges in ascending numerical order.  The order 
-        ///     is important since a binary search is used to locate and 
-        ///     uicode range from a charcater.
-        /// </summary>
-        private UnicodeRange[] unicodeRanges;
+/// <summary>
+///     Custom collection that maintains a list of Unicode ranges 
+///     a font supports and the glyph indices of each character.
+///     Cross-platform implementation using cmap table parsing.
+/// </summary>
+public class GdiUnicodeRanges
+{
+    private static readonly IComparer SearchComparer =
+        new UnicodeRangeComparer();
 
-        /// <summary>
-        ///     Class constuctor.
-        /// </summary>
-        /// <param name="dc"></param>
-        public GdiUnicodeRanges(GdiDeviceContent dc) {
-            LoadRanges(dc);
-        }
+    private UnicodeRange[] unicodeRanges = [];
 
-        /// <summary>
-        ///     Gets the number of unicode ranges.
-        /// </summary>
-        public int Count {
-            get { return unicodeRanges.Length; }
-        }
+    public GdiUnicodeRanges(GdiDeviceContent dc)
+    {
+        LoadRanges(dc);
+    }
 
-        /// <summary>
-        ///     Loads all the unicode ranges.
-        /// </summary>
-        private void LoadRanges(GdiDeviceContent dc) {
-            GlyphSet glyphSet = new GlyphSet();
-            uint size = LibWrapper.GetFontUnicodeRanges(dc.Handle, glyphSet);
-            if (size == 0) {
-                throw new Exception("Unable to retrieve unicode ranges.");
+    public int Count => unicodeRanges.Length;
+
+    private void LoadRanges(GdiDeviceContent dc)
+    {
+        try
+        {
+            var typeface = dc.CurrentTypeface;
+            if (typeface == null)
+            {
+                unicodeRanges = [new UnicodeRange(dc, 0x0020, 0x007E)];
+                return;
             }
 
-            unicodeRanges = new UnicodeRange[glyphSet.cRanges];
-            for (int i = 0, offset = 0; i < glyphSet.cRanges; i++) {
-                ushort wcLow = (ushort) (glyphSet.ranges[offset++] + (glyphSet.ranges[offset++] << 8));
-                ushort cGlyphs = (ushort) (glyphSet.ranges[offset++] + (glyphSet.ranges[offset++] << 8));
-                unicodeRanges[i] = new UnicodeRange(dc, wcLow, (ushort) (wcLow + cGlyphs - 1));
+            var cmap = FontManager.Instance.GetCmapReader(typeface);
+            if (cmap != null && cmap.Ranges.Count > 0)
+            {
+                unicodeRanges = cmap.Ranges
+                    .Select(range => new UnicodeRange(dc, range.Start, range.End))
+                    .ToArray();
+                return;
             }
-        }
 
-        /// <summary>
-        ///     Locates the <see cref="UnicodeRange"/> for the supplied character.
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns>
-        ///     The <see cref="UnicodeRange"/> object housing <i>c</i> or null 
-        ///     if a range does not exist for <i>c</i>.
-        /// </returns>
-        internal UnicodeRange GetRange(char c) {
-            // Use binary search algorith mto locate range
-            int index = Array.BinarySearch(
-                unicodeRanges, 0, unicodeRanges.Length, c, SearchComparer);
-
-            // BinarySearch will return -1 if character cannot be located
-            return (index < 0) ? null : unicodeRanges[index];
+            unicodeRanges = [new UnicodeRange(dc, 0x0020, 0x007E)];
         }
-
-        /// <summary>
-        ///     Translates the supplied character to a glyph index.
-        /// </summary>
-        /// <param name="c">Any unicode character.</param>
-        /// <returns>
-        ///     A glyph index for <i>c</i> or 0 the supplied character does 
-        ///     not exist in the font selected into the device context.
-        /// </returns>
-        public ushort MapCharacter(char c) {
-            UnicodeRange range = GetRange(c);
-            return (range == null) ? (ushort) 0 : range.MapCharacter(c);
+        catch (Exception ex)
+        {
+            FonetDriver.ActiveDriver?.FireFonetWarning(
+                $"Unable to retrieve unicode ranges for font; using Latin-1 fallback: {ex.Message}");
+            unicodeRanges = [new UnicodeRange(dc, 0x0020, 0x007E)];
         }
+    }
+
+    internal UnicodeRange? GetRange(char c)
+    {
+        int index = Array.BinarySearch(
+            unicodeRanges, 0, unicodeRanges.Length, c, SearchComparer);
+
+        return index < 0 ? null : unicodeRanges[index];
+    }
+
+    public ushort MapCharacter(char c)
+    {
+        UnicodeRange? range = GetRange(c);
+        return range == null ? (ushort)0 : range.MapCharacter(c);
     }
 }

@@ -1,63 +1,52 @@
-namespace Fonet.DataTypes
+using Genocs.Fonet.Fo.Expr;
+
+namespace Genocs.Fonet.DataTypes;
+
+internal class Length
 {
-    using Fonet.Fo.Expr;
+    protected int _millipoints;
+    protected bool _isComputed;
 
-    internal class Length
+    public int MValue()
     {
-        protected int millipoints = 0;
-        protected bool bIsComputed = false;
-
-        public int MValue()
+        if (!_isComputed)
         {
-            if (!bIsComputed)
-            {
-                ComputeValue();
-            }
-            return millipoints;
+            ComputeValue();
         }
-
-        public virtual void ComputeValue()
-        {
-        }
-
-        protected void SetComputedValue(int millipoints)
-        {
-            SetComputedValue(millipoints, true);
-        }
-
-        protected void SetComputedValue(int millipoints, bool bSetComputed)
-        {
-            this.millipoints = millipoints;
-            this.bIsComputed = bSetComputed;
-        }
-
-        public virtual bool IsAuto()
-        {
-            return false;
-        }
-
-        public bool IsComputed()
-        {
-            return bIsComputed;
-        }
-
-        public virtual double GetTableUnits()
-        {
-            return 0.0;
-        }
-
-        public virtual void ResolveTableUnit(double dTableUnit)
-        {
-        }
-
-        public virtual Numeric AsNumeric()
-        {
-            return null;
-        }
-
-        public override string ToString()
-        {
-            return millipoints + "mpt";
-        }
+        return _millipoints;
     }
+
+    public virtual void ComputeValue()
+    {
+    }
+
+    protected void SetComputedValue(int millipoints)
+    {
+        SetComputedValue(millipoints, true);
+    }
+
+    protected void SetComputedValue(int millipoints, bool bSetComputed)
+    {
+        _millipoints = millipoints;
+        _isComputed = bSetComputed;
+    }
+
+    public virtual bool IsAuto()
+        => false;
+
+    public bool IsComputed()
+        => _isComputed;
+
+    public virtual double GetTableUnits()
+        => 0.0;
+
+    public virtual void ResolveTableUnit(double dTableUnit)
+    {
+    }
+
+    public virtual Numeric? AsNumeric()
+        => null;
+
+    public override string ToString()
+        => $"{_millipoints}mpt";
 }

@@ -1,224 +1,218 @@
-namespace Fonet.Layout
+using System.Collections;
+using Genocs.Fonet.Fo.Flow;
+using Genocs.Fonet.Layout;
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo.Pagination;
+using Genocs.Fonet.Render.Pdf;
+
+namespace Genocs.Fonet.Layout;
+
+internal class Page
 {
-    using System.Collections;
-    using Fonet.DataTypes;
-    using Fonet.Fo.Flow;
-    using Fonet.Fo.Pagination;
-    using Fonet.Render.Pdf;
+    private int height;
+    private int width;
+    private BodyAreaContainer body;
+    private AreaContainer before;
+    private AreaContainer after;
+    private AreaContainer start;
+    private AreaContainer end;
+    private AreaTree areaTree;
+    private PageSequence pageSequence;
+    protected int pageNumber = 0;
+    protected string formattedPageNumber;
+    protected ArrayList linkSets = new ArrayList();
+    private ArrayList idList = new ArrayList();
+    private ArrayList footnotes = null;
+    private ArrayList markers = null;
 
-    internal class Page
+    internal Page(AreaTree areaTree, int height, int width)
     {
-        private int height;
-        private int width;
-        private BodyAreaContainer body;
-        private AreaContainer before;
-        private AreaContainer after;
-        private AreaContainer start;
-        private AreaContainer end;
-        private AreaTree areaTree;
-        private PageSequence pageSequence;
-        protected int pageNumber = 0;
-        protected string formattedPageNumber;
-        protected ArrayList linkSets = new ArrayList();
-        private ArrayList idList = new ArrayList();
-        private ArrayList footnotes = null;
-        private ArrayList markers = null;
+        this.areaTree = areaTree;
+        this.height = height;
+        this.width = width;
+        markers = new ArrayList();
+    }
 
-        internal Page(AreaTree areaTree, int height, int width)
-        {
-            this.areaTree = areaTree;
-            this.height = height;
-            this.width = width;
-            markers = new ArrayList();
-        }
+    public IDReferences getIDReferences()
+    {
+        return areaTree.getIDReferences();
+    }
 
-        public IDReferences getIDReferences()
-        {
-            return areaTree.getIDReferences();
-        }
+    public void setPageSequence(PageSequence pageSequence)
+    {
+        this.pageSequence = pageSequence;
+    }
 
-        public void setPageSequence(PageSequence pageSequence)
-        {
-            this.pageSequence = pageSequence;
-        }
+    public PageSequence getPageSequence()
+    {
+        return pageSequence;
+    }
 
-        public PageSequence getPageSequence()
-        {
-            return pageSequence;
-        }
+    public AreaTree getAreaTree()
+    {
+        return areaTree;
+    }
 
-        public AreaTree getAreaTree()
-        {
-            return areaTree;
-        }
+    public void setNumber(int number)
+    {
+        pageNumber = number;
+    }
 
-        public void setNumber(int number)
-        {
-            pageNumber = number;
-        }
+    public int getNumber()
+    {
+        return pageNumber;
+    }
 
-        public int getNumber()
-        {
-            return pageNumber;
-        }
+    public void setFormattedNumber(string number)
+    {
+        formattedPageNumber = number;
+    }
 
-        public void setFormattedNumber(string number)
-        {
-            formattedPageNumber = number;
-        }
+    public string getFormattedNumber()
+    {
+        return formattedPageNumber;
+    }
 
-        public string getFormattedNumber()
-        {
-            return formattedPageNumber;
-        }
+    internal void addAfter(AreaContainer area)
+    {
+        after = area;
+        area.setPage(this);
+    }
 
-        internal void addAfter(AreaContainer area)
-        {
-            after = area;
-            area.setPage(this);
-        }
+    internal void addBefore(AreaContainer area)
+    {
+        before = area;
+        area.setPage(this);
+    }
 
-        internal void addBefore(AreaContainer area)
-        {
-            before = area;
-            area.setPage(this);
-        }
+    public void addBody(BodyAreaContainer area)
+    {
+        body = area;
+        area.setPage(this);
+        ((BodyAreaContainer)area).getMainReferenceArea().setPage(this);
+        ((BodyAreaContainer)area).getBeforeFloatReferenceArea().setPage(this);
+        ((BodyAreaContainer)area).getFootnoteReferenceArea().setPage(this);
+    }
 
-        public void addBody(BodyAreaContainer area)
-        {
-            body = area;
-            area.setPage(this);
-            ((BodyAreaContainer)area).getMainReferenceArea().setPage(this);
-            ((BodyAreaContainer)area).getBeforeFloatReferenceArea().setPage(this);
-            ((BodyAreaContainer)area).getFootnoteReferenceArea().setPage(this);
-        }
+    internal void addEnd(AreaContainer area)
+    {
+        end = area;
+        area.setPage(this);
+    }
 
-        internal void addEnd(AreaContainer area)
-        {
-            end = area;
-            area.setPage(this);
-        }
+    internal void addStart(AreaContainer area)
+    {
+        start = area;
+        area.setPage(this);
+    }
 
-        internal void addStart(AreaContainer area)
-        {
-            start = area;
-            area.setPage(this);
-        }
+    public void render(PdfRenderer renderer)
+    {
+        renderer.RenderPage(this);
+    }
 
-        public void render(PdfRenderer renderer)
-        {
-            renderer.RenderPage(this);
-        }
+    public AreaContainer getAfter()
+    {
+        return after;
+    }
 
-        public AreaContainer getAfter()
-        {
-            return after;
-        }
+    public AreaContainer getBefore()
+    {
+        return before;
+    }
 
-        public AreaContainer getBefore()
-        {
-            return before;
-        }
+    public AreaContainer getStart()
+    {
+        return start;
+    }
 
-        public AreaContainer getStart()
-        {
-            return start;
-        }
+    public AreaContainer getEnd()
+    {
+        return end;
+    }
 
-        public AreaContainer getEnd()
-        {
-            return end;
-        }
+    public BodyAreaContainer getBody()
+    {
+        return body;
+    }
 
-        public BodyAreaContainer getBody()
-        {
-            return body;
-        }
+    public int GetHeight()
+    {
+        return height;
+    }
 
-        public int GetHeight()
-        {
-            return height;
-        }
+    public int getWidth()
+    {
+        return width;
+    }
 
-        public int getWidth()
-        {
-            return width;
-        }
+    public FontInfo? GetFontInfo()
+        => areaTree.FontInfo;
 
-        public FontInfo getFontInfo()
-        {
-            return areaTree.getFontInfo();
-        }
+    public void addLinkSet(LinkSet linkSet)
+    {
+        linkSets.Add(linkSet);
+    }
 
-        public void addLinkSet(LinkSet linkSet)
-        {
-            linkSets.Add(linkSet);
-        }
+    public ArrayList getLinkSets()
+    {
+        return linkSets;
+    }
 
-        public ArrayList getLinkSets()
-        {
-            return linkSets;
-        }
+    public bool hasLinks()
+    {
+        return linkSets.Count != 0;
+    }
 
-        public bool hasLinks()
-        {
-            return linkSets.Count != 0;
-        }
+    public void addToIDList(string id)
+    {
+        idList.Add(id);
+    }
 
-        public void addToIDList(string id)
-        {
-            idList.Add(id);
-        }
+    public ArrayList getIDList()
+    {
+        return idList;
+    }
 
-        public ArrayList getIDList()
-        {
-            return idList;
-        }
+    public ArrayList getPendingFootnotes()
+    {
+        return footnotes;
+    }
 
-        public ArrayList getPendingFootnotes()
+    public void setPendingFootnotes(ArrayList v)
+    {
+        footnotes = v;
+        if (footnotes != null)
         {
-            return footnotes;
-        }
-
-        public void setPendingFootnotes(ArrayList v)
-        {
-            footnotes = v;
-            if (footnotes != null)
+            foreach (FootnoteBody fb in footnotes)
             {
-                foreach (FootnoteBody fb in footnotes)
+                if (!Footnote.LayoutFootnote(this, fb, null))
                 {
-                    if (!Footnote.LayoutFootnote(this, fb, null))
-                    {
-                        // footnotes are too large to fit on empty page.
-                    }
+                    // footnotes are too large to fit on empty page.
                 }
-                footnotes = null;
             }
+            footnotes = null;
         }
+    }
 
-        public void addPendingFootnote(FootnoteBody fb)
-        {
-            if (footnotes == null)
-            {
-                footnotes = new ArrayList();
-            }
-            footnotes.Add(fb);
-        }
+    public void addPendingFootnote(FootnoteBody fb)
+    {
+        footnotes ??= new ArrayList();
+        footnotes.Add(fb);
+    }
 
-        public void unregisterMarker(Marker marker)
-        {
-            markers.Remove(marker);
-        }
+    public void unregisterMarker(Marker marker)
+    {
+        markers.Remove(marker);
+    }
 
-        public void registerMarker(Marker marker)
-        {
-            markers.Add(marker);
-        }
+    public void registerMarker(Marker marker)
+    {
+        markers.Add(marker);
+    }
 
-        public ArrayList getMarkers()
-        {
-            return this.markers;
-        }
-
+    public ArrayList getMarkers()
+    {
+        return this.markers;
     }
 }

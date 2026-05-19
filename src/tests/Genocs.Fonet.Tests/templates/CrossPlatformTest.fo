@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+	<fo:layout-master-set>
+		<fo:simple-page-master master-name="A4" page-width="210mm" page-height="297mm" margin="20mm">
+			<fo:region-body margin-bottom="20mm"/>
+			<fo:region-after extent="20mm"/>
+		</fo:simple-page-master>
+	</fo:layout-master-set>
+
+	<fo:page-sequence master-reference="A4">
+		<fo:static-content flow-name="xsl-region-after">
+			<fo:block text-align="center" font-size="10pt" color="#666666">
+				Cross-Platform PDF Test - Page <fo:page-number/>
+			</fo:block>
+		</fo:static-content>
+
+		<fo:flow flow-name="xsl-region-body">
+			<!-- Title -->
+			<fo:block font-family="Courier" font-size="24pt" font-weight="bold" color="#1a1a1a" space-after="10mm" text-align="center">
+				Cross-Platform Rendering Test
+			</fo:block>
+
+			<!-- Subtitle explaining the test -->
+			<fo:block font-family="Times-Roman" font-size="12pt" color="#333333" space-after="15mm">
+				This PDF demonstrates the cross-platform capabilities of Genocs.Fonet with SkiaSharp:
+			</fo:block>
+
+			<!-- Custom Fonts Section -->
+			<fo:block font-family="Nunito" font-size="14pt" font-weight="bold" color="#0066cc" space-before="5mm" space-after="8mm">
+				1. Custom Fonts (Nunito Family via SkiaSharp)
+			</fo:block>
+
+			<fo:block font-family="ZapfDingbats" font-size="12pt" space-after="5mm">
+				This text uses Nunito Regular - loaded via SkiaSharp's cross-platform font manager.
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-weight="bold" font-size="12pt" space-after="5mm">
+				This text uses Nunito Bold - works seamlessly on Windows, macOS, and Linux.
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-style="italic" font-size="12pt" space-after="10mm">
+				This text uses Nunito Italic - for supplementary details and captions.
+			</fo:block>
+
+			<!-- Color Variations Section -->
+			<fo:block font-family="Nunito" font-size="14pt" font-weight="bold" color="#0066cc" space-before="5mm" space-after="8mm">
+				2. Color Variations
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-size="12pt" color="#000000" space-after="5mm">
+				Black text - primary content color
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-size="12pt" color="#0066cc" space-after="5mm">
+				Blue text - for links and emphasis
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-size="12pt" color="#00aa00" space-after="5mm">
+				Green text - success and positive messages
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-size="12pt" color="#ff0000" space-after="5mm">
+				Red text - errors and warnings
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-size="12pt" color="#ff9900" space-after="10mm">
+				Orange text - important notices
+			</fo:block>
+
+			<!-- Typography Section -->
+			<fo:block font-family="Nunito" font-size="14pt" font-weight="bold" color="#0066cc" space-before="5mm" space-after="8mm">
+				3. Typography Styles
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-size="14pt" font-weight="bold" space-after="5mm">
+				Large Bold Text
+			</fo:block>
+
+			<fo:block font-family="Nunito" font-size="10pt" space-after="5mm">
+				Small text for footnotes and additional information that is less prominent.
+			</fo:block>
+
+			<fo:block font-family="Courier" font-size="11pt" background-color="#f0f0f0" padding="5pt" space-after="10mm">
+				Monospace-style text for special content
+			</fo:block>
+
+			<!-- Summary Section -->
+			<fo:block font-family="Helvetica" font-size="12pt" space-before="5mm" space-after="5mm" border-top="1pt solid #cccccc" padding-top="10mm">
+				<fo:block font-weight="bold" space-after="5mm">Test Summary:</fo:block>
+				<fo:block space-after="3mm">✓ Cross-platform font loading via SkiaSharp</fo:block>
+				<fo:block space-after="3mm">✓ Custom font embedding and rendering</fo:block>
+				<fo:block space-after="3mm">✓ Color management and typography options</fo:block>
+				<fo:block space-after="3mm">✓ PDF output generation with proper file I/O</fo:block>
+				<fo:block space-after="3mm">✓ Works on Windows, macOS, and Linux</fo:block>
+			</fo:block>
+
+			<!-- Footer Info -->
+			<fo:block font-family="Helvetica" font-size="10pt" color="#999999" text-align="center" space-before="10mm">
+				Generated with Genocs.Fonet - Cross-Platform PDF Library
+			</fo:block>
+		</fo:flow>
+	</fo:page-sequence>
+</fo:root>

@@ -1,121 +1,120 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
+
+namespace Genocs.Fonet.Fo.Flow;
+
+internal class BlockContainer : FObj
 {
-    using Fonet.Fo.Properties;
-    using Fonet.Layout;
+    private int position;
+    private int top;
+    private int bottom;
+    private int left;
+    private int right;
+    private int width;
+    private int height;
+    private int span;
+    private AreaContainer areaContainer;
 
-    internal class BlockContainer : FObj
+    new internal class Maker : FObj.Maker
     {
-        private int position;
-        private int top;
-        private int bottom;
-        private int left;
-        private int right;
-        private int width;
-        private int height;
-        private int span;
-        private AreaContainer areaContainer;
-
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new BlockContainer(parent, propertyList);
-            }
+            return new BlockContainer(parent, propertyList);
+        }
+    }
+
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    protected BlockContainer(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        this._name = "fo:block-container";
+        this.span = this._properties.GetProperty("span").GetEnum();
+    }
+
+    public override Status Layout(Area area)
+    {
+        if (this._marker == MarkerStart)
+        {
+            AbsolutePositionProps mAbsProps = _propertyManager.GetAbsolutePositionProps();
+            BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+            BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+            MarginProps mProps = _propertyManager.GetMarginProps();
+
+            this._marker = 0;
+            this.position = this._properties.GetProperty("position").GetEnum();
+            this.top = this._properties.GetProperty("top").GetLength().MValue();
+            this.bottom = this._properties.GetProperty("bottom").GetLength().MValue();
+            this.left = this._properties.GetProperty("left").GetLength().MValue();
+            this.right = this._properties.GetProperty("right").GetLength().MValue();
+            this.width = this._properties.GetProperty("width").GetLength().MValue();
+            this.height = this._properties.GetProperty("height").GetLength().MValue();
+            span = this._properties.GetProperty("span").GetEnum();
+
+            string id = this._properties.GetProperty("id").GetString();
+            area.GetIDReferences().InitializeID(id, area);
         }
 
-        new public static FObj.Maker GetMaker()
+        AreaContainer container = (AreaContainer)area;
+        if ((this.width == 0) && (this.height == 0))
         {
-            return new Maker();
+            width = right - left;
+            height = bottom - top;
         }
 
-        protected BlockContainer(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
+        this.areaContainer =
+            new AreaContainer(_propertyManager.GetFontState(container.getFontInfo()),
+                              container.getXPosition() + left,
+                              container.GetYPosition() - top, width, height,
+                              position);
+
+        areaContainer.setPage(area.getPage());
+        areaContainer.setBackground(_propertyManager.GetBackgroundProps());
+        areaContainer.setBorderAndPadding(_propertyManager.GetBorderAndPadding());
+        areaContainer.start();
+
+        areaContainer.setAbsoluteHeight(0);
+        areaContainer.setIDReferences(area.GetIDReferences());
+
+        int numChildren = this._children.Count;
+        for (int i = this._marker; i < numChildren; i++)
         {
-            this.name = "fo:block-container";
-            this.span = this.properties.GetProperty("span").GetEnum();
+            FObj fo = (FObj)_children[i];
+            Status status = fo.Layout(areaContainer);
         }
 
-        public override Status Layout(Area area)
+        areaContainer.end();
+        if (position == Position.ABSOLUTE)
         {
-            if (this.marker == MarkerStart)
-            {
-                AbsolutePositionProps mAbsProps = propMgr.GetAbsolutePositionProps();
-                BorderAndPadding bap = propMgr.GetBorderAndPadding();
-                BackgroundProps bProps = propMgr.GetBackgroundProps();
-                MarginProps mProps = propMgr.GetMarginProps();
-
-                this.marker = 0;
-                this.position = this.properties.GetProperty("position").GetEnum();
-                this.top = this.properties.GetProperty("top").GetLength().MValue();
-                this.bottom = this.properties.GetProperty("bottom").GetLength().MValue();
-                this.left = this.properties.GetProperty("left").GetLength().MValue();
-                this.right = this.properties.GetProperty("right").GetLength().MValue();
-                this.width = this.properties.GetProperty("width").GetLength().MValue();
-                this.height = this.properties.GetProperty("height").GetLength().MValue();
-                span = this.properties.GetProperty("span").GetEnum();
-
-                string id = this.properties.GetProperty("id").GetString();
-                area.getIDReferences().InitializeID(id, area);
-            }
-
-            AreaContainer container = (AreaContainer)area;
-            if ((this.width == 0) && (this.height == 0))
-            {
-                width = right - left;
-                height = bottom - top;
-            }
-
-            this.areaContainer =
-                new AreaContainer(propMgr.GetFontState(container.getFontInfo()),
-                                  container.getXPosition() + left,
-                                  container.GetYPosition() - top, width, height,
-                                  position);
-
-            areaContainer.setPage(area.getPage());
-            areaContainer.setBackground(propMgr.GetBackgroundProps());
-            areaContainer.setBorderAndPadding(propMgr.GetBorderAndPadding());
-            areaContainer.start();
-
-            areaContainer.setAbsoluteHeight(0);
-            areaContainer.setIDReferences(area.getIDReferences());
-
-            int numChildren = this.children.Count;
-            for (int i = this.marker; i < numChildren; i++)
-            {
-                FObj fo = (FObj)children[i];
-                Status status = fo.Layout(areaContainer);
-            }
-
-            areaContainer.end();
-            if (position == Position.ABSOLUTE)
-            {
-                areaContainer.SetHeight(height);
-            }
-            area.addChild(areaContainer);
-
-            return new Status(Status.OK);
+            areaContainer.SetHeight(height);
         }
+        area.addChild(areaContainer);
 
-        public override int GetContentWidth()
+        return new Status(Status.OK);
+    }
+
+    public override int GetContentWidth()
+    {
+        if (areaContainer != null)
         {
-            if (areaContainer != null)
-            {
-                return areaContainer.getContentWidth();
-            }
-            else
-            {
-                return 0;
-            }
+            return areaContainer.getContentWidth();
         }
-
-        public override bool GeneratesReferenceAreas()
+        else
         {
-            return true;
+            return 0;
         }
+    }
 
-        public int GetSpan()
-        {
-            return this.span;
-        }
+    public override bool GeneratesReferenceAreas()
+    {
+        return true;
+    }
+
+    public int GetSpan()
+    {
+        return this.span;
     }
 }

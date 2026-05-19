@@ -1,14 +1,19 @@
-namespace Fonet.Render.Pdf.Fonts {
-    internal class TimesBold : Base14Font {
+using Genocs.Fonet.Render.Pdf.Fonts;
+
+namespace Genocs.Fonet.Render.Pdf.Fonts
+{
+    internal class TimesBold : Base14Font
+    {
         private static readonly int[] CodePointWidths;
 
         private static readonly CodePointMapping DefaultMapping
             = CodePointMapping.GetMapping("WinAnsiEncoding");
 
         public TimesBold()
-            : base("Times-Bold", "WinAnsiEncoding", 676, 676, -205, 32, 255, CodePointWidths, DefaultMapping) {}
+            : base("Times-Bold", "WinAnsiEncoding", 676, 676, -205, 32, 255, CodePointWidths, DefaultMapping) { }
 
-        static TimesBold() {
+        static TimesBold()
+        {
             CodePointWidths = new int[256];
             CodePointWidths[0x0041] = 722;
             CodePointWidths[0x00C6] = 1000;

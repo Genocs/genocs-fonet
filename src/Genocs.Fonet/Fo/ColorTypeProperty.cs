@@ -1,46 +1,34 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class ColorTypeProperty(ColorType colorType) : Property
 {
-    internal class ColorTypeProperty : Property
-    {
-        internal class Maker : PropertyMaker
-        {
-            public Maker(string propName) : base(propName) { }
+    private readonly ColorType _colorType = colorType;
 
-            public override Property ConvertProperty(
-                Property p, PropertyList propertyList, FObj fo)
+    internal class Maker(string propName) : PropertyMaker(propName)
+    {
+        public override Property ConvertProperty(Property p, PropertyList propertyList, FObj fo)
+        {
+            if (p is ColorTypeProperty)
             {
-                if (p is ColorTypeProperty)
-                {
-                    return p;
-                }
-                ColorType val = p.GetColorType();
-                if (val != null)
-                {
-                    return new ColorTypeProperty(val);
-                }
-                return ConvertPropertyDatatype(p, propertyList, fo);
+                return p;
             }
 
-        }
+            ColorType val = p.GetColorType();
+            if (val != null)
+            {
+                return new ColorTypeProperty(val);
+            }
 
-        private ColorType colorType;
-
-        public ColorTypeProperty(ColorType colorType)
-        {
-            this.colorType = colorType;
-        }
-
-        public override ColorType GetColorType()
-        {
-            return this.colorType;
-        }
-
-        public override object GetObject()
-        {
-            return this.colorType;
+            return ConvertPropertyDatatype(p, propertyList, fo);
         }
 
     }
+
+    public override ColorType GetColorType()
+        => _colorType;
+
+    public override object GetObject()
+        => _colorType;
 }

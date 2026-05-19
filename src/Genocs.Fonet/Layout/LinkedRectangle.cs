@@ -1,7 +1,7 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
-    using Fonet.Layout.Inline;
-    using Fonet.Util;
+    using Genocs.Fonet.Layout.Inline;
+    using Genocs.Fonet.Util;
 
     internal class LinkedRectangle
     {

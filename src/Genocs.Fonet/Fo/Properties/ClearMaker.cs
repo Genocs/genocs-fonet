@@ -1,33 +1,48 @@
-using Fonet.DataTypes;
+namespace Genocs.Fonet.Fo.Properties;
 
-namespace Fonet.Fo.Properties
+internal class ClearMaker : EnumProperty.Maker
 {
-    internal class ClearMaker : ToBeImplementedProperty.Maker
+    private static readonly EnumProperty s_propNONE = new(Clear.NONE);
+    private static readonly EnumProperty s_propLEFT = new(Clear.LEFT);
+    private static readonly EnumProperty s_propRIGHT = new(Clear.RIGHT);
+    private static readonly EnumProperty s_propBOTH = new(Clear.BOTH);
+
+    public static PropertyMaker Maker(string propName) => new ClearMaker(propName);
+
+    protected ClearMaker(string name) : base(name) { }
+
+    public override bool IsInherited() => false;
+
+    public override Property CheckEnumValues(string value)
     {
-        new public static PropertyMaker Maker(string propName)
+        if (value.Equals("none"))
         {
-            return new ClearMaker(propName);
+            return s_propNONE;
         }
 
-        protected ClearMaker(string name) : base(name) { }
-
-
-        public override bool IsInherited()
+        if (value.Equals("left"))
         {
-            return false;
+            return s_propLEFT;
         }
 
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
+        if (value.Equals("right"))
         {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "none", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-
+            return s_propRIGHT;
         }
 
+        if (value.Equals("both"))
+        {
+            return s_propBOTH;
+        }
+
+        return base.CheckEnumValues(value);
+    }
+
+    private Property? m_defaultProp;
+
+    public override Property Make(PropertyList propertyList)
+    {
+        m_defaultProp ??= Make(propertyList, "none", propertyList.getParentFObj());
+        return m_defaultProp;
     }
 }

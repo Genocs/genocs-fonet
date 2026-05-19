@@ -1,5 +1,7 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
+    using Genocs.Fonet;
+    using Genocs.Fonet.Layout;
     using System;
     using System.Collections;
 
@@ -78,7 +80,11 @@ namespace Fonet.Layout
                     i = 0;
                 }
             }
-            catch (Exception)
+            catch (FormatException)
+            {
+                i = 0;
+            }
+            catch (OverflowException)
             {
                 i = 0;
             }

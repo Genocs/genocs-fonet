@@ -1,96 +1,86 @@
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+using Genocs.Fonet.Pdf;
+
+internal class IDNode
 {
-    using Fonet.Pdf;
+    private readonly string _idValue;
 
-    internal class IDNode
+    private PdfObjectReference? internalLinkGoToPageReference;
+    private PdfGoTo? internalLinkGoTo;
+
+    private int pageNumber = -1;
+    private int xPosition = 0;
+    private int yPosition = 0;
+
+    internal IDNode(string idValue)
     {
-        private string idValue;
+        _idValue = idValue;
+    }
 
-        private PdfObjectReference internalLinkGoToPageReference;
+    internal void SetPageNumber(int number)
+    {
+        pageNumber = number;
+    }
 
-        private PdfGoTo internalLinkGoTo;
+    public string? GetPageNumber()
+    {
+        return (pageNumber != -1) ? pageNumber.ToString() : null;
+    }
 
-        private int pageNumber = -1;
-        private int xPosition = 0;
-        private int yPosition = 0;
-
-        internal IDNode(string idValue)
+    internal void CreateInternalLinkGoTo(PdfObjectId objectId)
+    {
+        if (internalLinkGoToPageReference == null)
         {
-            this.idValue = idValue;
+            internalLinkGoTo = new PdfGoTo(null, objectId);
+        }
+        else
+        {
+            internalLinkGoTo = new PdfGoTo(internalLinkGoToPageReference, objectId);
         }
 
-        internal void SetPageNumber(int number)
+        if (xPosition != 0)
         {
-            pageNumber = number;
+            internalLinkGoTo.X = xPosition;
+            internalLinkGoTo.Y = yPosition;
         }
+    }
 
-        public string GetPageNumber()
+    internal void SetInternalLinkGoToPageReference(PdfObjectReference pageReference)
+    {
+        if (internalLinkGoTo != null)
         {
-            return (pageNumber != -1) ? pageNumber.ToString() : null;
+            internalLinkGoTo.PageReference = pageReference;
         }
-
-        internal void CreateInternalLinkGoTo(PdfObjectId objectId)
+        else
         {
-            if (internalLinkGoToPageReference == null)
-            {
-                internalLinkGoTo = new PdfGoTo(null, objectId);
-            }
-            else
-            {
-                internalLinkGoTo = new PdfGoTo(internalLinkGoToPageReference, objectId);
-            }
-
-            if (xPosition != 0)
-            {
-                internalLinkGoTo.X = xPosition;
-                internalLinkGoTo.Y = yPosition;
-            }
+            internalLinkGoToPageReference = pageReference;
         }
+    }
 
-        internal void SetInternalLinkGoToPageReference(PdfObjectReference pageReference)
+    internal string GetInternalLinkGoToReference()
+        => internalLinkGoTo != null ? $"{internalLinkGoTo.ObjectId.ObjectNumber} {internalLinkGoTo.ObjectId.GenerationNumber} R" : string.Empty;
+
+    protected string GetIDValue()
+        => _idValue;
+
+    internal PdfGoTo? GetInternalLinkGoTo()
+        => internalLinkGoTo;
+
+    internal bool IsThereInternalLinkGoTo()
+        => internalLinkGoTo != null;
+
+    internal void SetPosition(int x, int y)
+    {
+        if (internalLinkGoTo != null)
         {
-            if (internalLinkGoTo != null)
-            {
-                internalLinkGoTo.PageReference = pageReference;
-            }
-            else
-            {
-                internalLinkGoToPageReference = pageReference;
-            }
+            internalLinkGoTo.X = x;
+            internalLinkGoTo.Y = y;
         }
-
-        internal string GetInternalLinkGoToReference()
+        else
         {
-            return internalLinkGoTo.ObjectId.ObjectNumber + " " + internalLinkGoTo.ObjectId.GenerationNumber + " R";
-        }
-
-        protected string GetIDValue()
-        {
-            return idValue;
-        }
-
-        internal PdfGoTo GetInternalLinkGoTo()
-        {
-            return internalLinkGoTo;
-        }
-
-        internal bool IsThereInternalLinkGoTo()
-        {
-            return internalLinkGoTo != null;
-        }
-
-        internal void SetPosition(int x, int y)
-        {
-            if (internalLinkGoTo != null)
-            {
-                internalLinkGoTo.X = x;
-                internalLinkGoTo.Y = y;
-            }
-            else
-            {
-                xPosition = x;
-                yPosition = y;
-            }
+            xPosition = x;
+            yPosition = y;
         }
     }
 }

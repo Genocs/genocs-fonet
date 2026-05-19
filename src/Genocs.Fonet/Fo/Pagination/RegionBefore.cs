@@ -1,73 +1,71 @@
-using Fonet.Fo.Properties;
-using Fonet.Layout;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
 
-namespace Fonet.Fo.Pagination
+namespace Genocs.Fonet.Fo.Pagination;
+
+internal class RegionBefore : Region
 {
-    internal class RegionBefore : Region
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new RegionBefore(parent, propertyList);
-            }
+            return new RegionBefore(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
-        {
-            return new Maker();
-        }
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
 
-        public const string REGION_CLASS = "before";
+    public const string REGION_CLASS = "before";
 
-        private int precedence;
+    private int precedence;
 
-        protected RegionBefore(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            precedence = this.properties.GetProperty("precedence").GetEnum();
-        }
-
-
-        public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
-                                                  int allocationRectangleYPosition,
-                                                  int allocationRectangleWidth,
-                                                  int allocationRectangleHeight)
-        {
-            BorderAndPadding bap = propMgr.GetBorderAndPadding();
-            BackgroundProps bProps = propMgr.GetBackgroundProps();
-            int extent = this.properties.GetProperty("extent").GetLength().MValue();
-
-            RegionArea area = new RegionArea(
-                allocationRectangleXPosition,
-                allocationRectangleYPosition,
-                allocationRectangleWidth,
-                extent);
-            area.setBackground(bProps);
-
-            return area;
-        }
+    protected RegionBefore(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        precedence = this._properties.GetProperty("precedence").GetEnum();
+    }
 
 
-        protected override string GetDefaultRegionName()
-        {
-            return "xsl-region-before";
-        }
+    public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
+                                              int allocationRectangleYPosition,
+                                              int allocationRectangleWidth,
+                                              int allocationRectangleHeight)
+    {
+        BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+        BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+        int extent = this._properties.GetProperty("extent").GetLength().MValue();
 
-        protected override string GetElementName()
-        {
-            return "fo:region-before";
-        }
+        RegionArea area = new RegionArea(
+            allocationRectangleXPosition,
+            allocationRectangleYPosition,
+            allocationRectangleWidth,
+            extent);
+        area.setBackground(bProps);
 
-        public override string GetRegionClass()
-        {
-            return REGION_CLASS;
-        }
+        return area;
+    }
 
-        public bool getPrecedence()
-        {
-            return (precedence == Precedence.TRUE ? true : false);
-        }
 
+    protected override string GetDefaultRegionName()
+    {
+        return "xsl-region-before";
+    }
+
+    protected override string GetElementName()
+    {
+        return "fo:region-before";
+    }
+
+    public override string GetRegionClass()
+    {
+        return REGION_CLASS;
+    }
+
+    public bool getPrecedence()
+    {
+        return (precedence == Precedence.TRUE ? true : false);
     }
 }

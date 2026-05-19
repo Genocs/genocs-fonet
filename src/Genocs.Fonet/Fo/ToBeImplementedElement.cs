@@ -1,15 +1,12 @@
-using Fonet.Layout;
+using Genocs.Fonet.Layout;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class ToBeImplementedElement : FObj
 {
-    internal class ToBeImplementedElement : FObj
-    {
-        protected ToBeImplementedElement(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList) { }
+    protected ToBeImplementedElement(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList) { }
 
-        public override Status Layout(Area area)
-        {
-            return new Status(Status.OK);
-        }
-    }
+    public override Status Layout(Area area)
+        => new(Status.OK);
 }

@@ -1,33 +1,31 @@
-using System;
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal class RoundFunction : FunctionBase
 {
-    internal class RoundFunction : FunctionBase
+    public override int NumArgs
     {
-        public override int NumArgs
+        get
         {
-            get
-            {
-                return 1;
-            }
+            return 1;
         }
-
-        public override Property Eval(Property[] args, PropertyInfo pInfo)
-        {
-            Number dbl = args[0].GetNumber();
-            if (dbl == null)
-            {
-                throw new PropertyException("Non number operand to round function");
-            }
-            double n = dbl.DoubleValue();
-            double r = Math.Floor(n + 0.5);
-            if (r == 0.0 && n < 0.0)
-            {
-                r = -r;
-            }
-            return new NumberProperty(r);
-        }
-
     }
+
+    public override Property Eval(Property[] args, PropertyInfo pInfo)
+    {
+        Number dbl = args[0].GetNumber();
+        if (dbl == null)
+        {
+            throw new PropertyException("Non number operand to round function");
+        }
+        double n = dbl.DoubleValue();
+        double r = Math.Floor(n + 0.5);
+        if (r == 0.0 && n < 0.0)
+        {
+            r = -r;
+        }
+        return new NumberProperty(r);
+    }
+
 }

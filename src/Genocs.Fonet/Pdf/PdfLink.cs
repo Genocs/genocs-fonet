@@ -1,7 +1,8 @@
 using System.Diagnostics;
-using Fonet.Util;
+using Genocs.Fonet.Pdf;
+using Genocs.Fonet.Util;
 
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     // TODO: rename to PdfLinkAnnotation?
     public sealed class PdfLink : PdfDictionary

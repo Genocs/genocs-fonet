@@ -1,4 +1,6 @@
-namespace Fonet.Fo
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.Fo
 {
     internal class Declarations : ToBeImplementedElement
     {
@@ -18,7 +20,7 @@ namespace Fonet.Fo
         protected Declarations(FObj parent, PropertyList propertyList)
             : base(parent, propertyList)
         {
-            this.name = "fo:declarations";
+            this._name = "fo:declarations";
         }
     }
 }

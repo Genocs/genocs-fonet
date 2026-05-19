@@ -1,15 +1,10 @@
-namespace Fonet.DataTypes
-{
-    internal class AutoLength : Length
-    {
-        public override bool IsAuto()
-        {
-            return true;
-        }
+namespace Genocs.Fonet.DataTypes;
 
-        public override string ToString()
-        {
-            return "auto";
-        }
-    }
+internal class AutoLength : Length
+{
+    public override bool IsAuto()
+        => true;
+
+    public override string ToString()
+        => "auto";
 }

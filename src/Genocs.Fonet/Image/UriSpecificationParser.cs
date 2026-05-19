@@ -1,4 +1,4 @@
-namespace Fonet.Image
+namespace Genocs.Fonet.Image
 {
     /// <summary>
     ///     Parses a &lt;uri-specification&gt; as defined by 

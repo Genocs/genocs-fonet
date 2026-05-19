@@ -1,24 +1,22 @@
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal class NearestSpecPropFunction : FunctionBase
 {
-    internal class NearestSpecPropFunction : FunctionBase
+    public override int NumArgs
     {
-        public override int NumArgs
+        get
         {
-            get
-            {
-                return 1;
-            }
+            return 1;
         }
+    }
 
-        public override Property Eval(Property[] args, PropertyInfo pInfo)
+    public override Property Eval(Property[] args, PropertyInfo pInfo)
+    {
+        string propName = args[0].GetString();
+        if (propName == null)
         {
-            string propName = args[0].GetString();
-            if (propName == null)
-            {
-                throw new PropertyException("Incorrect parameter to from-nearest-specified-value function");
-            }
-            return pInfo.getPropertyList().GetNearestSpecifiedProperty(propName);
+            throw new PropertyException("Incorrect parameter to from-nearest-specified-value function");
         }
-
+        return pInfo.getPropertyList().GetNearestSpecifiedProperty(propName);
     }
 }

@@ -1,6 +1,8 @@
+using Genocs.Fonet.Fo;
+using Genocs.Fonet.Fo.Properties;
 using System.Text;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class BorderBeforeColorMaker : GenericColor
     {

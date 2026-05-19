@@ -1,8 +1,8 @@
 using System;
 using System.Text;
-using Fonet.Pdf.Gdi;
+using Genocs.Fonet.Pdf.Gdi;
 
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     Represents a Identity-H character encoding

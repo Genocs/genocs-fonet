@@ -1,4 +1,6 @@
-namespace Fonet.Layout.Inline
+using Genocs.Fonet.Layout;
+
+namespace Genocs.Fonet.Layout.Inline
 {
     internal abstract class InlineArea : Area
     {

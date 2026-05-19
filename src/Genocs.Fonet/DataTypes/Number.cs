@@ -1,42 +1,41 @@
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal class Number
 {
-    internal class Number
+    private decimal value;
+
+    public Number(int n)
     {
-        private decimal value;
+        value = n;
+    }
 
-        public Number(int n)
-        {
-            value = n;
-        }
+    public Number(decimal n)
+    {
+        value = n;
+    }
 
-        public Number(decimal n)
-        {
-            value = n;
-        }
+    public Number(double n)
+    {
+        value = (decimal)n;
+    }
 
-        public Number(double n)
-        {
-            value = (decimal)n;
-        }
+    public int IntValue()
+    {
+        return (int)value;
+    }
 
-        public int IntValue()
-        {
-            return (int)value;
-        }
+    public double DoubleValue()
+    {
+        return (double)value;
+    }
 
-        public double DoubleValue()
-        {
-            return (double)value;
-        }
+    public float FloatValue()
+    {
+        return (float)value;
+    }
 
-        public float FloatValue()
-        {
-            return (float)value;
-        }
-
-        public decimal DecimalValue()
-        {
-            return value;
-        }
+    public decimal DecimalValue()
+    {
+        return value;
     }
 }

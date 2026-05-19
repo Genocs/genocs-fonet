@@ -1,61 +1,45 @@
+using Genocs.Fonet.Layout;
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo.Pagination;
 using System.Collections;
-using System.IO;
-using Fonet.DataTypes;
-using Fonet.Fo.Pagination;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout;
+
+internal class AreaTree(StreamRenderer streamRenderer)
 {
-    internal class AreaTree
+   public FontInfo? FontInfo { get; set; }
+
+    private readonly StreamRenderer streamRenderer = streamRenderer;
+
+    public void addPage(Page page)
     {
-        private FontInfo fontInfo;
-
-        private StreamRenderer streamRenderer;
-
-        public AreaTree(StreamRenderer streamRenderer)
+        try
         {
-            this.streamRenderer = streamRenderer;
+            streamRenderer.QueuePage(page);
         }
-
-        public void setFontInfo(FontInfo fontInfo)
+        catch (IOException e)
         {
-            this.fontInfo = fontInfo;
+            throw new FonetException("", e);
         }
+    }
 
-        public FontInfo getFontInfo()
-        {
-            return this.fontInfo;
-        }
+    public IDReferences getIDReferences()
+    {
+        return streamRenderer.GetIDReferences();
+    }
 
-        public void addPage(Page page)
-        {
-            try
-            {
-                streamRenderer.QueuePage(page);
-            }
-            catch (IOException e)
-            {
-                throw new FonetException("", e);
-            }
-        }
+    public ArrayList GetDocumentMarkers()
+    {
+        return streamRenderer.GetDocumentMarkers();
+    }
 
-        public IDReferences getIDReferences()
-        {
-            return streamRenderer.GetIDReferences();
-        }
+    public PageSequence GetCurrentPageSequence()
+    {
+        return streamRenderer.GetCurrentPageSequence();
+    }
 
-        public ArrayList GetDocumentMarkers()
-        {
-            return streamRenderer.GetDocumentMarkers();
-        }
-
-        public PageSequence GetCurrentPageSequence()
-        {
-            return streamRenderer.GetCurrentPageSequence();
-        }
-
-        public ArrayList GetCurrentPageSequenceMarkers()
-        {
-            return streamRenderer.GetCurrentPageSequenceMarkers();
-        }
+    public ArrayList GetCurrentPageSequenceMarkers()
+    {
+        return streamRenderer.GetCurrentPageSequenceMarkers();
     }
 }

@@ -1,7 +1,7 @@
 using System.IO;
-using Fonet.Pdf.Security;
+using Genocs.Fonet.Pdf.Security;
 
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     A class that enables a well structured PDF document to be generated.

@@ -1,12 +1,11 @@
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class BaselineShift
 {
-    internal class BaselineShift
-    {
-        public const int BASELINE = Constants.BASELINE;
+    public const int BASELINE = Constants.BASELINE;
 
-        public const int SUB = Constants.SUB;
+    public const int SUB = Constants.SUB;
 
-        public const int SUPER = Constants.SUPER;
+    public const int SUPER = Constants.SUPER;
 
-    }
 }

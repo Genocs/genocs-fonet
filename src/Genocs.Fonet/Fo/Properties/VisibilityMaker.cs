@@ -1,31 +1,42 @@
-using Fonet.DataTypes;
+namespace Genocs.Fonet.Fo.Properties;
 
-namespace Fonet.Fo.Properties
+internal class VisibilityMaker : EnumProperty.Maker
 {
-    internal class VisibilityMaker : ToBeImplementedProperty.Maker
+    private static readonly EnumProperty s_propVISIBLE = new(Visibility.VISIBLE);
+    private static readonly EnumProperty s_propHIDDEN = new(Visibility.HIDDEN);
+    private static readonly EnumProperty s_propCOLLAPSE = new(Visibility.COLLAPSE);
+
+    public static PropertyMaker Maker(string propName) => new VisibilityMaker(propName);
+
+    protected VisibilityMaker(string name) : base(name) { }
+
+    public override bool IsInherited() => true;
+
+    public override Property CheckEnumValues(string value)
     {
-        new public static PropertyMaker Maker(string propName)
+        if (value.Equals("visible"))
         {
-            return new VisibilityMaker(propName);
+            return s_propVISIBLE;
         }
 
-        protected VisibilityMaker(string name) : base(name) { }
-
-        public override bool IsInherited()
+        if (value.Equals("hidden"))
         {
-            return false;
+            return s_propHIDDEN;
         }
 
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
+        if (value.Equals("collapse"))
         {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "visible", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
+            return s_propCOLLAPSE;
         }
 
+        return base.CheckEnumValues(value);
+    }
+
+    private Property? m_defaultProp;
+
+    public override Property Make(PropertyList propertyList)
+    {
+        m_defaultProp ??= Make(propertyList, "visible", propertyList.getParentFObj());
+        return m_defaultProp;
     }
 }

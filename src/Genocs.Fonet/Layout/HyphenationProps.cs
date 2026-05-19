@@ -1,4 +1,4 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     internal class HyphenationProps
     {

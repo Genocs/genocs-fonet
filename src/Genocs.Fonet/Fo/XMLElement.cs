@@ -1,57 +1,46 @@
-using System;
-using Fonet.Layout;
-using Fonet.Layout.Inline;
+using Genocs.Fonet.Layout;
+using Genocs.Fonet.Layout.Inline;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class XMLElement : XMLObj
 {
-    internal class XMLElement : XMLObj
+    // TODO: Implement namespace support for XML elements
+    private readonly string _namespace = string.Empty;
+
+    new internal class Maker : FObj.Maker
     {
-        private string nmspace = String.Empty;
+        private readonly string _tag;
 
-        new internal class Maker : FObj.Maker
-        {
-            private string tag;
+        internal Maker(string tag)
+            => _tag = tag;
 
-            internal Maker(string t)
-            {
-                tag = t;
-            }
-
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new XMLElement(parent, propertyList, tag);
-            }
-        }
-
-        public static FObj.Maker GetMaker(string tag)
-        {
-            return new Maker(tag);
-        }
-
-        public XMLElement(FObj parent, PropertyList propertyList, string tag)
-            : base(parent, propertyList, tag)
-        {
-            Init();
-        }
-
-        public override Status Layout(Area area)
-        {
-            if (!(area is ForeignObjectArea))
-            {
-                throw new FonetException("XML not in fo:instream-foreign-object");
-            }
-
-            return new Status(Status.OK);
-        }
-
-        private void Init()
-        {
-            CreateBasicDocument();
-        }
-
-        public override string GetNameSpace()
-        {
-            return nmspace;
-        }
+        public override FObj Make(FObj parent, PropertyList propertyList)
+            => new XMLElement(parent, propertyList, _tag);
     }
+
+    public static FObj.Maker GetMaker(string tag)
+        => new Maker(tag);
+
+    public XMLElement(FObj parent, PropertyList propertyList, string tag)
+        : base(parent, propertyList, tag)
+    {
+        Init();
+    }
+
+    public override Status Layout(Area area)
+    {
+        if (area is not ForeignObjectArea)
+        {
+            throw new FonetException("XML not in fo:instream-foreign-object");
+        }
+
+        return new Status(Status.OK);
+    }
+
+    private void Init()
+        => CreateBasicDocument();
+
+    public override string GetNameSpace()
+        => _namespace;
 }

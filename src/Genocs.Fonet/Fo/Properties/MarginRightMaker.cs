@@ -1,31 +1,23 @@
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class MarginRightMaker : GenericMargin
 {
-    internal class MarginRightMaker : LengthProperty.Maker
+    public static PropertyMaker Maker(string propName) => new MarginRightMaker(propName);
+
+    protected MarginRightMaker(string name) : base(name) { }
+
+    public override Property Compute(PropertyList propertyList)
     {
-        new public static PropertyMaker Maker(string propName)
-        {
-            return new MarginRightMaker(propName);
-        }
+        FObj parentFO = propertyList.getParentFObj();
+        Property? p = propertyList.GetExplicitOrShorthandProperty(PropName);
+        return p != null ? ConvertProperty(p, propertyList, parentFO) : null;
+    }
 
-        protected MarginRightMaker(string name) : base(name) { }
+    private Property? m_defaultProp;
 
-
-        public override bool IsInherited()
-        {
-            return false;
-        }
-
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "0pt", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-
-        }
-
+    public override Property Make(PropertyList propertyList)
+    {
+        m_defaultProp ??= Make(propertyList, "0pt", propertyList.getParentFObj());
+        return m_defaultProp;
     }
 }

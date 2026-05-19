@@ -1,4 +1,4 @@
-namespace Fonet.Fo.Flow
+namespace Genocs.Fonet.Fo.Flow
 {
     internal class TableFooter : AbstractTableBody
     {
@@ -28,7 +28,7 @@ namespace Fonet.Fo.Flow
         public TableFooter(FObj parent, PropertyList propertyList)
             : base(parent, propertyList)
         {
-            this.name = "fo:table-footer";
+            this._name = "fo:table-footer";
         }
     }
 }

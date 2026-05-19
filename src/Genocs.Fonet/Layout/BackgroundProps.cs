@@ -1,7 +1,7 @@
-using Fonet.DataTypes;
-using Fonet.Image;
+using Genocs.Fonet.Image;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     internal class BackgroundProps
     {

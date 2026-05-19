@@ -1,239 +1,214 @@
-namespace Fonet.Image
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Pdf.Filter;
+using SkiaSharp;
+
+namespace Genocs.Fonet.Image;
+
+/// <summary>
+/// A bitmap image that will be referenced by fo:external-graphic.
+/// </summary>
+internal sealed class FonetImage
 {
-    using System;
-    using System.IO;
-    using Fonet.DataTypes;
-    using Fonet.Pdf.Filter;
-    using SixLabors.ImageSharp;
-    using SixLabors.ImageSharp.Formats;
-    using SixLabors.ImageSharp.PixelFormats;
+    public const int DEFAULT_BITPLANES = 8;    
+
+    // image width
+    private int width = 0;
+    // image height
+    private int height = 0;
+
+    // Bits per pixel
+    private int _bitsPerPixel = 0;
+    // Image data 
+    private byte[]? _bitmaps = null;
 
     /// <summary>
-    /// A bitmap image that will be referenced by fo:external-graphic.
+    ///     Filter that will be applied to image data
     /// </summary>
-    internal sealed class FonetImage
+    private IFilter? filter = null;
+    /// <summary>
+    ///     Constructs a new FonetImage using the supplied bitmap.
+    /// </summary>
+    /// <remarks>
+    ///     Does not hold a reference to the passed bitmap.  Instead the
+    ///     image data is extracted from <b>bitmap</b> on construction.
+    /// </remarks>
+    /// <param name="href">The location of <i>bitmap</i></param>
+    /// <param name="imageData">The image data</param>
+    public FonetImage(string href, byte[] imageData)
     {
-        public const int DEFAULT_BITPLANES = 8;
-
-        // Image URL
-        private string m_href = null;
-
-        // image width
-        private int width = 0;
-
-        // image height
-        private int height = 0;
-
-        // Image color space 
-        private ColorSpace m_colorSpace = null;
-
-        // Bits per pixel
-        private int m_bitsPerPixel = 0;
-
-        // Image data 
-        private byte[] m_bitmaps = null;
-
-        /// <summary>
-        ///     Filter that will be applied to image data
-        /// </summary>
-        private IFilter filter = null;
-
-        /// <summary>
-        ///     Constructs a new FonetImage using the supplied bitmap.
-        /// </summary>
-        /// <remarks>
-        ///     Does not hold a reference to the passed bitmap.  Instead the
-        ///     image data is extracted from <b>bitmap</b> on construction.
-        /// </remarks>
-        /// <param name="href">The location of <i>bitmap</i></param>
-        /// <param name="imageData">The image data</param>
-        public FonetImage(string href, byte[] imageData)
+        Uri = href;
+        ColorSpace = new ColorSpace(ColorSpace.DeviceRgb);
+        _bitsPerPixel = DEFAULT_BITPLANES; // 8
+        
+        // Detect image format and load image info using SkiaSharp
+        using (var stream = new MemoryStream(imageData))
+        using (var managedStream = new SKManagedStream(stream))
+        using (var codec = SKCodec.Create(managedStream))
         {
-            this.m_href = href;
-
-            m_colorSpace = new ColorSpace(ColorSpace.DeviceRgb);
-            m_bitsPerPixel = DEFAULT_BITPLANES; // 8
-
-            // Bitmap does not seem to be thread-safe.  The only situation
-            // Where this causes a problem is when the evaluation image is
-            // used.  Each thread is given the same instance of Bitmap from
-            // the resource manager.
-            IImageFormat imageFormat = Image.DetectFormat(imageData);
-            ImageInfo imageInfo = Image.Identify(imageData);
-            if (imageFormat == null || imageInfo == null)
+            if (codec == null)
             {
                 throw new FonetImageException("Unsupported or invalid image format.");
             }
-
-            this.width = imageInfo.Width;
-            this.height = imageInfo.Height;
-            this.m_bitmaps = imageData;
-
-            ExtractImage(imageData, imageFormat);
+            this.width = codec.Info.Width;
+            this.height = codec.Info.Height;
         }
 
-        /// <summary>
-        ///     Return the image URL.
-        /// </summary>
-        /// <returns>the image URL (as a string)</returns>
-        public string Uri
+        this._bitmaps = imageData;
+        ExtractImage(imageData);
+    }
+    /// <summary>
+    /// Return the image URL.
+    /// </summary>
+    /// <returns>the image URL (as a string)</returns>
+    public string Uri { get; }
+
+    /// <summary>
+    ///     Return the image width. 
+    /// </summary>
+    /// <returns>the image width</returns>
+    public int Width
+    {
+        get
         {
-            get
-            {
-                return m_href;
-            }
+            return this.width;
         }
-
-        /// <summary>
-        ///     Return the image width. 
-        /// </summary>
-        /// <returns>the image width</returns>
-        public int Width
+    }
+    /// <summary>
+    ///     Return the image height. 
+    /// </summary>
+    /// <returns>the image height</returns>
+    public int Height
+    {
+        get
         {
-            get
-            {
-                return this.width;
-            }
+            return this.height;
         }
-
-        /// <summary>
-        ///     Return the image height. 
-        /// </summary>
-        /// <returns>the image height</returns>
-        public int Height
+    }
+    /// <summary>
+    ///     Return the number of bits per pixel. 
+    /// </summary>
+    /// <returns>number of bits per pixel</returns>
+    public int BitsPerPixel
+    {
+        get
         {
-            get
-            {
-                return this.height;
-            }
+            return _bitsPerPixel;
         }
-
-        /// <summary>
-        ///     Return the number of bits per pixel. 
-        /// </summary>
-        /// <returns>number of bits per pixel</returns>
-        public int BitsPerPixel
+    }
+    /// <summary>
+    /// Return the image data size
+    /// </summary>
+    /// <returns>The image data size</returns>
+    public int BitmapsSize
+    {
+        get
         {
-            get
-            {
-                return m_bitsPerPixel;
-            }
+            return (_bitmaps != null) ? _bitmaps.Length : 0;
         }
-
-        /// <summary>
-        ///     Return the image data size
-        /// </summary>
-        /// <returns>The image data size</returns>
-        public int BitmapsSize
+    }
+    /// <summary>
+    /// Return the image data (uncompressed). 
+    /// </summary>
+    /// <returns>the image data</returns>
+    public byte[]? Bitmaps
+    {
+        get
         {
-            get
-            {
-                return (m_bitmaps != null) ? m_bitmaps.Length : 0;
-            }
+            return _bitmaps;
         }
+    }
+    /// <summary>
+    /// Return the image color space. 
+    /// </summary>
+    /// <returns>the image color space (Fonet.Datatypes.ColorSpace)</returns>
+    public ColorSpace ColorSpace { get; private set; }
 
-        /// <summary>
-        ///     Return the image data (uncompressed). 
-        /// </summary>
-        /// <returns>the image data</returns>
-        public byte[] Bitmaps
+    /// <summary>
+    /// Returns the filter that should be applied to the bitmap data.
+    /// </summary>
+    public IFilter? Filter
+    {
+        get
         {
-            get
-            {
-                return m_bitmaps;
-            }
+            return filter;
         }
-
-        /// <summary>
-        ///     Return the image color space. 
-        /// </summary>
-        /// <returns>the image color space (Fonet.Datatypes.ColorSpace)</returns>
-        public ColorSpace ColorSpace
+    }
+    /// <summary>
+    /// Extracts the raw data from the image into a byte array suitable
+    /// for including in the PDF document.  The image is always extracted
+    /// as a 24-bit RGB image, regardless of it's original colour space
+    /// and colour depth.
+    /// </summary>
+    /// <param name="imageData">The original image bytes.</param>
+    /// <returns>A byte array containing the raw 24-bit RGB data</returns>
+    private void ExtractImage(byte[] imageData)
+    {
+        // Detect format from image data using SkiaSharp
+        using var stream = new MemoryStream(imageData);
+        using var managedStream = new SKManagedStream(stream);
+        using var codec = SKCodec.Create(managedStream) ?? throw new FonetImageException("Unable to decode image data.");
+        
+        // This should be a factory when we handle more image types
+        if (String.Equals(codec.EncodedFormat.ToString(), "Jpeg", StringComparison.OrdinalIgnoreCase))
         {
-            get
-            {
-                return m_colorSpace;
-            }
+            JpegParser parser = new JpegParser(_bitmaps);
+            JpegInfo info = parser.Parse();
+            _bitsPerPixel = info.BitsPerSample;
+            ColorSpace = new ColorSpace(info.ColourSpace);
+            width = info.Width;
+            height = info.Height;
+
+            // A "no-op" filter since the JPEG data is already compressed
+            filter = new DctFilter();
         }
-
-        /// <summary>
-        ///     Returns the filter that should be applied to the bitmap data.
-        /// </summary>
-        public IFilter Filter
+        else
         {
-            get
-            {
-                return filter;
-            }
+            ExtractOtherImageBits(imageData);
+            // Performs zip compression
+            filter = new FlateFilter();
         }
-
-        /// <summary>
-        ///     Extracts the raw data from the image into a byte array suitable
-        ///     for including in the PDF document.  The image is always extracted
-        ///     as a 24-bit RGB image, regardless of it's original colour space
-        ///     and colour depth.
-        /// </summary>
-        /// <param name="imageData">The original image bytes.</param>
-        /// <param name="imageFormat">Detected image format.</param>
-        /// <returns>A byte array containing the raw 24-bit RGB data</returns>
-        private void ExtractImage(byte[] imageData, IImageFormat imageFormat)
+    }
+    private void ExtractOtherImageBits(byte[] imageData)
+    {
+        try
         {
-            // This should be a factory when we handle more image types
-            if (String.Equals(imageFormat.Name, "JPEG", StringComparison.OrdinalIgnoreCase))
+            using var source = SKBitmap.Decode(imageData) ?? throw new FonetImageException("Unable to decode image data.");
+            using var bitmap = new SKBitmap(source.Width, source.Height, SKColorType.Rgb888x, SKAlphaType.Opaque);
+            if (!source.CopyTo(bitmap))
             {
-                JpegParser parser = new JpegParser(m_bitmaps);
-                JpegInfo info = parser.Parse();
-
-                m_bitsPerPixel = info.BitsPerSample;
-                m_colorSpace = new ColorSpace(info.ColourSpace);
-                width = info.Width;
-                height = info.Height;
-
-                // A "no-op" filter since the JPEG data is already compressed
-                filter = new DctFilter();
+                throw new FonetImageException("Unable to convert image to RGB.");
             }
-            else
-            {
-                ExtractOtherImageBits(imageData);
 
-                // Performs zip compression
-                filter = new FlateFilter();
+            _bitmaps = new byte[bitmap.Width * bitmap.Height * 3];
+            var pixmap = bitmap.PeekPixels();
+            if (pixmap == null)
+            {
+                throw new FonetImageException("Unable to access image pixels.");
             }
-        }
 
-        private void ExtractOtherImageBits(byte[] imageData)
-        {
-            try
+            var pixelSpan = pixmap.GetPixelSpan();
+            int rowBytes = pixmap.RowBytes;
+            int destinationIndex = 0;
+            for (int y = 0; y < bitmap.Height; y++)
             {
-                using Image<Rgb24> image = Image.Load<Rgb24>(imageData);
-
-                // The size of the required byte array is not only a factor of the
-                // width and height, but also the color components of each pixel.
-                // Each pixel requires three bytes of storage - one byte each for
-                // the red, green and blue components.
-                m_bitmaps = new byte[image.Width * image.Height * 3];
-
-                int destinationIndex = 0;
-                image.ProcessPixelRows(accessor =>
+                ReadOnlySpan<byte> row = pixelSpan.Slice(y * rowBytes, rowBytes);
+                for (int x = 0; x < bitmap.Width; x++)
                 {
-                    for (int y = 0; y < accessor.Height; y++)
-                    {
-                        Span<Rgb24> pixelRow = accessor.GetRowSpan(y);
-                        for (int x = 0; x < accessor.Width; x++)
-                        {
-                            Rgb24 pixel = pixelRow[x];
-                            m_bitmaps[destinationIndex++] = pixel.R;
-                            m_bitmaps[destinationIndex++] = pixel.G;
-                            m_bitmaps[destinationIndex++] = pixel.B;
-                        }
-                    }
-                });
+                    int offset = x * 4;
+                    _bitmaps[destinationIndex++] = row[offset];
+                    _bitmaps[destinationIndex++] = row[offset + 1];
+                    _bitmaps[destinationIndex++] = row[offset + 2];
+                }
             }
-            catch (Exception e)
-            {
-                FonetDriver.ActiveDriver.FireFonetError(e.ToString());
-                throw new FonetImageException("Unable to decode image data.", e);
-            }
+        }
+        catch (FonetImageException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            FonetDriver.ActiveDriver?.FireFonetError($"Image decode failed for {Uri}: {e.Message}");
+            throw new FonetImageException("Unable to decode image data.", e);
         }
     }
 }

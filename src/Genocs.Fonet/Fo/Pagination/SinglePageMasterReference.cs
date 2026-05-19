@@ -1,57 +1,55 @@
-namespace Fonet.Fo.Pagination
+namespace Genocs.Fonet.Fo.Pagination;
+
+internal class SinglePageMasterReference : PageMasterReference, ISubSequenceSpecifier
 {
-    internal class SinglePageMasterReference : PageMasterReference, SubSequenceSpecifier
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new SinglePageMasterReference(parent, propertyList);
-            }
+            return new SinglePageMasterReference(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
+    new public static FObj.Maker GetMaker()
+    {
+        return new SinglePageMasterReference.Maker();
+    }
+
+    private const int FIRST = 0;
+
+    private const int DONE = 1;
+
+    private int state;
+
+    public SinglePageMasterReference(
+        FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        this.state = FIRST;
+    }
+
+    public override string GetNextPageMaster(int currentPageNumber,
+                                             bool thisIsFirstPage,
+                                             bool isEmptyPage)
+    {
+        if (this.state == FIRST)
         {
-            return new SinglePageMasterReference.Maker();
+            this.state = DONE;
+            return MasterName;
         }
-
-        private const int FIRST = 0;
-
-        private const int DONE = 1;
-
-        private int state;
-
-        public SinglePageMasterReference(
-            FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
+        else
         {
-            this.state = FIRST;
+            return null;
         }
+    }
 
-        public override string GetNextPageMaster(int currentPageNumber,
-                                                 bool thisIsFirstPage,
-                                                 bool isEmptyPage)
-        {
-            if (this.state == FIRST)
-            {
-                this.state = DONE;
-                return MasterName;
-            }
-            else
-            {
-                return null;
-            }
-        }
+    public override void Reset()
+    {
+        this.state = FIRST;
+    }
 
-        public override void Reset()
-        {
-            this.state = FIRST;
-        }
-
-        protected override string GetElementName()
-        {
-            return "fo:single-page-master-reference";
-        }
-
+    protected override string GetElementName()
+    {
+        return "fo:single-page-master-reference";
     }
 }

@@ -1,6 +1,7 @@
+using Genocs.Fonet.Fo;
 using System.Text;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class BorderLeftWidthMaker : GenericBorderWidth
     {

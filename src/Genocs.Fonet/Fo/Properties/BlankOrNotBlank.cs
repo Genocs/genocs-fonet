@@ -1,12 +1,10 @@
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class BlankOrNotBlank
 {
-    internal class BlankOrNotBlank
-    {
-        public const int BLANK = Constants.BLANK;
+    public const int BLANK = Constants.BLANK;
 
-        public const int NOT_BLANK = Constants.NOT_BLANK;
+    public const int NOT_BLANK = Constants.NOT_BLANK;
 
-        public const int ANY = Constants.ANY;
-
-    }
+    public const int ANY = Constants.ANY;
 }

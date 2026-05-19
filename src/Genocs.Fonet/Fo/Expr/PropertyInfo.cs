@@ -1,77 +1,75 @@
+using Genocs.Fonet.DataTypes;
 using System.Collections;
-using Fonet.DataTypes;
 
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal class PropertyInfo
 {
-    internal class PropertyInfo
+    private PropertyMaker maker;
+    private PropertyList plist;
+    private FObj fo;
+    private Stack stkFunction;
+
+    public PropertyInfo(PropertyMaker maker, PropertyList plist, FObj fo)
     {
-        private PropertyMaker maker;
-        private PropertyList plist;
-        private FObj fo;
-        private Stack stkFunction;
+        this.maker = maker;
+        this.plist = plist;
+        this.fo = fo;
+    }
 
-        public PropertyInfo(PropertyMaker maker, PropertyList plist, FObj fo)
+    public bool inheritsSpecified()
+    {
+        return maker.InheritsSpecified();
+    }
+
+    public IPercentBase GetPercentBase()
+    {
+        IPercentBase pcbase = getFunctionPercentBase();
+        return (pcbase != null) ? pcbase : maker.GetPercentBase(fo, plist);
+    }
+
+    public int currentFontSize()
+    {
+        return plist.GetProperty("font-size").GetLength().MValue();
+    }
+
+    public FObj getFO()
+    {
+        return fo;
+    }
+
+    public PropertyList getPropertyList()
+    {
+        return plist;
+    }
+
+    public void pushFunction(IFunction func)
+    {
+        if (stkFunction == null)
         {
-            this.maker = maker;
-            this.plist = plist;
-            this.fo = fo;
+            stkFunction = new Stack();
         }
+        stkFunction.Push(func);
+    }
 
-        public bool inheritsSpecified()
+    public void popFunction()
+    {
+        if (stkFunction != null)
         {
-            return maker.InheritsSpecified();
+            stkFunction.Pop();
         }
+    }
 
-        public IPercentBase GetPercentBase()
+    private IPercentBase getFunctionPercentBase()
+    {
+        if (stkFunction != null)
         {
-            IPercentBase pcbase = getFunctionPercentBase();
-            return (pcbase != null) ? pcbase : maker.GetPercentBase(fo, plist);
-        }
-
-        public int currentFontSize()
-        {
-            return plist.GetProperty("font-size").GetLength().MValue();
-        }
-
-        public FObj getFO()
-        {
-            return fo;
-        }
-
-        public PropertyList getPropertyList()
-        {
-            return plist;
-        }
-
-        public void pushFunction(IFunction func)
-        {
-            if (stkFunction == null)
+            IFunction f = (IFunction)stkFunction.Peek();
+            if (f != null)
             {
-                stkFunction = new Stack();
-            }
-            stkFunction.Push(func);
-        }
-
-        public void popFunction()
-        {
-            if (stkFunction != null)
-            {
-                stkFunction.Pop();
+                return f.GetPercentBase();
             }
         }
-
-        private IPercentBase getFunctionPercentBase()
-        {
-            if (stkFunction != null)
-            {
-                IFunction f = (IFunction)stkFunction.Peek();
-                if (f != null)
-                {
-                    return f.GetPercentBase();
-                }
-            }
-            return null;
-        }
-
+        return null;
     }
 }

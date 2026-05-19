@@ -1,19 +1,10 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal abstract class FunctionBase : IFunction
 {
-    internal abstract class FunctionBase : IFunction
-    {
-        public abstract int NumArgs
-        {
-            get;
-        }
-
-        public virtual IPercentBase GetPercentBase()
-        {
-            return null;
-        }
-
-        public abstract Property Eval(Property[] args, PropertyInfo propInfo);
-    }
+    public abstract int NumArgs { get; }
+    public virtual IPercentBase GetPercentBase() => null;
+    public abstract Property Eval(Property[] args, PropertyInfo propInfo);
 }

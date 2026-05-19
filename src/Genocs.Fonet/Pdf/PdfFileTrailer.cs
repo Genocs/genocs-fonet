@@ -1,4 +1,6 @@
-namespace Fonet.Pdf
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     Class representing a file trailer.

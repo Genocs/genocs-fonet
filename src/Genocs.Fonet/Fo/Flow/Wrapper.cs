@@ -1,4 +1,6 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.Fo.Flow
 {
     internal class Wrapper : FObjMixed
     {
@@ -18,13 +20,13 @@ namespace Fonet.Fo.Flow
         public Wrapper(FObj parent, PropertyList propertyList)
             : base(parent, propertyList)
         {
-            this.name = "fo:wrapper";
+            this._name = "fo:wrapper";
         }
 
         protected internal override void AddCharacters(char[] data, int start, int length)
         {
             FOText ft = new FOText(data, start, length, this);
-            children.Add(ft);
+            _children.Add(ft);
         }
 
     }

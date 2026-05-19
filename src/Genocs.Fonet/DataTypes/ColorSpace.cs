@@ -1,102 +1,73 @@
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal class ColorSpace
 {
-    internal class ColorSpace
+    public const int DeviceUnknown = -1;
+    public const int DeviceGray = 1;
+    public const int DeviceRgb = 2;
+    public const int DeviceCmyk = 3;
+
+    protected int _colorSpace; 
+    private byte[]? _iccProfile;
+    private int _componentsCount;
+
+    public ColorSpace(int colorSpace)
     {
-        public const int DeviceUnknown = -1;
-        public const int DeviceGray = 1;
-        public const int DeviceRgb = 2;
-        public const int DeviceCmyk = 3;
+        _colorSpace = colorSpace;
+        _componentsCount = CalculateNumComponents();
+    }
 
-        protected int currentColorSpace = -1;
+    public void SetColorSpace(int colorSpace)
+    {
+        _colorSpace = colorSpace;
+        _componentsCount = CalculateNumComponents();
+    }
 
-        private bool hasICCProfile;
-        private byte[] iccProfile;
-        private int numComponents;
+    public bool HasICCProfile()
+    {
+        return _iccProfile != null && _iccProfile.Length > 0;
+    }
 
-        public ColorSpace(int theColorSpace)
+    public byte[] GetICCProfile()
+    {
+        if (HasICCProfile())
         {
-            this.currentColorSpace = theColorSpace;
-            this.hasICCProfile = false;
-            this.numComponents = this.CalculateNumComponents();
+            return _iccProfile!;
         }
-
-        public void SetColorSpace(int theColorSpace)
+        else
         {
-            this.currentColorSpace = theColorSpace;
-            this.numComponents = this.CalculateNumComponents();
+            return [];
         }
+    }
 
-        public bool HasICCProfile()
-        {
-            return this.hasICCProfile;
-        }
+    public void SetICCProfile(byte[] iccProfile)
+        => _iccProfile = iccProfile;
 
-        public byte[] GetICCProfile()
-        {
-            if (this.hasICCProfile)
-            {
-                return this.iccProfile;
-            }
-            else
-            {
-                return new byte[0];
-            }
-        }
+    public int GetColorSpace()
+        => _colorSpace;
 
-        public void SetICCProfile(byte[] iccProfile)
-        {
-            this.iccProfile = iccProfile;
-            this.hasICCProfile = true;
-        }
+    public int GetNumComponents()
+        => _componentsCount;
 
-        public int GetColorSpace()
+    public string GetColorSpacePDFString()
+    {
+        return _colorSpace switch
         {
-            return this.currentColorSpace;
-        }
+            DeviceGray => "DeviceGray",
+            DeviceRgb => "DeviceRGB",
+            DeviceCmyk => "DeviceCMYK",
+            _ => "DeviceRGB",
+        };
+    }
 
-        public int GetNumComponents()
+    private int CalculateNumComponents()
+    {
+        return _colorSpace switch
         {
-            return this.numComponents;
-        }
-
-        public string GetColorSpacePDFString()
-        {
-            if (this.currentColorSpace == DeviceRgb)
-            {
-                return "DeviceRGB";
-            }
-            else if (this.currentColorSpace == DeviceCmyk)
-            {
-                return "DeviceCMYK";
-            }
-            else if (this.currentColorSpace == DeviceGray)
-            {
-                return "DeviceGray";
-            }
-            else
-            {
-                return "DeviceRGB";
-            }
-        }
-
-        private int CalculateNumComponents()
-        {
-            if (this.currentColorSpace == DeviceGray)
-            {
-                return 1;
-            }
-            else if (this.currentColorSpace == DeviceRgb)
-            {
-                return 3;
-            }
-            else if (this.currentColorSpace == DeviceCmyk)
-            {
-                return 4;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+            DeviceGray => 1,
+            DeviceRgb => 3,
+            DeviceCmyk => 4,
+            _ => 0,
+        };
     }
 }

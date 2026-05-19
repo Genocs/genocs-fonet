@@ -1,4 +1,4 @@
-namespace Fonet.Layout.Inline
+namespace Genocs.Fonet.Layout.Inline
 {
     internal class PageNumberInlineArea : WordArea
     {

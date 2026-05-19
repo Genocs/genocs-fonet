@@ -1,72 +1,70 @@
-namespace Fonet.Image
+using Genocs.Fonet.Layout;
+using Genocs.Fonet.Layout.Inline;
+using Genocs.Fonet.Render.Pdf;
+
+namespace Genocs.Fonet.Image;
+
+internal class ImageArea : InlineArea
 {
-    using Fonet.Layout;
-    using Fonet.Layout.Inline;
-    using Fonet.Render.Pdf;
+    protected int xOffset = 0;
+    protected int align;
+    protected int valign;
+    protected FonetImage image;
 
-    internal class ImageArea : InlineArea
+    public ImageArea(FontState fontState, FonetImage img, int AllocationWidth,
+                     int width, int height, int startIndent, int endIndent,
+                     int align)
+        : base(fontState, width, 0, 0, 0)
     {
-        protected int xOffset = 0;
-        protected int align;
-        protected int valign;
-        protected FonetImage image;
+        this.currentHeight = height;
+        this.contentRectangleWidth = width;
+        this.height = height;
+        this.image = img;
+        this.align = align;
+    }
 
-        public ImageArea(FontState fontState, FonetImage img, int AllocationWidth,
-                         int width, int height, int startIndent, int endIndent,
-                         int align)
-            : base(fontState, width, 0, 0, 0)
-        {
-            this.currentHeight = height;
-            this.contentRectangleWidth = width;
-            this.height = height;
-            this.image = img;
-            this.align = align;
-        }
+    public override int getXOffset()
+    {
+        return this.xOffset;
+    }
 
-        public override int getXOffset()
-        {
-            return this.xOffset;
-        }
+    public FonetImage getImage()
+    {
+        return this.image;
+    }
 
-        public FonetImage getImage()
-        {
-            return this.image;
-        }
+    public override void Render(PdfRenderer renderer)
+    {
+        renderer.RenderImageArea(this);
+    }
 
-        public override void render(PdfRenderer renderer)
-        {
-            renderer.RenderImageArea(this);
-        }
+    public int getImageHeight()
+    {
+        return currentHeight;
+    }
 
-        public int getImageHeight()
-        {
-            return currentHeight;
-        }
+    public void setAlign(int align)
+    {
+        this.align = align;
+    }
 
-        public void setAlign(int align)
-        {
-            this.align = align;
-        }
+    public int getAlign()
+    {
+        return this.align;
+    }
 
-        public int getAlign()
-        {
-            return this.align;
-        }
+    public override void setVerticalAlign(int align)
+    {
+        this.valign = align;
+    }
 
-        public override void setVerticalAlign(int align)
-        {
-            this.valign = align;
-        }
+    public override int getVerticalAlign()
+    {
+        return this.valign;
+    }
 
-        public override int getVerticalAlign()
-        {
-            return this.valign;
-        }
-
-        public void setStartIndent(int startIndent)
-        {
-            xOffset = startIndent;
-        }
-
+    public void setStartIndent(int startIndent)
+    {
+        xOffset = startIndent;
     }
 }

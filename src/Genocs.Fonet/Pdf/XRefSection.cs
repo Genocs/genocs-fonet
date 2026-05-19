@@ -1,4 +1,6 @@
-namespace Fonet.Pdf
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     A single section in a PDF file's cross-reference table.

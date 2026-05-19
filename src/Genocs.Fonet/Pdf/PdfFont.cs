@@ -1,4 +1,6 @@
-namespace Fonet.Pdf
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf
 {
     public abstract class PdfFont : PdfDictionary
     {

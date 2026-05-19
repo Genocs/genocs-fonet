@@ -1,7 +1,8 @@
 using System;
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class GenericKeep : KeepProperty.Maker
     {

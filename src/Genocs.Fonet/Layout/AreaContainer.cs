@@ -1,72 +1,71 @@
-using Fonet.Render.Pdf;
+using Genocs.Fonet.Layout;
+using Genocs.Fonet.Render.Pdf;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout;
+
+internal class AreaContainer : Area
 {
-    internal class AreaContainer : Area
+    private int xPosition;
+    private int yPosition;
+    private int position;
+
+    private string areaName;
+
+    public AreaContainer(FontState fontState, int xPosition, int yPosition, int allocationWidth, int maxHeight, int position)
+        : base(fontState, allocationWidth, maxHeight)
     {
-        private int xPosition;
-        private int yPosition;
-        private int position;
+        this.xPosition = xPosition;
+        this.yPosition = yPosition;
+        this.position = position;
+    }
 
-        private string areaName;
+    public override void Render(PdfRenderer renderer)
+    {
+        renderer.RenderAreaContainer(this);
+    }
 
-        public AreaContainer(FontState fontState, int xPosition, int yPosition,
-                             int allocationWidth, int maxHeight, int position)
-            : base(fontState, allocationWidth, maxHeight)
-        {
-            this.xPosition = xPosition;
-            this.yPosition = yPosition;
-            this.position = position;
-        }
+    public int getPosition()
+    {
+        return position;
+    }
 
-        public override void render(PdfRenderer renderer)
-        {
-            renderer.RenderAreaContainer(this);
-        }
+    public int getXPosition()
+    {
+        return xPosition;
+    }
 
-        public int getPosition()
-        {
-            return position;
-        }
+    public void setXPosition(int value)
+    {
+        xPosition = value;
+    }
 
-        public int getXPosition()
-        {
-            return xPosition;
-        }
+    public int GetYPosition()
+    {
+        return yPosition;
+    }
 
-        public void setXPosition(int value)
-        {
-            xPosition = value;
-        }
+    public int GetCurrentYPosition()
+    {
+        return yPosition;
+    }
 
-        public int GetYPosition()
-        {
-            return yPosition;
-        }
+    public void setYPosition(int value)
+    {
+        yPosition = value;
+    }
 
-        public int GetCurrentYPosition()
-        {
-            return yPosition;
-        }
+    public void shiftYPosition(int value)
+    {
+        yPosition += value;
+    }
 
-        public void setYPosition(int value)
-        {
-            yPosition = value;
-        }
+    public string getAreaName()
+    {
+        return areaName;
+    }
 
-        public void shiftYPosition(int value)
-        {
-            yPosition += value;
-        }
-
-        public string getAreaName()
-        {
-            return areaName;
-        }
-
-        public void setAreaName(string areaName)
-        {
-            this.areaName = areaName;
-        }
+    public void setAreaName(string areaName)
+    {
+        this.areaName = areaName;
     }
 }

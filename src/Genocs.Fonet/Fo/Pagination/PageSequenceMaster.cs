@@ -1,81 +1,82 @@
-namespace Fonet.Fo.Pagination
+using Genocs.Fonet;
+using Genocs.Fonet.Fo;
+using System.Collections;
+
+namespace Genocs.Fonet.Fo.Pagination;
+
+internal class PageSequenceMaster : FObj
 {
-    using System.Collections;
-
-    internal class PageSequenceMaster : FObj
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new PageSequenceMaster(parent, propertyList);
-            }
+            return new PageSequenceMaster(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    private LayoutMasterSet layoutMasterSet;
+
+    private ArrayList subSequenceSpecifiers;
+
+    protected PageSequenceMaster(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        this._name = "fo:page-sequence-master";
+
+        subSequenceSpecifiers = new ArrayList();
+
+        if (parent.GetName().Equals("fo:layout-master-set"))
         {
-            return new Maker();
-        }
-
-        private LayoutMasterSet layoutMasterSet;
-
-        private ArrayList subSequenceSpecifiers;
-
-        protected PageSequenceMaster(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            this.name = "fo:page-sequence-master";
-
-            subSequenceSpecifiers = new ArrayList();
-
-            if (parent.GetName().Equals("fo:layout-master-set"))
+            this.layoutMasterSet = (LayoutMasterSet)parent;
+            string pm = this._properties.GetProperty("master-name").GetString();
+            if (pm == null)
             {
-                this.layoutMasterSet = (LayoutMasterSet)parent;
-                string pm = this.properties.GetProperty("master-name").GetString();
-                if (pm == null)
-                {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "page-sequence-master does not have a page-master-name and so is being ignored");
-                }
-                else
-                {
-                    this.layoutMasterSet.addPageSequenceMaster(pm, this);
-                }
+                FonetDriver.ActiveDriver.FireFonetWarning(
+                    "page-sequence-master does not have a page-master-name and so is being ignored");
             }
             else
             {
-                throw new FonetException("fo:page-sequence-master must be child "
-                    + "of fo:layout-master-set, not "
-                    + parent.GetName());
+                this.layoutMasterSet.addPageSequenceMaster(pm, this);
             }
         }
-
-        protected internal void AddSubsequenceSpecifier(SubSequenceSpecifier pageMasterReference)
+        else
         {
-            subSequenceSpecifiers.Add(pageMasterReference);
+            throw new FonetException("fo:page-sequence-master must be child "
+                + "of fo:layout-master-set, not "
+                + parent.GetName());
         }
+    }
 
-        protected internal SubSequenceSpecifier getSubSequenceSpecifier(int sequenceNumber)
+    protected internal void AddSubsequenceSpecifier(ISubSequenceSpecifier pageMasterReference)
+    {
+        subSequenceSpecifiers.Add(pageMasterReference);
+    }
+
+    protected internal ISubSequenceSpecifier getSubSequenceSpecifier(int sequenceNumber)
+    {
+        if (sequenceNumber >= 0
+            && sequenceNumber < GetSubSequenceSpecifierCount())
         {
-            if (sequenceNumber >= 0
-                && sequenceNumber < GetSubSequenceSpecifierCount())
-            {
-                return (SubSequenceSpecifier)subSequenceSpecifiers[sequenceNumber];
-            }
-            return null;
+            return (ISubSequenceSpecifier)subSequenceSpecifiers[sequenceNumber];
         }
+        return null;
+    }
 
-        protected internal int GetSubSequenceSpecifierCount()
-        {
-            return subSequenceSpecifiers.Count;
-        }
+    protected internal int GetSubSequenceSpecifierCount()
+    {
+        return subSequenceSpecifiers.Count;
+    }
 
-        public void Reset()
+    public void Reset()
+    {
+        foreach (ISubSequenceSpecifier s in subSequenceSpecifiers)
         {
-            foreach (SubSequenceSpecifier s in subSequenceSpecifiers)
-            {
-                s.Reset();
-            }
+            s.Reset();
         }
     }
 }

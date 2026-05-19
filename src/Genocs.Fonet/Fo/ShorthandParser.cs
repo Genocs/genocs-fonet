@@ -1,8 +1,6 @@
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal interface IShorthandParser
 {
-    internal interface IShorthandParser
-    {
-        Property GetValueForProperty(
-            string propName, PropertyMaker maker, PropertyList propertyList);
-    }
+    Property GetValueForProperty(string propName, PropertyMaker maker, PropertyList propertyList);
 }

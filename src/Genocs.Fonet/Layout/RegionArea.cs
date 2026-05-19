@@ -1,44 +1,35 @@
-using Fonet.Fo.Properties;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout;
+
+internal class RegionArea(int xPosition, int yPosition, int width, int height)
 {
-    internal class RegionArea
+    protected int xPosition = xPosition;
+    protected int yPosition = yPosition;
+    protected int width = width;
+    protected int height = height;
+    protected BackgroundProps? background;
+
+    public AreaContainer makeAreaContainer()
     {
-        protected int xPosition;
-        protected int yPosition;
-        protected int width;
-        protected int height;
-        protected BackgroundProps background;
+        AreaContainer area = new AreaContainer(null, xPosition, yPosition, width, height, Position.ABSOLUTE);
+        area.setBackground(getBackground());
+        return area;
+    }
 
-        public RegionArea(int xPosition, int yPosition, int width, int height)
-        {
-            this.xPosition = xPosition;
-            this.yPosition = yPosition;
-            this.width = width;
-            this.height = height;
-        }
+    public BackgroundProps? getBackground()
+    {
+        return this.background;
+    }
 
-        public AreaContainer makeAreaContainer()
-        {
-            AreaContainer area = new AreaContainer(
-                null, xPosition, yPosition, width, height, Position.ABSOLUTE);
-            area.setBackground(getBackground());
-            return area;
-        }
+    public void setBackground(BackgroundProps bg)
+    {
+        this.background = bg;
+    }
 
-        public BackgroundProps getBackground()
-        {
-            return this.background;
-        }
-
-        public void setBackground(BackgroundProps bg)
-        {
-            this.background = bg;
-        }
-
-        public int GetHeight()
-        {
-            return height;
-        }
+    public int GetHeight()
+    {
+        return height;
     }
 }

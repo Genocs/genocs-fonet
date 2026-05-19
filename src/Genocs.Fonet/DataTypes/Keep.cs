@@ -1,90 +1,88 @@
-using Fonet.Fo;
+using Genocs.Fonet.Fo;
 
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal class Keep : ICompoundDatatype
 {
-    internal class Keep : ICompoundDatatype
+    private Property withinLine;
+
+    private Property withinColumn;
+
+    private Property withinPage;
+
+    public Keep()
     {
-        private Property withinLine;
+    }
 
-        private Property withinColumn;
-
-        private Property withinPage;
-
-        public Keep()
+    public void SetComponent(string sCmpnName, Property cmpnValue, bool bIsDefault)
+    {
+        if (sCmpnName.Equals("within-line"))
         {
+            setWithinLine(cmpnValue, bIsDefault);
         }
-
-        public void SetComponent(string sCmpnName, Property cmpnValue,
-                                 bool bIsDefault)
+        else if (sCmpnName.Equals("within-column"))
         {
-            if (sCmpnName.Equals("within-line"))
-            {
-                setWithinLine(cmpnValue, bIsDefault);
-            }
-            else if (sCmpnName.Equals("within-column"))
-            {
-                setWithinColumn(cmpnValue, bIsDefault);
-            }
-            else if (sCmpnName.Equals("within-page"))
-            {
-                setWithinPage(cmpnValue, bIsDefault);
-            }
+            setWithinColumn(cmpnValue, bIsDefault);
         }
-
-        public Property GetComponent(string sCmpnName)
+        else if (sCmpnName.Equals("within-page"))
         {
-            if (sCmpnName.Equals("within-line"))
-            {
-                return getWithinLine();
-            }
-            else if (sCmpnName.Equals("within-column"))
-            {
-                return getWithinColumn();
-            }
-            else if (sCmpnName.Equals("within-page"))
-            {
-                return getWithinPage();
-            }
-            else
-            {
-                return null;
-            }
+            setWithinPage(cmpnValue, bIsDefault);
         }
+    }
 
-        public void setWithinLine(Property withinLine, bool bIsDefault)
+    public Property? GetComponent(string sCmpnName)
+    {
+        if (sCmpnName.Equals("within-line"))
         {
-            this.withinLine = withinLine;
+            return getWithinLine();
         }
+        else if (sCmpnName.Equals("within-column"))
+        {
+            return getWithinColumn();
+        }
+        else if (sCmpnName.Equals("within-page"))
+        {
+            return getWithinPage();
+        }
+        else
+        {
+            return null;
+        }
+    }
 
-        protected void setWithinColumn(Property withinColumn,
-                                       bool bIsDefault)
-        {
-            this.withinColumn = withinColumn;
-        }
+    public void setWithinLine(Property withinLine, bool bIsDefault)
+    {
+        this.withinLine = withinLine;
+    }
 
-        public void setWithinPage(Property withinPage, bool bIsDefault)
-        {
-            this.withinPage = withinPage;
-        }
+    protected void setWithinColumn(Property withinColumn,
+                                   bool bIsDefault)
+    {
+        this.withinColumn = withinColumn;
+    }
 
-        public Property getWithinLine()
-        {
-            return this.withinLine;
-        }
+    public void setWithinPage(Property withinPage, bool bIsDefault)
+    {
+        this.withinPage = withinPage;
+    }
 
-        public Property getWithinColumn()
-        {
-            return this.withinColumn;
-        }
+    public Property getWithinLine()
+    {
+        return this.withinLine;
+    }
 
-        public Property getWithinPage()
-        {
-            return this.withinPage;
-        }
+    public Property getWithinColumn()
+    {
+        return this.withinColumn;
+    }
 
-        public override string ToString()
-        {
-            return "Keep";
-        }
+    public Property getWithinPage()
+    {
+        return this.withinPage;
+    }
+
+    public override string ToString()
+    {
+        return "Keep";
     }
 }

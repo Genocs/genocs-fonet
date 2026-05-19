@@ -1,8 +1,9 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
-    using Fonet.Render.Pdf;
-    using Fonet.Render.Pdf.Fonts;
-    using Fonet.Pdf.Gdi;
+    using Genocs.Fonet.Render.Pdf;
+    using Genocs.Fonet.Pdf.Gdi;
+    using Genocs.Fonet.Render.Pdf.Fonts;
+    using Genocs.Fonet.Layout;
 
     internal class FontState
     {
@@ -24,6 +25,8 @@ namespace Fonet.Layout
 
         private int letterSpacing;
 
+        private int wordSpacing;
+
         public FontState(FontInfo fontInfo, string fontFamily, string fontStyle,
                          string fontWeight, int fontSize, int fontVariant)
         {
@@ -36,6 +39,7 @@ namespace Fonet.Layout
             this.metric = fontInfo.GetMetricsFor(fontName);
             this.fontVariant = fontVariant;
             this.letterSpacing = 0;
+            this.wordSpacing = 0;
         }
 
         public FontState(FontInfo fontInfo, string fontFamily, string fontStyle,
@@ -43,6 +47,22 @@ namespace Fonet.Layout
             : this(fontInfo, fontFamily, fontStyle, fontWeight, fontSize, fontVariant)
         {
             this.letterSpacing = letterSpacing;
+        }
+
+        public FontState(FontInfo fontInfo, string fontFamily, string fontStyle,
+                         string fontWeight, int fontSize, int fontVariant,
+                         int letterSpacing, int wordSpacing)
+            : this(fontInfo, fontFamily, fontStyle, fontWeight, fontSize, fontVariant, letterSpacing)
+        {
+            this.wordSpacing = wordSpacing;
+        }
+
+        public int WordSpacing
+        {
+            get
+            {
+                return wordSpacing;
+            }
         }
 
         public int Ascender

@@ -1,7 +1,8 @@
-using Fonet.Fo.Properties;
-using Fonet.Render.Pdf;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
+using Genocs.Fonet.Render.Pdf;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     internal class ColumnArea : AreaContainer
     {
@@ -17,7 +18,7 @@ namespace Fonet.Layout
             this.setAreaName("normal-flow-ref.-area");
         }
 
-        public override void render(PdfRenderer renderer)
+        public override void Render(PdfRenderer renderer)
         {
             renderer.RenderAreaContainer(this);
         }

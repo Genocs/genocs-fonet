@@ -1,6 +1,6 @@
-using Fonet.Render.Pdf;
+using Genocs.Fonet.Render.Pdf;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     internal class DisplaySpace : Space
     {
@@ -16,7 +16,7 @@ namespace Fonet.Layout
             return size;
         }
 
-        public override void render(PdfRenderer renderer)
+        public override void Render(PdfRenderer renderer)
         {
             renderer.RenderDisplaySpace(this);
         }

@@ -1,35 +1,23 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class SpaceProperty(Space space) : Property
 {
-    internal class SpaceProperty : Property
+    private readonly Space _space = space;
+
+    internal class Maker : LengthRangeProperty.Maker
     {
-        internal class Maker : LengthRangeProperty.Maker
-        {
-            protected Maker(string name) : base(name) { }
-
-        }
-
-        private Space space;
-
-        public SpaceProperty(Space space)
-        {
-            this.space = space;
-        }
-
-        public override Space GetSpace()
-        {
-            return this.space;
-        }
-
-        public override LengthRange GetLengthRange()
-        {
-            return this.space;
-        }
-
-        public override object GetObject()
-        {
-            return this.space;
-        }
+        protected Maker(string name) : base(name) { }
     }
+
+
+    public override Space GetSpace()
+        => _space;
+
+    public override LengthRange GetLengthRange()
+        => _space;
+
+    public override object GetObject()
+        => _space;
 }

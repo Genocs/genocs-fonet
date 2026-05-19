@@ -1,7 +1,8 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
-    using Fonet.Fo.Properties;
-    using Fonet.Render.Pdf;
+    using Genocs.Fonet.Fo.Properties;
+    using Genocs.Fonet.Layout;
+    using Genocs.Fonet.Render.Pdf;
 
     internal class SpanArea : AreaContainer
     {
@@ -35,7 +36,7 @@ namespace Fonet.Layout
             }
         }
 
-        public override void render(PdfRenderer renderer)
+        public override void Render(PdfRenderer renderer)
         {
             renderer.RenderSpanArea(this);
         }

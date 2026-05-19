@@ -1,54 +1,35 @@
-using Fonet.Fo.Expr;
+using Genocs.Fonet.Fo.Expr;
 
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal class PercentLength(double factor, IPercentBase? baseLength) : Length
 {
+    private readonly double _factor = factor;
+    public IPercentBase? BaseLength { get; set; } = baseLength;
 
-    internal class PercentLength : Length
+
+    public PercentLength(double factor) : this(factor, null)
     {
+    }
 
-        private double factor;
-        private IPercentBase lbase = null;
 
-        public PercentLength(double factor) : this(factor, null)
-        {
-        }
+    public override void ComputeValue()
+    {
+        SetComputedValue((int)(_factor * BaseLength?.GetBaseLength() ?? 0));
+    }
 
-        public PercentLength(double factor, IPercentBase lbase)
-        {
-            this.factor = factor;
-            this.lbase = lbase;
-        }
+    public double Value()
+    {
+        return _factor;
+    }
 
-        public IPercentBase BaseLength
-        {
-            get
-            {
-                return lbase;
-            }
-            set
-            {
-                this.lbase = value;
-            }
-        }
+    public override string ToString()
+    {
+        return (_factor * 100.0).ToString() + "%";
+    }
 
-        public override void ComputeValue()
-        {
-            SetComputedValue((int)(factor * (double)lbase.GetBaseLength()));
-        }
-
-        public double value()
-        {
-            return factor;
-        }
-
-        public override string ToString()
-        {
-            return (factor * 100.0).ToString() + "%";
-        }
-
-        public override Numeric AsNumeric()
-        {
-            return new Numeric(this);
-        }
+    public override Numeric AsNumeric()
+    {
+        return new Numeric(this);
     }
 }

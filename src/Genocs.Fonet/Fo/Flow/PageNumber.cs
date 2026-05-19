@@ -1,76 +1,75 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
+
+namespace Genocs.Fonet.Fo.Flow;
+
+internal class PageNumber : FObj
 {
-    using Fonet.DataTypes;
-    using Fonet.Fo.Properties;
-    using Fonet.Layout;
-
-    internal class PageNumber : FObj
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new PageNumber(parent, propertyList);
-            }
+            return new PageNumber(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    private float red;
+    private float green;
+    private float blue;
+    private int wrapOption;
+    private int whiteSpaceCollapse;
+    private TextState ts;
+
+    public PageNumber(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        _name = "fo:page-number";
+    }
+
+    public override Status Layout(Area area)
+    {
+        if (area is not BlockArea)
         {
-            return new Maker();
-        }
-
-        private float red;
-        private float green;
-        private float blue;
-        private int wrapOption;
-        private int whiteSpaceCollapse;
-        private TextState ts;
-
-        public PageNumber(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            this.name = "fo:page-number";
-        }
-
-        public override Status Layout(Area area)
-        {
-            if (!(area is BlockArea))
-            {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    "Page-number outside block area");
-                return new Status(Status.OK);
-            }
-            if (this.marker == MarkerStart)
-            {
-                AccessibilityProps mAccProps = propMgr.GetAccessibilityProps();
-                AuralProps mAurProps = propMgr.GetAuralProps();
-                BorderAndPadding bap = propMgr.GetBorderAndPadding();
-                BackgroundProps bProps = propMgr.GetBackgroundProps();
-                MarginInlineProps mProps = propMgr.GetMarginInlineProps();
-                RelativePositionProps mRelProps = propMgr.GetRelativePositionProps();
-
-                ColorType c = this.properties.GetProperty("color").GetColorType();
-                this.red = c.Red;
-                this.green = c.Green;
-                this.blue = c.Blue;
-
-                this.wrapOption = this.properties.GetProperty("wrap-option").GetEnum();
-                this.whiteSpaceCollapse =
-                    this.properties.GetProperty("white-space-collapse").GetEnum();
-                ts = new TextState();
-                this.marker = 0;
-
-                string id = this.properties.GetProperty("id").GetString();
-                area.getIDReferences().InitializeID(id, area);
-            }
-
-            string p = area.getPage().getFormattedNumber();
-            this.marker = FOText.addText((BlockArea)area,
-                                         propMgr.GetFontState(area.getFontInfo()),
-                                         red, green, blue, wrapOption, null,
-                                         whiteSpaceCollapse, p.ToCharArray(), 0,
-                                         p.Length, ts, VerticalAlign.BASELINE);
+            FonetDriver.ActiveDriver.FireFonetWarning("page-number outside block area");
             return new Status(Status.OK);
         }
+
+        if (_marker == MarkerStart)
+        {
+            AccessibilityProps mAccProps = _propertyManager.GetAccessibilityProps();
+            AuralProps mAurProps = _propertyManager.GetAuralProps();
+            BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+            BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+            MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
+            RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
+
+            ColorType c = _properties.GetProperty("color").GetColorType();
+            red = c.Red;
+            green = c.Green;
+            blue = c.Blue;
+
+            wrapOption = _properties.GetProperty("wrap-option").GetEnum();
+            whiteSpaceCollapse =_properties.GetProperty("white-space-collapse").GetEnum();
+            ts = new TextState();
+            _marker = 0;
+
+            string id = _properties.GetProperty("id").GetString();
+            area.GetIDReferences().InitializeID(id, area);
+        }
+
+        string p = area.getPage().getFormattedNumber();
+        _marker = FOText.addText((BlockArea)area,
+                                     _propertyManager.GetFontState(area.getFontInfo()),
+                                     red, green, blue, wrapOption, null,
+                                     whiteSpaceCollapse, p.ToCharArray(), 0,
+                                     p.Length, ts, VerticalAlign.BASELINE);
+
+        return new Status(Status.OK);
     }
 }

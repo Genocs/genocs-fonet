@@ -1,19 +1,17 @@
-namespace Fonet;
-
-using System;
-using System.IO;
 using System.Net;
 using System.Xml;
-using Fonet.Fo;
-using Fonet.Render.Pdf;
+using Genocs.Fonet.Fo;
+using Genocs.Fonet.Render.Pdf;
+
+namespace Genocs.Fonet;
 
 /// <summary>
-///     FonetDriver provides the client with a single interface to invoking FO.NET.
+/// FonetDriver provides the client with a single interface to invoking FO.NET.
 /// </summary>
 /// <remarks>
-///     The examples belows demonstrate several ways of invoking FO.NET.  The 
-///     methodology is the same regardless of how FO.NET is embedded in your 
-///     system (ASP.NET, WinForm, Web Service, etc).
+/// The examples belows demonstrate several ways of invoking FO.NET. The 
+/// methodology is the same regardless of how FO.NET is embedded in your 
+/// system (ASP.NET, WinForm, Web Service, etc).
 /// </remarks>
 /// <example>
 /// <code lang="csharp">
@@ -51,75 +49,88 @@ using Fonet.Render.Pdf;
 /// </example>
 public class FonetDriver
 {
-
     /// <summary>
-    ///     Determines if the output stream passed to Render() should
-    ///     be closed upon completion or if a fatal exception occurs.
+    /// Gets or sets the base directory used to locate external 
+    /// resources such as images loaded
+    /// from when using relative path references.
     /// </summary>
-    private bool closeOnExit = true;
+    /// <value>
+    /// Defaults to the current working directory.
+    /// </value>
+    public DirectoryInfo? BaseDirectory { get; set; }
 
     /// <summary>
-    ///     Options to supply to the renderer.
+    /// Gets or sets the optional image handler that is responsible for loading the image
+    /// data for external graphics.
     /// </summary>
-    private PdfRendererOptions renderOptions;
+    /// <remarks>
+    /// If null is returned from the image handler, then FO.NET will perform 
+    /// normal processing.
+    /// </remarks>
+    public FonetImageHandler? ImageHandler { get; set; }
 
     /// <summary>
-    ///     Maps a set of credentials to an internet resource
+    /// Gets or sets the time in milliseconds timeout used when accessing external resources via a URL.
     /// </summary>
-    private CredentialCache credentials;
+    /// <remarks>
+    /// The default value is 100000 milliseconds.
+    /// </remarks>
+    /// <value>
+    /// The timeout value in milliseconds
+    /// </value>
+    public int Timeout { get; set; }
 
     /// <summary>
-    ///     The directory that external resources such as images are loaded 
-    ///     from when using relative path references.
+    /// Determines if the output stream passed to Render() should
+    /// be closed upon completion or if a fatal exception occurs.
     /// </summary>
-    private DirectoryInfo baseDirectory;
+    public bool CloseOnExit { get; set; }
 
     /// <summary>
-    ///     The timeout used when accessing external resources via a URL.
+    /// Options that are passed to the rendering engine.
     /// </summary>
-    private int timeout;
+    public PdfRendererOptions? Options { get; set; }
 
     /// <summary>
-    ///     The active driver.
+    /// Maps a set of credentials to an internet resource
+    /// </summary>
+    private CredentialCache? credentials;
+
+    /// <summary>
+    /// The active driver.
     /// </summary>
     [ThreadStatic]
     private static FonetDriver? activeDriver;
 
     /// <summary>
-    ///     The delegate subscribers must implement to receive FO.NET events.
+    /// The delegate subscribers must implement to receive FO.NET events.
     /// </summary>
     /// <remarks>
-    ///     The <paramref name="driver"/> parameter will be a reference to 
-    ///     the  active FonetDriver.  The <paramref name="e"/> parameter will 
-    ///     contain a human-readable error message.
+    /// The <paramref name="driver"/> parameter will be a reference to 
+    /// the active FonetDriver.  The <paramref name="e"/> parameter will 
+    /// contain a human-readable error message.
     /// </remarks>
     /// <param name="driver">A reference to the active FonetDriver</param>
     /// <param name="e">Encapsulates a human readable error message</param>
     public delegate void FonetEventHandler(object driver, FonetEventArgs e);
 
     /// <summary>
-    ///     An optional image handler that can be registered to load image
-    ///     data for external graphic formatting objects.
+    /// The delegate subscribers must implement to handle the loading 
+    /// of image data in response to external-graphic formatting objects.
     /// </summary>
-    private FonetImageHandler imageHandler;
+    public delegate byte[]? FonetImageHandler(string src);
 
     /// <summary>
-    ///     The delegate subscribers must implement to handle the loading 
-    ///     of image data in response to external-graphic formatting objects.
-    /// </summary>
-    public delegate byte[] FonetImageHandler(string src);
-
-    /// <summary>
-    ///     A multicast delegate.  The error event FO.NET publishes.
+    /// A multicast delegate. The error event FO.NET publishes.
     /// </summary>
     /// <remarks>
-    ///     The method signature for this event handler should match 
-    ///     the following:
-    ///     <pre class="code"><span class="lang">
-    ///     void FonetError(object driver, FonetEventArgs e);
-    ///     </span></pre>
-    ///     The first parameter <i>driver</i> will be a reference to the 
-    ///     active FonetDriver instance.
+    /// The method signature for this event handler should match 
+    /// the following:
+    /// <pre class="code"><span class="lang">
+    /// void FonetError(object driver, FonetEventArgs e);
+    /// </span></pre>
+    /// The first parameter <i>driver</i> will be a reference to the 
+    /// active FonetDriver instance.
     /// </remarks>
     /// <example>Subscribing to the 'error' event
     ///     <pre class="code"><span class="lang">[C#]</span><br/>
@@ -130,7 +141,7 @@ public class FonetDriver
     ///     }
     ///     </pre>
     /// </example>
-    public event FonetEventHandler OnError;
+    public event FonetEventHandler? OnError;
 
     /// <summary>
     ///     A multicast delegate.  The warning event FO.NET publishes.
@@ -144,7 +155,7 @@ public class FonetDriver
     ///     The first parameter <i>driver</i> will be a reference to the 
     ///     active FonetDriver instance.
     /// </remarks>
-    public event FonetEventHandler OnWarning;
+    public event FonetEventHandler? OnWarning;
 
     /// <summary>
     ///     A multicast delegate.  The info event FO.NET publishes.
@@ -158,7 +169,7 @@ public class FonetDriver
     ///     The first parameter <i>driver</i> will be a reference to the 
     ///     active FonetDriver instance.
     /// </remarks>
-    public event FonetEventHandler OnInfo;
+    public event FonetEventHandler? OnInfo;
 
     /// <summary>
     ///     Constructs a new FonetDriver and registers the newly created 
@@ -183,22 +194,6 @@ public class FonetDriver
     }
 
     /// <summary>
-    ///     Determines if the output stream should be automatically closed 
-    ///     upon completion of the render process.
-    /// </summary>
-    public bool CloseOnExit
-    {
-        get
-        {
-            return closeOnExit;
-        }
-        set
-        {
-            closeOnExit = value;
-        }
-    }
-
-    /// <summary>
     ///     Gets or sets the active <see cref="FonetDriver"/>.
     /// </summary>
     /// <value>
@@ -214,67 +209,6 @@ public class FonetDriver
         set
         {
             activeDriver = value;
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets the base directory used to locate external 
-    ///     resourcs such as images.
-    /// </summary>
-    /// <value>
-    ///     Defaults to the current working directory.
-    /// </value>
-    public DirectoryInfo BaseDirectory
-    {
-        get
-        {
-            return baseDirectory;
-        }
-        set
-        {
-            baseDirectory = value;
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets the handler that is responsible for loading the image
-    ///     data for external graphics.
-    /// </summary>
-    /// <remarks>
-    ///     If null is returned from the image handler, then FO.NET will perform 
-    ///     normal processing.
-    /// </remarks>
-    public FonetImageHandler ImageHandler
-    {
-        get
-        {
-            return imageHandler;
-        }
-        set
-        {
-            imageHandler = value;
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets the time in milliseconds until an HTTP image request 
-    ///     times out.
-    /// </summary>
-    /// <remarks>
-    ///     The default value is 100000 milliseconds.
-    /// </remarks>
-    /// <value>
-    ///     The timeout value in milliseconds
-    /// </value>
-    public int Timeout
-    {
-        get
-        {
-            return timeout;
-        }
-        set
-        {
-            timeout = value;
         }
     }
 
@@ -301,27 +235,8 @@ public class FonetDriver
     {
         get
         {
-            if (credentials == null)
-            {
-                credentials = new CredentialCache();
-            }
-
+            credentials ??= [];
             return credentials;
-        }
-    }
-
-    /// <summary>
-    ///     Options that are passed to the rendering engine.
-    /// </summary>
-    public PdfRendererOptions Options
-    {
-        get
-        {
-            return renderOptions;
-        }
-        set
-        {
-            renderOptions = value;
         }
     }
 
@@ -337,7 +252,7 @@ public class FonetDriver
     ///     Any subclass of the Stream class.
     /// </param>
     /// <remarks>
-    ///     Any exceptions that occur during the render process are arranged 
+    ///     Any exceptions that occur during the Render process are arranged 
     ///     into three categories: information, warning and error.  You may 
     ///     intercept any or all of theses exceptional states by registering 
     ///     an event listener.  See <see cref="FonetDriver.OnError"/> for an 
@@ -348,8 +263,8 @@ public class FonetDriver
     /// </remarks>
     public virtual void Render(XmlDocument doc, Stream outputStream)
     {
-        StringWriter sw = new StringWriter();
-        XmlTextWriter writer = new XmlTextWriter(sw);
+        StringWriter sw = new();
+        XmlTextWriter writer = new(sw);
         doc.Save(writer);
         writer.Close();
 
@@ -364,9 +279,7 @@ public class FonetDriver
     /// <param name="inputReader">A character orientated stream</param>
     /// <param name="outputStream">Any subclass of the Stream class</param>
     public virtual void Render(TextReader inputReader, Stream outputStream)
-    {
-        Render(CreateXmlTextReader(inputReader), outputStream);
-    }
+        => Render(CreateXmlTextReader(inputReader), outputStream);
 
     /// <summary>
     ///     Executes the conversion reading the source tree from the file 
@@ -382,75 +295,66 @@ public class FonetDriver
     /// <param name="inputFile">Path to an XSL-FO file</param>
     /// <param name="outputFile">Path to a file</param>
     public virtual void Render(string inputFile, string outputFile)
-    {
-        Render(CreateXmlTextReader(inputFile),
-               new FileStream(outputFile, FileMode.Create, FileAccess.Write));
-    }
+        => Render(CreateXmlTextReader(inputFile), new FileStream(outputFile, FileMode.Create, FileAccess.Write));
 
     /// <summary>
-    ///     Executes the conversion reading the source tree from the file 
-    ///     <i>inputFile</i>, converting it to a format dictated by the 
-    ///     renderer and writing it to the supplied output stream.
+    /// Executes the conversion reading the source tree from the file 
+    /// <i>inputFile</i>, converting it to a format dictated by the 
+    /// renderer and writing it to the supplied output stream.
     /// </summary>
     /// <param name="inputFile">Path to an XSL-FO file</param>
-    /// <param name="outputStream">
-    ///     Any subclass of the Stream class, e.g. FileStream
-    /// </param>
+    /// <param name="outputStream">Any subclass of the Stream class, e.g. FileStream</param>
     public virtual void Render(string inputFile, Stream outputStream)
-    {
-        Render(CreateXmlTextReader(inputFile), outputStream);
-    }
+        => Render(CreateXmlTextReader(inputFile), outputStream);
 
     /// <summary>
-    ///     Executes the conversion reading the source tree from the input 
-    ///     stream, converting it to a format dictated by the render and 
-    ///     writing it to the supplied output stream.
+    /// Executes the conversion reading the source tree from the input 
+    /// stream, converting it to a format dictated by the Render and 
+    /// writing it to the supplied output stream.
     /// </summary>
     /// <param name="inputStream">Any subclass of the Stream class, e.g. FileStream</param>
     /// <param name="outputStream">Any subclass of the Stream class, e.g. FileStream</param>
     public virtual void Render(Stream inputStream, Stream outputStream)
-    {
-        Render(CreateXmlTextReader(inputStream), outputStream);
-    }
+        => Render(CreateXmlTextReader(inputStream), outputStream);
 
     /// <summary>
-    ///     Executes the conversion reading the source tree from the input 
-    ///     reader, converting it to a format dictated by the render and 
-    ///     writing it to the supplied output stream.
+    /// Executes the conversion reading the source tree from the input 
+    /// reader, converting it to a format dictated by the Render and 
+    /// writing it to the supplied output stream.
     /// </summary>
     /// <remarks>
-    ///     The evaluation copy of this class will output an evaluation
-    ///     banner to standard out
+    /// The evaluation copy of this class will output an evaluation
+    /// banner to standard out
     /// </remarks>
     /// <param name="inputReader">
-    ///     Reader that provides fast, non-cached, forward-only access 
-    ///     to XML data
+    /// Reader that provides fast, non-cached, forward-only access 
+    /// to XML data
     /// </param>
     /// <param name="outputStream">
-    ///     Any subclass of the Stream class, e.g. FileStream
+    /// Any subclass of the Stream class, e.g. FileStream
     /// </param>
     public void Render(XmlReader inputReader, Stream outputStream)
     {
         try
         {
             // Constructs an area tree renderer and supplies the renderer options
-            PdfRenderer renderer = new PdfRenderer(outputStream);
+            PdfRenderer renderer = new(outputStream);
 
-            if (renderOptions != null)
+            if (Options != null)
             {
-                renderer.Options = renderOptions;
+                renderer.Options = Options;
             }
 
             // Create the stream-renderer.
-            StreamRenderer sr = new StreamRenderer(renderer);
+            StreamRenderer sr = new(renderer);
 
             // Create the tree builder and give it the stream renderer.
-            FOTreeBuilder tb = new FOTreeBuilder();
+            FOTreeBuilder tb = new();
             tb.SetStreamRenderer(sr);
 
             // Setup the mapping between xsl:fo elements and our fo classes.
-            StandardElementMapping sem = new StandardElementMapping();
-            sem.AddToBuilder(tb);
+            StandardElementMapping sem = new();
+            StandardElementMapping.AddToBuilder(tb);
 
             // Start processing the xml document.
             tb.Parse(inputReader);
@@ -467,16 +371,16 @@ public class FonetDriver
     }
 
     /// <summary>
-    ///     Sends an 'error' event to all registered listeners.
+    /// Sends an 'error' event to all registered listeners.
     /// </summary>
     /// <remarks>
-    ///     If there are no listeners, a <see cref="SystemException"/> is 
-    ///     thrown immediately halting execution
+    /// If there are no listeners, a <see cref="SystemException"/> is 
+    /// thrown immediately halting execution
     /// </remarks>
     /// <param name="message">Any error message, which may be null</param>
     /// <exception cref="SystemException">
-    ///     If no listener is registered for this event, a SystemException
-    ///     will be thrown
+    /// If no listener is registered for this event, a SystemException
+    /// will be thrown
     /// </exception>
     internal void FireFonetError(string message)
     {
@@ -491,11 +395,11 @@ public class FonetDriver
     }
 
     /// <summary>
-    ///     Sends a 'warning' event to all registered listeners
+    /// Sends a 'warning' event to all registered listeners
     /// </summary>
     /// <remarks>
-    ///     If there are no listeners, <i>message</i> is written out 
-    ///     to the console instead
+    /// If there are no listeners, <i>message</i> is written out 
+    /// to the console instead
     /// </remarks>
     /// <param name="message">Any warning message, which may be null</param>
     internal void FireFonetWarning(string message)
@@ -511,11 +415,11 @@ public class FonetDriver
     }
 
     /// <summary>
-    ///     Sends an 'info' event to all registered lisetners
+    /// Sends an 'info' event to all registered lisetners
     /// </summary>
     /// <remarks>
-    ///     If there are no listeners, <i>message</i> is written out 
-    ///     to the console instead
+    /// If there are no listeners, <i>message</i> is written out 
+    /// to the console instead
     /// </remarks>
     /// <param name="message">An info message, which may be null</param>
     internal void FireFonetInfo(string message)
@@ -531,44 +435,32 @@ public class FonetDriver
     }
 
     /// <summary>
-    ///     Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
-    ///     for the supplied file
+    /// Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
+    /// for the supplied file
     /// </summary>
     /// <remarks>
-    ///     The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
+    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
     /// </remarks>
-    private XmlReader CreateXmlTextReader(string inputFile)
-    {
-        XmlTextReader reader = new XmlTextReader(inputFile);
-
-        return reader;
-    }
+    private static XmlTextReader CreateXmlTextReader(string inputFile)
+        => new(inputFile);
 
     /// <summary>
-    ///     Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
-    ///     for the supplied file
+    /// Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
+    /// for the supplied file
     /// </summary>
     /// <remarks>
-    ///     The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
+    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
     /// </remarks>
-    private XmlReader CreateXmlTextReader(Stream inputStream)
-    {
-        XmlTextReader reader = new XmlTextReader(inputStream);
-
-        return reader;
-    }
+    private static XmlTextReader CreateXmlTextReader(Stream inputStream)
+        => new(inputStream);
 
     /// <summary>
-    ///     Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
-    ///     for the supplied file
+    /// Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
+    /// for the supplied file
     /// </summary>
     /// <remarks>
-    ///     The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
+    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
     /// </remarks>
-    private XmlReader CreateXmlTextReader(TextReader inputReader)
-    {
-        XmlTextReader reader = new XmlTextReader(inputReader);
-
-        return reader;
-    }
+    private static XmlTextReader CreateXmlTextReader(TextReader inputReader)
+        => new(inputReader);
 }

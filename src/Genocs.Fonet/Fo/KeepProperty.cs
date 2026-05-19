@@ -1,6 +1,6 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo
 {
     internal class KeepProperty : Property
     {

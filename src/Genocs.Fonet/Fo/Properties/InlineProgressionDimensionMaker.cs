@@ -1,8 +1,9 @@
 using System;
 using System.Text;
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class InlineProgressionDimensionMaker : LengthRangeProperty.Maker
     {
@@ -22,7 +23,7 @@ namespace Fonet.Fo.Properties
         }
 
         private static readonly PropertyMaker s_MinimumMaker =
-            new SP_MinimumMaker("inline-progression-dimension.minimum");
+            new SP_MinimumMaker("inline-progression-dimension._minimum");
 
         private class SP_OptimumMaker : LengthProperty.Maker
         {
@@ -139,16 +140,13 @@ namespace Fonet.Fo.Properties
             LengthRange p = new LengthRange();
             Property subProp;
 
-            subProp = GetSubpropMaker("minimum").Make(pList,
-                                                      GetDefaultForMinimum(), fo);
+            subProp = GetSubpropMaker("minimum").Make(pList, GetDefaultForMinimum(), fo);
             p.SetComponent("minimum", subProp, true);
 
-            subProp = GetSubpropMaker("optimum").Make(pList,
-                                                      GetDefaultForOptimum(), fo);
+            subProp = GetSubpropMaker("optimum").Make(pList, GetDefaultForOptimum(), fo);
             p.SetComponent("optimum", subProp, true);
 
-            subProp = GetSubpropMaker("maximum").Make(pList,
-                                                      GetDefaultForMaximum(), fo);
+            subProp = GetSubpropMaker("maximum").Make(pList, GetDefaultForMaximum(), fo);
             p.SetComponent("maximum", subProp, true);
 
             return new LengthRangeProperty(p);

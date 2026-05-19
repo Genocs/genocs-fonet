@@ -1,108 +1,105 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.Fo.Pagination;
+using Genocs.Fonet.Layout;
+
+namespace Genocs.Fonet.Fo.Flow;
+
+internal class StaticContent : Flow
 {
-    using Fonet.Fo.Pagination;
-    using Fonet.Layout;
-
-    internal class StaticContent : Flow
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
+            return new StaticContent(parent, propertyList);
+        }
+    }
+
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    protected StaticContent(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        ((PageSequence)parent).IsFlowSet = false;
+    }
+
+    public override Status Layout(Area area)
+    {
+        return Layout(area, null);
+    }
+
+    public override Status Layout(Area area, Region region)
+    {
+        ResetMarker();
+
+        int numChildren = _children.Count;
+        string regionClass = "none";
+        if (region != null)
+        {
+            regionClass = region.GetRegionClass();
+        }
+        else
+        {
+            if (GetFlowName().Equals("xsl-region-before"))
             {
-                return new StaticContent(parent, propertyList);
+                regionClass = RegionBefore.REGION_CLASS;
+            }
+            else if (GetFlowName().Equals("xsl-region-after"))
+            {
+                regionClass = RegionAfter.REGION_CLASS;
+            }
+            else if (GetFlowName().Equals("xsl-region-start"))
+            {
+                regionClass = RegionStart.REGION_CLASS;
+            }
+            else if (GetFlowName().Equals("xsl-region-end"))
+            {
+                regionClass = RegionEnd.REGION_CLASS;
             }
         }
 
-        new public static FObj.Maker GetMaker()
+        if (area is AreaContainer)
         {
-            return new Maker();
+            ((AreaContainer)area).setAreaName(regionClass);
         }
 
-        protected StaticContent(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            ((PageSequence)parent).IsFlowSet = false;
-        }
+        area.setAbsoluteHeight(0);
 
-        public override Status Layout(Area area)
-        {
-            return Layout(area, null);
-        }
+        SetContentWidth(area.getContentWidth());
 
-        public override Status Layout(Area area, Region region)
+        for (int i = 0; i < numChildren; i++)
         {
-            int numChildren = this.children.Count;
-            string regionClass = "none";
-            if (region != null)
+            FObj fo = (FObj)_children[i];
+
+            Status status;
+            if ((status = fo.Layout(area)).IsIncomplete())
             {
-                regionClass = region.GetRegionClass();
-            }
-            else
-            {
-                if (GetFlowName().Equals("xsl-region-before"))
+                FonetDriver.ActiveDriver.FireFonetWarning("Some static content could not fit in the area.");
+                _marker = i;
+                if ((i != 0) && (status.GetCode() == Status.AREA_FULL_NONE))
                 {
-                    regionClass = RegionBefore.REGION_CLASS;
+                    status = new Status(Status.AREA_FULL_SOME);
                 }
-                else if (GetFlowName().Equals("xsl-region-after"))
-                {
-                    regionClass = RegionAfter.REGION_CLASS;
-                }
-                else if (GetFlowName().Equals("xsl-region-start"))
-                {
-                    regionClass = RegionStart.REGION_CLASS;
-                }
-                else if (GetFlowName().Equals("xsl-region-end"))
-                {
-                    regionClass = RegionEnd.REGION_CLASS;
-                }
+                return (status);
             }
-
-            if (area is AreaContainer)
-            {
-                ((AreaContainer)area).setAreaName(regionClass);
-            }
-
-            area.setAbsoluteHeight(0);
-
-            SetContentWidth(area.getContentWidth());
-
-            for (int i = 0; i < numChildren; i++)
-            {
-                FObj fo = (FObj)children[i];
-
-                Status status;
-                if ((status = fo.Layout(area)).isIncomplete())
-                {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "Some static content could not fit in the area.");
-                    this.marker = i;
-                    if ((i != 0) && (status.getCode() == Status.AREA_FULL_NONE))
-                    {
-                        status = new Status(Status.AREA_FULL_SOME);
-                    }
-                    return (status);
-                }
-            }
-            ResetMarker();
-            return new Status(Status.OK);
         }
+        ResetMarker();
+        return new Status(Status.OK);
+    }
 
-        protected override string GetElementName()
+    protected override string GetElementName()
+        => "fo:static-content";
+
+    protected override void SetFlowName(string name)
+    {
+        if (name == null || name.Equals(""))
         {
-            return "fo:static-content";
+            throw new FonetException($"A 'flow-name' is required for {GetElementName()}.");
         }
-
-        protected override void SetFlowName(string name)
+        else
         {
-            if (name == null || name.Equals(""))
-            {
-                throw new FonetException("A 'flow-name' is required for "
-                    + GetElementName() + ".");
-            }
-            else
-            {
-                base.SetFlowName(name);
-            }
+            base.SetFlowName(name);
         }
     }
 }

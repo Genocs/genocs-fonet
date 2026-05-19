@@ -1,33 +1,32 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.Layout;
+
+namespace Genocs.Fonet.Fo.Flow;
+
+internal class BidiOverride : ToBeImplementedElement
 {
-    using Fonet.Layout;
-
-    internal class BidiOverride : ToBeImplementedElement
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new BidiOverride(parent, propertyList);
-            }
+            return new BidiOverride(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
-        {
-            return new Maker();
-        }
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
 
-        protected BidiOverride(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            this.name = "fo:bidi-override";
-        }
+    protected BidiOverride(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        this._name = "fo:bidi-override";
+    }
 
-        public override Status Layout(Area area)
-        {
-            AuralProps mAurProps = propMgr.GetAuralProps();
-            RelativePositionProps mProps = propMgr.GetRelativePositionProps();
-            return base.Layout(area);
-        }
+    public override Status Layout(Area area)
+    {
+        AuralProps mAurProps = _propertyManager.GetAuralProps();
+        RelativePositionProps mProps = _propertyManager.GetRelativePositionProps();
+        return base.Layout(area);
     }
 }

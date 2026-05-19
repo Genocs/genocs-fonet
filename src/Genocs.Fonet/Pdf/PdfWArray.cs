@@ -1,4 +1,4 @@
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     Array class used to represent the /W entry in the CIDFont dictionary.

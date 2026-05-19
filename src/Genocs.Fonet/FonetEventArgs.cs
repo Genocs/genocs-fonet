@@ -1,38 +1,35 @@
-using System;
+namespace Genocs.Fonet;
 
-namespace Fonet {
+/// <summary>
+///     A class containing event data for the Error, Warning and Info 
+///     events defined in <see cref="FonetDriver"/>.
+/// </summary>
+/// <remarks>
+///     Initialises a new instance of the <i>FonetEventArgs</i> class.
+/// </remarks>
+/// <param name="message">The text of the event message.</param>
+public class FonetEventArgs(string message) : EventArgs
+{
+    private string message = message;
+
     /// <summary>
-    ///     A class containing event data for the Error, Warning and Info 
-    ///     events defined in <see cref="FonetDriver"/>.
+    ///     Retrieves the event message.
     /// </summary>
-    public class FonetEventArgs : EventArgs {
-        private string message;
+    /// <returns>A string which may be null.</returns>
+    public string GetMessage()
+    {
+        return message;
+    }
 
-        /// <summary>
-        ///     Initialises a new instance of the <i>FonetEventArgs</i> class.
-        /// </summary>
-        /// <param name="message">The text of the event message.</param>
-        public FonetEventArgs(string message) {
-            this.message = message;
-        }
-
-        /// <summary>
-        ///     Retrieves the event message.
-        /// </summary>
-        /// <returns>A string which may be null.</returns>
-        public string GetMessage() {
-            return message;
-        }
-
-        /// <summary>
-        ///     Converts this <i>FonetEventArgs</i> to a string.
-        /// </summary>
-        /// <returns>
-        ///     A string representation of this class which is identical 
-        ///     to <see cref="GetMessage"/>.
-        /// </returns>
-        public override string ToString() {
-            return GetMessage();
-        }
+    /// <summary>
+    ///     Converts this <i>FonetEventArgs</i> to a string.
+    /// </summary>
+    /// <returns>
+    ///     A string representation of this class which is identical 
+    ///     to <see cref="GetMessage"/>.
+    /// </returns>
+    public override string ToString()
+    {
+        return GetMessage();
     }
 }

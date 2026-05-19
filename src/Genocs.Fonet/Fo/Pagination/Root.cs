@@ -1,80 +1,66 @@
-namespace Fonet.Fo.Pagination
+using System.Collections;
+
+namespace Genocs.Fonet.Fo.Pagination;
+
+internal class Root : FObj
 {
-    using System.Collections;
-
-    internal class Root : FObj
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new Root(parent, propertyList);
-            }
+            return new Root(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    public LayoutMasterSet? LayoutMasterSet { get; set; }
+
+    private ArrayList pageSequences;
+
+    private int runningPageNumberCounter = 0;
+
+    protected internal Root(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        this._name = "fo:root";
+        pageSequences = new ArrayList();
+        if (parent != null)
         {
-            return new Maker();
+            throw new FonetException("root must be root element");
         }
+    }
 
-        private LayoutMasterSet layoutMasterSet;
+    protected internal int getRunningPageNumberCounter()
+    {
+        return this.runningPageNumberCounter;
+    }
 
-        private ArrayList pageSequences;
+    protected internal void SetRunningPageNumberCounter(int count)
+        => runningPageNumberCounter = count;
 
-        private int runningPageNumberCounter = 0;
+    public int getPageSequenceCount()
+    {
+        return pageSequences.Count;
+    }
 
-        protected internal Root(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
+    public PageSequence getSucceedingPageSequence(PageSequence current)
+    {
+        int currentIndex = pageSequences.IndexOf(current);
+        if (currentIndex == -1)
         {
-            this.name = "fo:root";
-            pageSequences = new ArrayList();
-            if (parent != null)
-            {
-                throw new FonetException("root must be root element");
-            }
+            return null;
         }
-
-        protected internal int getRunningPageNumberCounter()
+        if (currentIndex < (pageSequences.Count - 1))
         {
-            return this.runningPageNumberCounter;
+            return (PageSequence)pageSequences[currentIndex + 1];
         }
-
-        protected internal void setRunningPageNumberCounter(int count)
+        else
         {
-            this.runningPageNumberCounter = count;
+            return null;
         }
-
-        public int getPageSequenceCount()
-        {
-            return pageSequences.Count;
-        }
-
-        public PageSequence getSucceedingPageSequence(PageSequence current)
-        {
-            int currentIndex = pageSequences.IndexOf(current);
-            if (currentIndex == -1)
-            {
-                return null;
-            }
-            if (currentIndex < (pageSequences.Count - 1))
-            {
-                return (PageSequence)pageSequences[currentIndex + 1];
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public LayoutMasterSet getLayoutMasterSet()
-        {
-            return this.layoutMasterSet;
-        }
-
-        public void setLayoutMasterSet(LayoutMasterSet layoutMasterSet)
-        {
-            this.layoutMasterSet = layoutMasterSet;
-        }
-
     }
 }

@@ -1,6 +1,6 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class FontMaker : ToBeImplementedProperty.Maker
     {

@@ -1,14 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
+		<PackageId>Genocs.Fonet</PackageId>
+		<RootNamespace>Genocs.Fonet</RootNamespace>
+		<AssemblyName>Genocs.Fonet</AssemblyName>
+		<Title>Genocs Fonet library</Title>
+		<Description>Fonet library for Genocs projects.</Description>
+		<Summary>The PDF building library based on Fonet.</Summary>
+		<PackageTags>genocs fonet pdf</PackageTags>
+	</PropertyGroup>
+
+	<PropertyGroup>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+		<PackageReference Include="SkiaSharp" Version="2.88.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Genocs.Fonet.Tests" />
 	</ItemGroup>
 
 </Project>

@@ -1,17 +1,15 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal interface IFunction
 {
-    internal interface IFunction
+    int NumArgs
     {
-        int NumArgs
-        {
-            get;
-        }
-
-        IPercentBase GetPercentBase();
-
-        Property Eval(Property[] args, PropertyInfo propInfo);
+        get;
     }
 
+    IPercentBase GetPercentBase();
+
+    Property Eval(Property[] args, PropertyInfo propInfo);
 }

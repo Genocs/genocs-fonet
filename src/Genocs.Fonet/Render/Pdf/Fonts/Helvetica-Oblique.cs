@@ -1,14 +1,19 @@
-namespace Fonet.Render.Pdf.Fonts {
-    internal class HelveticaOblique : Base14Font {
+using Genocs.Fonet.Render.Pdf.Fonts;
+
+namespace Genocs.Fonet.Render.Pdf.Fonts
+{
+    internal class HelveticaOblique : Base14Font
+    {
         private static readonly int[] CodePointWidths;
 
         private static readonly CodePointMapping DefaultMapping
             = CodePointMapping.GetMapping("WinAnsiEncoding");
 
         public HelveticaOblique()
-            : base("Helvetica-Oblique", "WinAnsiEncoding", 718, 718, -207, 32, 255, CodePointWidths, DefaultMapping) {}
+            : base("Helvetica-Oblique", "WinAnsiEncoding", 718, 718, -207, 32, 255, CodePointWidths, DefaultMapping) { }
 
-        static HelveticaOblique() {
+        static HelveticaOblique()
+        {
             CodePointWidths = new int[256];
             CodePointWidths[0x0041] = 667;
             CodePointWidths[0x00C6] = 1000;

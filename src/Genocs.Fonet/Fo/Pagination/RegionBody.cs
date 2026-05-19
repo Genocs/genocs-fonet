@@ -1,92 +1,90 @@
-using System;
-using Fonet.Fo.Properties;
-using Fonet.Layout;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
 
-namespace Fonet.Fo.Pagination
+namespace Genocs.Fonet.Fo.Pagination;
+
+internal class RegionBody : Region
 {
-    internal class RegionBody : Region
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new RegionBody(parent, propertyList);
-            }
+            return new RegionBody(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    public const string REGION_CLASS = "body";
+
+    protected RegionBody(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList) { }
+
+    public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
+                                              int allocationRectangleYPosition,
+                                              int allocationRectangleWidth,
+                                              int allocationRectangleHeight)
+    {
+        BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+        BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+        MarginProps mProps = _propertyManager.GetMarginProps();
+        BodyRegionArea body = new BodyRegionArea(allocationRectangleXPosition
+            + mProps.marginLeft,
+                                                 allocationRectangleYPosition
+                                                     - mProps.marginTop,
+                                                 allocationRectangleWidth
+                                                     - mProps.marginLeft
+                                                     - mProps.marginRight,
+                                                 allocationRectangleHeight
+                                                     - mProps.marginTop
+                                                     - mProps.marginBottom);
+
+        body.setBackground(_propertyManager.GetBackgroundProps());
+
+        int overflow = this._properties.GetProperty("overflow").GetEnum();
+        string columnCountAsString =
+            this._properties.GetProperty("column-count").GetString();
+        int columnCount = 1;
+        try
         {
-            return new Maker();
+            columnCount = Int32.Parse(columnCountAsString);
         }
-
-        public const string REGION_CLASS = "body";
-
-        protected RegionBody(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList) { }
-
-        public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
-                                                  int allocationRectangleYPosition,
-                                                  int allocationRectangleWidth,
-                                                  int allocationRectangleHeight)
+        catch (FormatException)
         {
-            BorderAndPadding bap = propMgr.GetBorderAndPadding();
-            BackgroundProps bProps = propMgr.GetBackgroundProps();
-            MarginProps mProps = propMgr.GetMarginProps();
-            BodyRegionArea body = new BodyRegionArea(allocationRectangleXPosition
-                + mProps.marginLeft,
-                                                     allocationRectangleYPosition
-                                                         - mProps.marginTop,
-                                                     allocationRectangleWidth
-                                                         - mProps.marginLeft
-                                                         - mProps.marginRight,
-                                                     allocationRectangleHeight
-                                                         - mProps.marginTop
-                                                         - mProps.marginBottom);
-
-            body.setBackground(propMgr.GetBackgroundProps());
-
-            int overflow = this.properties.GetProperty("overflow").GetEnum();
-            string columnCountAsString =
-                this.properties.GetProperty("column-count").GetString();
-            int columnCount = 1;
-            try
-            {
-                columnCount = Int32.Parse(columnCountAsString);
-            }
-            catch (FormatException)
-            {
-                FonetDriver.ActiveDriver.FireFonetError(
-                    "Bad value on region body 'column-count'");
-                columnCount = 1;
-            }
-            if ((columnCount > 1) && (overflow == Overflow.SCROLL))
-            {
-                FonetDriver.ActiveDriver.FireFonetError(
-                    "Setting 'column-count' to 1 because 'overflow' is set to 'scroll'");
-                columnCount = 1;
-            }
-            body.setColumnCount(columnCount);
-
-            int columnGap =
-                this.properties.GetProperty("column-gap").GetLength().MValue();
-            body.setColumnGap(columnGap);
-
-            return body;
+            FonetDriver.ActiveDriver.FireFonetError(
+                "Bad value on region body 'column-count'");
+            columnCount = 1;
         }
-
-        protected override string GetDefaultRegionName()
+        if ((columnCount > 1) && (overflow == Overflow.SCROLL))
         {
-            return "xsl-region-body";
+            FonetDriver.ActiveDriver.FireFonetError(
+                "Setting 'column-count' to 1 because 'overflow' is set to 'scroll'");
+            columnCount = 1;
         }
+        body.setColumnCount(columnCount);
 
-        protected override string GetElementName()
-        {
-            return "fo:region-body";
-        }
+        int columnGap =
+            this._properties.GetProperty("column-gap").GetLength().MValue();
+        body.setColumnGap(columnGap);
 
-        public override string GetRegionClass()
-        {
-            return REGION_CLASS;
-        }
+        return body;
+    }
+
+    protected override string GetDefaultRegionName()
+    {
+        return "xsl-region-body";
+    }
+
+    protected override string GetElementName()
+    {
+        return "fo:region-body";
+    }
+
+    public override string GetRegionClass()
+    {
+        return REGION_CLASS;
     }
 }

@@ -1,6 +1,6 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
-    using Fonet.Pdf.Gdi;
+    using Genocs.Fonet.Pdf.Gdi;
 
     /// <summary>
     ///     A font descriptor specifies metrics and other attributes of a 

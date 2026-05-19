@@ -1,4 +1,6 @@
-namespace Fonet.Pdf
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     A Type 0 font is a composite font whose glyphs are obtained from a

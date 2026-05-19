@@ -1,31 +1,31 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.Layout;
+
+namespace Genocs.Fonet.Fo.Flow;
+
+internal class Float : FObjMixed
 {
-    using Fonet.Layout;
-
-    internal class Float : ToBeImplementedElement
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList) =>
+            new Float(parent, propertyList);
+    }
+
+    new public static FObj.Maker GetMaker() => new Maker();
+
+    protected Float(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        _name = "fo:float";
+    }
+
+    public override Status Layout(Area area)
+    {
+        if (!_propertyManager.IsVisible())
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new Float(parent, propertyList);
-            }
+            return new Status(Status.OK);
         }
 
-        new public static FObj.Maker GetMaker()
-        {
-            return new Maker();
-        }
-
-        protected Float(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            this.name = "fo:float";
-        }
-
-        public override Status Layout(Area area)
-        {
-            return base.Layout(area);
-        }
+        // Full side-float placement is deferred; render floated content in flow order.
+        return base.Layout(area);
     }
 }

@@ -1,14 +1,12 @@
-using Fonet.Render.Pdf;
+using Genocs.Fonet.Render.Pdf;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout;
+
+internal abstract class Box
 {
-    internal abstract class Box
-    {
-        protected internal Area parent;
+    protected internal Area? parent;
 
-        protected internal AreaTree areaTree = null;
+    protected internal AreaTree? areaTree;
 
-        public abstract void render(PdfRenderer renderer);
-    }
-
+    public abstract void Render(PdfRenderer renderer);
 }

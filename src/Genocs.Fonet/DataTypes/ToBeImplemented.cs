@@ -1,9 +1,8 @@
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal class ToBeImplemented
 {
-    internal class ToBeImplemented
+    public ToBeImplemented(string value)
     {
-        public ToBeImplemented(string value)
-        {
-        }
     }
 }

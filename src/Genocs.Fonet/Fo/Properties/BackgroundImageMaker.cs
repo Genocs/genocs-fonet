@@ -1,4 +1,4 @@
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class BackgroundImageMaker : StringProperty.Maker
     {

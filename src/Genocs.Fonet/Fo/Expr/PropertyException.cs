@@ -1,11 +1,5 @@
-using System;
+namespace Genocs.Fonet.Fo.Expr;
 
-namespace Fonet.Fo.Expr
+internal class PropertyException(string detail) : Exception(detail)
 {
-    internal class PropertyException : Exception
-    {
-        public PropertyException(string detail) : base(detail)
-        {
-        }
-    }
 }

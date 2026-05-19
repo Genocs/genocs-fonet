@@ -1,4 +1,6 @@
-namespace Fonet.Fo.Properties
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class GenericPadding : LengthProperty.Maker
     {

@@ -1,6 +1,6 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     internal class AbsolutePositionProps
     {

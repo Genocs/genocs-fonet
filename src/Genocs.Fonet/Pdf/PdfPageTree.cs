@@ -1,4 +1,6 @@
-namespace Fonet.Pdf
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     The pages of a document are accessed through a structure known

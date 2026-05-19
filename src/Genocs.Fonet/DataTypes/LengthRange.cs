@@ -1,107 +1,106 @@
-namespace Fonet.DataTypes
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.DataTypes;
+
+
+internal class LengthRange : ICompoundDatatype
 {
-    using Fonet.Fo;
+    private Property? _minimum;
+    private Property? _optimum;
+    private Property? _maximum;
+    private const int MINSET = 1;
+    private const int OPTSET = 2;
+    private const int MAXSET = 4;
+    private int bfSet = 0;
+    private bool bChecked = false;
 
-    internal class LengthRange : ICompoundDatatype
+    public virtual void SetComponent(string sCmpnName, Property cmpnValue, bool bIsDefault)
     {
-        private Property minimum;
-        private Property optimum;
-        private Property maximum;
-        private const int MINSET = 1;
-        private const int OPTSET = 2;
-        private const int MAXSET = 4;
-        private int bfSet = 0;
-        private bool bChecked = false;
-
-        public virtual void SetComponent(string sCmpnName, Property cmpnValue,
-                                         bool bIsDefault)
+        if (sCmpnName.Equals("minimum"))
         {
-            if (sCmpnName.Equals("minimum"))
-            {
-                SetMinimum(cmpnValue, bIsDefault);
-            }
-            else if (sCmpnName.Equals("optimum"))
-            {
-                SetOptimum(cmpnValue, bIsDefault);
-            }
-            else if (sCmpnName.Equals("maximum"))
-            {
-                SetMaximum(cmpnValue, bIsDefault);
-            }
+            SetMinimum(cmpnValue, bIsDefault);
         }
-
-        public virtual Property GetComponent(string sCmpnName)
+        else if (sCmpnName.Equals("optimum"))
         {
-            if (sCmpnName.Equals("minimum"))
-            {
-                return GetMinimum();
-            }
-            else if (sCmpnName.Equals("optimum"))
-            {
-                return GetOptimum();
-            }
-            else if (sCmpnName.Equals("maximum"))
-            {
-                return GetMaximum();
-            }
-            else
-            {
-                return null;
-            }
+            SetOptimum(cmpnValue, bIsDefault);
         }
-
-        protected void SetMinimum(Property minimum, bool bIsDefault)
+        else if (sCmpnName.Equals("maximum"))
         {
-            this.minimum = minimum;
-            if (!bIsDefault)
-            {
-                bfSet |= MINSET;
-            }
+            SetMaximum(cmpnValue, bIsDefault);
         }
+    }
 
-        protected void SetMaximum(Property max, bool bIsDefault)
+    public virtual Property? GetComponent(string sCmpnName)
+    {
+        if (sCmpnName.Equals("minimum"))
         {
-            maximum = max;
-            if (!bIsDefault)
-            {
-                bfSet |= MAXSET;
-            }
+            return GetMinimum();
         }
+        else if (sCmpnName.Equals("optimum"))
+        {
+            return GetOptimum();
+        }
+        else if (sCmpnName.Equals("maximum"))
+        {
+            return GetMaximum();
+        }
+        else
+        {
+            return null;
+        }
+    }
 
-        protected void SetOptimum(Property opt, bool bIsDefault)
+    protected void SetMinimum(Property minimum, bool bIsDefault)
+    {
+        _minimum = minimum;
+        if (!bIsDefault)
         {
-            optimum = opt;
-            if (!bIsDefault)
-            {
-                bfSet |= OPTSET;
-            }
+            bfSet |= MINSET;
         }
+    }
 
-        private void CheckConsistency()
+    protected void SetMaximum(Property max, bool bIsDefault)
+    {
+        _maximum = max;
+        if (!bIsDefault)
         {
-            if (bChecked)
-            {
-                return;
-            }
-            bChecked = true;
+            bfSet |= MAXSET;
         }
+    }
 
-        public Property GetMinimum()
+    protected void SetOptimum(Property opt, bool bIsDefault)
+    {
+        _optimum = opt;
+        if (!bIsDefault)
         {
-            CheckConsistency();
-            return this.minimum;
+            bfSet |= OPTSET;
         }
+    }
 
-        public Property GetMaximum()
+    private void CheckConsistency()
+    {
+        if (bChecked)
         {
-            CheckConsistency();
-            return this.maximum;
+            return;
         }
+        bChecked = true;
+    }
 
-        public Property GetOptimum()
-        {
-            CheckConsistency();
-            return this.optimum;
-        }
+    public Property? GetMinimum()
+    {
+        CheckConsistency();
+        return _minimum;
+    }
+
+    public Property? GetMaximum()
+    {
+        CheckConsistency();
+        return _maximum;
+    }
+
+    public Property? GetOptimum()
+    {
+        CheckConsistency();
+        return _optimum;
     }
 }

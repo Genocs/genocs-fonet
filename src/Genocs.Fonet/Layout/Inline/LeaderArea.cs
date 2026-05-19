@@ -1,7 +1,7 @@
-using Fonet.Fo.Properties;
-using Fonet.Render.Pdf;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Render.Pdf;
 
-namespace Fonet.Layout.Inline
+namespace Genocs.Fonet.Layout.Inline
 {
     internal class LeaderArea : InlineArea
     {
@@ -26,7 +26,7 @@ namespace Fonet.Layout.Inline
             this.ruleThickness = ruleThickness;
         }
 
-        public override void render(PdfRenderer renderer)
+        public override void Render(PdfRenderer renderer)
         {
             renderer.RenderLeaderArea(this);
         }

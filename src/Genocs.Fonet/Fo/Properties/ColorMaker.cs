@@ -1,4 +1,6 @@
-namespace Fonet.Fo.Properties
+using Genocs.Fonet.Fo.Properties;
+
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class ColorMaker : GenericColor
     {

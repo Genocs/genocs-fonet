@@ -1,37 +1,77 @@
-namespace Fonet.Fo.Flow
-{
-    using Fonet.Layout;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
 
-    internal class TableAndCaption : ToBeImplementedElement
+namespace Genocs.Fonet.Fo.Flow;
+
+internal class TableAndCaption : FObj
+{
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList) =>
+            new TableAndCaption(parent, propertyList);
+    }
+
+    new public static FObj.Maker GetMaker() => new Maker();
+
+    protected TableAndCaption(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        _name = "fo:table-and-caption";
+    }
+
+    public override Status Layout(Area area)
+    {
+        if (!_propertyManager.IsVisible())
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
+            return new Status(Status.OK);
+        }
+
+        Table? table = null;
+        TableCaption? caption = null;
+        foreach (FONode child in _children)
+        {
+            if (child is Table t)
             {
-                return new TableAndCaption(parent, propertyList);
+                table = t;
+            }
+            else if (child is TableCaption c)
+            {
+                caption = c;
             }
         }
 
-        new public static FObj.Maker GetMaker()
+        int captionSide = caption != null
+            ? caption._properties.GetProperty("caption-side").GetEnum()
+            : _properties.GetProperty("caption-side").GetEnum();
+        bool captionFirst = captionSide != CaptionSide.AFTER;
+
+        if (captionFirst && caption != null)
         {
-            return new Maker();
+            Status status = caption.Layout(area);
+            if (status.IsIncomplete())
+            {
+                return status;
+            }
         }
 
-        protected TableAndCaption(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
+        if (table != null)
         {
-            this.name = "fo:table-and-caption";
+            Status status = table.Layout(area);
+            if (status.IsIncomplete())
+            {
+                return status;
+            }
         }
 
-        public override Status Layout(Area area)
+        if (!captionFirst && caption != null)
         {
-            AccessibilityProps mAccProps = propMgr.GetAccessibilityProps();
-            AuralProps mAurProps = propMgr.GetAuralProps();
-            BorderAndPadding bap = propMgr.GetBorderAndPadding();
-            BackgroundProps bProps = propMgr.GetBackgroundProps();
-            MarginProps mProps = propMgr.GetMarginProps();
-            RelativePositionProps mRelProps = propMgr.GetRelativePositionProps();
-            return base.Layout(area);
+            Status status = caption.Layout(area);
+            if (status.IsIncomplete())
+            {
+                return status;
+            }
         }
+
+        return new Status(Status.OK);
     }
 }

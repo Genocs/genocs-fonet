@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+  <fo:layout-master-set>
+    <fo:simple-page-master master-name="A4" page-width="210mm" page-height="297mm" margin="20mm">
+      <fo:region-body/>
+    </fo:simple-page-master>
+  </fo:layout-master-set>
+  <fo:page-sequence master-reference="A4">
+    <fo:flow flow-name="xsl-region-body">
+      <fo:block font-family="Nunito" font-size="12pt" margin="10pt 20pt 30pt 40pt" background-color="#EEEEEE">
+        Margin shorthand block
+      </fo:block>
+
+      <fo:block font-family="Nunito" font-size="12pt" visibility="hidden">
+        This hidden block should not appear in the PDF.
+      </fo:block>
+
+      <fo:block font-family="Nunito" font-size="12pt" letter-spacing="2pt" word-spacing="6pt">
+        Spaced words in this line.
+      </fo:block>
+
+      <fo:table-and-caption>
+        <fo:table-caption caption-side="before">
+          <fo:block font-family="Nunito" font-size="14pt" font-weight="bold">
+            Quarterly Results
+          </fo:block>
+        </fo:table-caption>
+        <fo:table width="100%">
+          <fo:table-column column-width="proportional-column-width(1)"/>
+          <fo:table-column column-width="proportional-column-width(1)"/>
+          <fo:table-body>
+            <fo:table-row>
+              <fo:table-cell padding="4pt">
+                <fo:block font-family="Nunito" font-size="10pt">Q1</fo:block>
+              </fo:table-cell>
+              <fo:table-cell padding="4pt">
+                <fo:block font-family="Nunito" font-size="10pt">100</fo:block>
+              </fo:table-cell>
+            </fo:table-row>
+            <fo:table-row>
+              <fo:table-cell padding="4pt">
+                <fo:block font-family="Nunito" font-size="10pt">Q2</fo:block>
+              </fo:table-cell>
+              <fo:table-cell padding="4pt">
+                <fo:block font-family="Nunito" font-size="10pt">200</fo:block>
+              </fo:table-cell>
+            </fo:table-row>
+          </fo:table-body>
+        </fo:table>
+      </fo:table-and-caption>
+    </fo:flow>
+  </fo:page-sequence>
+</fo:root>

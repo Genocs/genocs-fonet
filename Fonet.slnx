@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/_Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/Genocs.Fonet.XsltTransformer/Genocs.Fonet.XsltTransformer.csproj" Id="c6c7e766-11cc-446f-8eb5-d7700217f9a1" />
+  <Project Path="src/Genocs.Fonet/Genocs.Fonet.csproj" />
+  <Project Path="src/Host/Host.csproj" />
+  <Project Path="src/tests/Genocs.Fonet.Tests/Genocs.Fonet.Tests.csproj" />
+</Solution>

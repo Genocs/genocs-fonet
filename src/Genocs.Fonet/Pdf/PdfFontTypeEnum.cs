@@ -1,4 +1,4 @@
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     /// <summary>
     ///     An enumeration listing all the fonts types available in Pdf.

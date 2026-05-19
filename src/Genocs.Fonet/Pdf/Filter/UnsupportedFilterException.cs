@@ -1,12 +1,3 @@
-namespace Fonet.Pdf.Filter
-{
-    using System;
+namespace Genocs.Fonet.Pdf.Filter;
 
-    public class UnsupportedFilterException : Exception
-    {
-        public UnsupportedFilterException(string filterName)
-            : base(String.Format("The {0} filter is not supported.", filterName))
-        {
-        }
-    }
-}
+public class UnsupportedFilterException(string filterName) : Exception(String.Format("The {0} filter is not supported.", filterName));

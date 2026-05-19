@@ -1,55 +1,53 @@
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class BlankOrNotBlankMaker : EnumProperty.Maker
 {
-    internal class BlankOrNotBlankMaker : EnumProperty.Maker
+    protected static readonly EnumProperty s_propBLANK = new EnumProperty(Constants.BLANK);
+
+    protected static readonly EnumProperty s_propNOT_BLANK = new EnumProperty(Constants.NOT_BLANK);
+
+    protected static readonly EnumProperty s_propANY = new EnumProperty(Constants.ANY);
+
+    new public static PropertyMaker Maker(string propName)
     {
-        protected static readonly EnumProperty s_propBLANK = new EnumProperty(Constants.BLANK);
+        return new BlankOrNotBlankMaker(propName);
+    }
 
-        protected static readonly EnumProperty s_propNOT_BLANK = new EnumProperty(Constants.NOT_BLANK);
+    protected BlankOrNotBlankMaker(string name) : base(name) { }
 
-        protected static readonly EnumProperty s_propANY = new EnumProperty(Constants.ANY);
+    public override bool IsInherited()
+    {
+        return false;
+    }
 
-        new public static PropertyMaker Maker(string propName)
+    public override Property CheckEnumValues(string value)
+    {
+        if (value.Equals("blank"))
         {
-            return new BlankOrNotBlankMaker(propName);
+            return s_propBLANK;
         }
 
-        protected BlankOrNotBlankMaker(string name) : base(name) { }
-
-        public override bool IsInherited()
+        if (value.Equals("not-blank"))
         {
-            return false;
+            return s_propNOT_BLANK;
         }
 
-        public override Property CheckEnumValues(string value)
+        if (value.Equals("any"))
         {
-            if (value.Equals("blank"))
-            {
-                return s_propBLANK;
-            }
-
-            if (value.Equals("not-blank"))
-            {
-                return s_propNOT_BLANK;
-            }
-
-            if (value.Equals("any"))
-            {
-                return s_propANY;
-            }
-
-            return base.CheckEnumValues(value);
+            return s_propANY;
         }
 
-        private Property m_defaultProp = null;
+        return base.CheckEnumValues(value);
+    }
 
-        public override Property Make(PropertyList propertyList)
+    private Property m_defaultProp = null;
+
+    public override Property Make(PropertyList propertyList)
+    {
+        if (m_defaultProp == null)
         {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "any", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
+            m_defaultProp = Make(propertyList, "any", propertyList.getParentFObj());
         }
-
+        return m_defaultProp;
     }
 }

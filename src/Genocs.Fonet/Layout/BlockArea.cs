@@ -1,8 +1,9 @@
 using System.Collections;
-using Fonet.Fo.Flow;
-using Fonet.Render.Pdf;
+using Genocs.Fonet.Fo.Flow;
+using Genocs.Fonet.Layout;
+using Genocs.Fonet.Render.Pdf;
 
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     internal class BlockArea : Area
     {
@@ -39,7 +40,7 @@ namespace Fonet.Layout
             }
         }
 
-        public override void render(PdfRenderer renderer)
+        public override void Render(PdfRenderer renderer)
         {
             renderer.RenderBlockArea(this);
         }
@@ -87,7 +88,7 @@ namespace Fonet.Layout
                 this.currentLineArea.align(this.align);
                 this.addLineArea(this.currentLineArea);
             }
-            this.currentLineArea = new LineArea(fontState, lineHeight,
+            this.currentLineArea = new LineArea(FontState, lineHeight,
                                                 halfLeading, allocationWidth,
                                                 startIndent, endIndent,
                                                 currentLineArea);
@@ -120,7 +121,7 @@ namespace Fonet.Layout
 
         public override void start()
         {
-            currentLineArea = new LineArea(fontState, lineHeight, halfLeading,
+            currentLineArea = new LineArea(FontState, lineHeight, halfLeading,
                                            allocationWidth,
                                            startIndent + textIndent, endIndent,
                                            null);

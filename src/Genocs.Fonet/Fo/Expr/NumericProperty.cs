@@ -1,40 +1,38 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal class NumericProperty : Property
 {
-    internal class NumericProperty : Property
+    internal Numeric Numeric { get; set; }
+
+    internal NumericProperty(Numeric value)
     {
-        private Numeric numeric;
+        Numeric = value;
+    }
 
-        internal NumericProperty(Numeric value)
-        {
-            this.numeric = value;
-        }
+    public override Numeric GetNumeric()
+    {
+        return this.Numeric;
+    }
 
-        public override Numeric GetNumeric()
-        {
-            return this.numeric;
-        }
+    public override Number GetNumber()
+    {
+        return Numeric.AsNumber();
+    }
 
-        public override Number GetNumber()
-        {
-            return numeric.asNumber();
-        }
+    public override Length GetLength()
+    {
+        return Numeric.AsLength();
+    }
 
-        public override Length GetLength()
-        {
-            return numeric.asLength();
-        }
+    public override ColorType GetColorType()
+    {
+        return null;
+    }
 
-        public override ColorType GetColorType()
-        {
-            return null;
-        }
-
-        public override object GetObject()
-        {
-            return this.numeric;
-        }
-
+    public override object GetObject()
+    {
+        return Numeric;
     }
 }

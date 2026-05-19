@@ -1,38 +1,39 @@
-namespace Fonet.Pdf.Filter
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf.Filter;
+
+public class DctFilter : IFilter
 {
-    public class DctFilter : IFilter
+    public DctFilter()
     {
-        public DctFilter()
-        {
-        }
+    }
 
-        public PdfObject Name
+    public PdfObject Name
+    {
+        get
         {
-            get
-            {
-                return PdfName.Names.DCTDecode;
-            }
+            return PdfName.Names.DCTDecode;
         }
+    }
 
-        public PdfObject DecodeParms
+    public PdfObject DecodeParms
+    {
+        get
         {
-            get
-            {
-                return PdfNull.Null;
-            }
+            return PdfNull.Null;
         }
+    }
 
-        public bool HasDecodeParams
+    public bool HasDecodeParams
+    {
+        get
         {
-            get
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        public byte[] Encode(byte[] data)
-        {
-            return data;
-        }
+    public byte[] Encode(byte[] data)
+    {
+        return data;
     }
 }

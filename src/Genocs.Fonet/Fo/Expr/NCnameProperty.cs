@@ -1,30 +1,28 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal class NCnameProperty : Property
 {
-    internal class NCnameProperty : Property
+    private string ncName;
+
+    public NCnameProperty(string ncName)
     {
-        private string ncName;
+        this.ncName = ncName;
+    }
 
-        public NCnameProperty(string ncName)
-        {
-            this.ncName = ncName;
-        }
+    public ColorType getColor()
+    {
+        throw new PropertyException("Not a Color");
+    }
 
-        public ColorType getColor()
-        {
-            throw new PropertyException("Not a Color");
-        }
+    public override string GetString()
+    {
+        return this.ncName;
+    }
 
-        public override string GetString()
-        {
-            return this.ncName;
-        }
-
-        public override string GetNCname()
-        {
-            return this.ncName;
-        }
-
+    public override string GetNCname()
+    {
+        return this.ncName;
     }
 }

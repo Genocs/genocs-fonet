@@ -1,67 +1,41 @@
-using Fonet.Fo;
+using Genocs.Fonet.Fo;
 
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal class Space : LengthRange
 {
-    internal class Space : LengthRange
+    public Property? Conditionality { get; set; }
+    public Property? Precedence { get; set; }
+
+    public override void SetComponent(string componentName, Property componentValue, bool isDefault)
     {
-        private Property precedence;
-        private Property conditionality;
-
-        public override void SetComponent(string componentName, Property componentValue, bool isDefault)
+        if (componentName.Equals("precedence"))
         {
-            if (componentName.Equals("precedence"))
-            {
-                Precedence = componentValue;
-            }
-            else if (componentName.Equals("conditionality"))
-            {
-                Conditionality = componentValue;
-            }
-            else
-            {
-                base.SetComponent(componentName, componentValue, isDefault);
-            }
+            Precedence = componentValue;
         }
-
-        public override Property GetComponent(string componentName)
+        else if (componentName.Equals("conditionality"))
         {
-            if (componentName.Equals("precedence"))
-            {
-                return Precedence;
-            }
-            else if (componentName.Equals("conditionality"))
-            {
-                return Conditionality;
-            }
-            else
-            {
-                return base.GetComponent(componentName);
-            }
+            Conditionality = componentValue;
         }
-
-        public Property Conditionality
+        else
         {
-            get
-            {
-                return conditionality;
-            }
-            set
-            {
-                conditionality = value;
-            }
+            base.SetComponent(componentName, componentValue, isDefault);
         }
+    }
 
-        public Property Precedence
+    public override Property? GetComponent(string componentName)
+    {
+        if (componentName.Equals("precedence"))
         {
-            get
-            {
-                return precedence;
-            }
-            set
-            {
-                precedence = value;
-            }
+            return Precedence;
         }
-
+        else if (componentName.Equals("conditionality"))
+        {
+            return Conditionality;
+        }
+        else
+        {
+            return base.GetComponent(componentName);
+        }
     }
 }

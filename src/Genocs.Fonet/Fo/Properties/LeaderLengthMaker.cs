@@ -1,7 +1,8 @@
 using System;
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class LeaderLengthMaker : LengthRangeProperty.Maker
     {
@@ -116,16 +117,13 @@ namespace Fonet.Fo.Properties
             LengthRange p = new LengthRange();
             Property subProp;
 
-            subProp = GetSubpropMaker("minimum").Make(pList,
-                                                      GetDefaultForMinimum(), fo);
+            subProp = GetSubpropMaker("minimum").Make(pList, GetDefaultForMinimum(), fo);
             p.SetComponent("minimum", subProp, true);
 
-            subProp = GetSubpropMaker("optimum").Make(pList,
-                                                      GetDefaultForOptimum(), fo);
+            subProp = GetSubpropMaker("optimum").Make(pList, GetDefaultForOptimum(), fo);
             p.SetComponent("optimum", subProp, true);
 
-            subProp = GetSubpropMaker("maximum").Make(pList,
-                                                      GetDefaultForMaximum(), fo);
+            subProp = GetSubpropMaker("maximum").Make(pList, GetDefaultForMaximum(), fo);
             p.SetComponent("maximum", subProp, true);
 
             return new LengthRangeProperty(p);
@@ -135,19 +133,16 @@ namespace Fonet.Fo.Properties
         protected virtual String GetDefaultForMinimum()
         {
             return "0pt";
-
         }
 
         protected virtual String GetDefaultForOptimum()
         {
             return "12.0pt";
-
         }
 
         protected virtual String GetDefaultForMaximum()
         {
             return "100%";
-
         }
 
         public override Property ConvertProperty(Property p, PropertyList pList, FObj fo)
@@ -156,6 +151,7 @@ namespace Fonet.Fo.Properties
             {
                 return p;
             }
+
             if (!(p is EnumProperty))
             {
                 p = m_shorthandMaker.ConvertProperty(p, pList, fo);

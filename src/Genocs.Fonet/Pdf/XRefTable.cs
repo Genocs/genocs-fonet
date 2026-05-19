@@ -1,4 +1,4 @@
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
 
     /// <summary>

@@ -1,200 +1,197 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.Fo.Pagination;
+using Genocs.Fonet.Layout;
+using System.Collections;
+
+namespace Genocs.Fonet.Fo.Flow;
+
+internal class Flow : FObj
 {
-    using System.Collections;
-    using Fonet.Fo.Pagination;
-    using Fonet.Layout;
-
-    internal class Flow : FObj
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new Flow(parent, propertyList);
-            }
+            return new Flow(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    private PageSequence pageSequence;
+    private ArrayList markerSnapshot;
+    private string _flowName;
+    private int contentWidth;
+    private Status _status = new Status(Status.AREA_FULL_NONE);
+
+    protected Flow(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        this._name = GetElementName();
+
+        if (parent.GetName().Equals("fo:page-sequence"))
         {
-            return new Maker();
+            this.pageSequence = (PageSequence)parent;
         }
-
-        private PageSequence pageSequence;
-        private ArrayList markerSnapshot;
-        private string _flowName;
-        private int contentWidth;
-        private Status _status = new Status(Status.AREA_FULL_NONE);
-
-        protected Flow(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
+        else
         {
-            this.name = GetElementName();
+            throw new FonetException("flow must be child of "
+                + "page-sequence, not "
+                + parent.GetName());
+        }
+        SetFlowName(GetProperty("flow-name").GetString());
 
-            if (parent.GetName().Equals("fo:page-sequence"))
+        if (pageSequence.IsFlowSet)
+        {
+            if (this._name.Equals("fo:flow"))
             {
-                this.pageSequence = (PageSequence)parent;
+                throw new FonetException("Only a single fo:flow permitted per fo:page-sequence");
             }
             else
             {
-                throw new FonetException("flow must be child of "
-                    + "page-sequence, not "
-                    + parent.GetName());
-            }
-            SetFlowName(GetProperty("flow-name").GetString());
-
-            if (pageSequence.IsFlowSet)
-            {
-                if (this.name.Equals("fo:flow"))
-                {
-                    throw new FonetException("Only a single fo:flow permitted"
-                        + " per fo:page-sequence");
-                }
-                else
-                {
-                    throw new FonetException(this.name
-                        + " not allowed after fo:flow");
-                }
-            }
-            pageSequence.AddFlow(this);
-        }
-
-        protected virtual void SetFlowName(string name)
-        {
-            if (name == null || name.Equals(""))
-            {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    "A 'flow-name' is required for " + GetElementName() + ".");
-                _flowName = "xsl-region-body";
-            }
-            else
-            {
-                _flowName = name;
+                throw new FonetException($"{_name} not allowed after fo:flow");
             }
         }
+        pageSequence.AddFlow(this);
+    }
 
-        public string GetFlowName()
+    protected virtual void SetFlowName(string name)
+    {
+        if (name == null || name.Equals(""))
         {
-            return _flowName;
+            FonetDriver.ActiveDriver.FireFonetWarning(
+                "A 'flow-name' is required for " + GetElementName() + ".");
+            _flowName = "xsl-region-body";
+        }
+        else
+        {
+            _flowName = name;
+        }
+    }
+
+    public string GetFlowName()
+    {
+        return _flowName;
+    }
+
+    public override Status Layout(Area area)
+    {
+        return Layout(area, null);
+    }
+
+    public virtual Status Layout(Area area, Region region)
+    {
+        if (this._marker == MarkerStart)
+        {
+            this._marker = 0;
         }
 
-        public override Status Layout(Area area)
+        BodyAreaContainer bac = (BodyAreaContainer)area;
+
+        bool prevChildMustKeepWithNext = false;
+        ArrayList pageMarker = this.GetMarkerSnapshot(new ArrayList());
+
+        int numChildren = this._children.Count;
+        if (numChildren == 0)
         {
-            return Layout(area, null);
+            throw new FonetException("fo:flow must contain block-level children");
         }
-
-        public virtual Status Layout(Area area, Region region)
+        for (int i = this._marker; i < numChildren; i++)
         {
-            if (this.marker == MarkerStart)
+            FObj fo = (FObj)_children[i];
+
+            if (bac.isBalancingRequired(fo))
             {
-                this.marker = 0;
+                bac.resetSpanArea();
+
+                this.Rollback(markerSnapshot);
+                i = this._marker - 1;
+                continue;
             }
-
-            BodyAreaContainer bac = (BodyAreaContainer)area;
-
-            bool prevChildMustKeepWithNext = false;
-            ArrayList pageMarker = this.getMarkerSnapshot(new ArrayList());
-
-            int numChildren = this.children.Count;
-            if (numChildren == 0)
+            Area currentArea = bac.getNextArea(fo);
+            currentArea.setIDReferences(bac.GetIDReferences());
+            if (bac.isNewSpanArea())
             {
-                throw new FonetException("fo:flow must contain block-level children");
+                this._marker = i;
+                markerSnapshot = this.GetMarkerSnapshot(new ArrayList());
             }
-            for (int i = this.marker; i < numChildren; i++)
+            SetContentWidth(currentArea.getContentWidth());
+
+            _status = fo.Layout(currentArea);
+
+            if (_status.IsIncomplete())
             {
-                FObj fo = (FObj)children[i];
-
-                if (bac.isBalancingRequired(fo))
+                if ((prevChildMustKeepWithNext) && (_status.LaidOutNone()))
                 {
-                    bac.resetSpanArea();
-
-                    this.Rollback(markerSnapshot);
-                    i = this.marker - 1;
-                    continue;
+                    this._marker = i - 1;
+                    FObj prevChild = (FObj)_children[this._marker];
+                    prevChild.RemoveAreas();
+                    prevChild.ResetMarker();
+                    prevChild.RemoveID(area.GetIDReferences());
+                    _status = new Status(Status.AREA_FULL_SOME);
+                    return _status;
                 }
-                Area currentArea = bac.getNextArea(fo);
-                currentArea.setIDReferences(bac.getIDReferences());
-                if (bac.isNewSpanArea())
+                if (bac.isLastColumn())
                 {
-                    this.marker = i;
-                    markerSnapshot = this.getMarkerSnapshot(new ArrayList());
-                }
-                SetContentWidth(currentArea.getContentWidth());
-
-                _status = fo.Layout(currentArea);
-
-                if (_status.isIncomplete())
-                {
-                    if ((prevChildMustKeepWithNext) && (_status.laidOutNone()))
+                    if (_status.GetCode() == Status.FORCE_COLUMN_BREAK)
                     {
-                        this.marker = i - 1;
-                        FObj prevChild = (FObj)children[this.marker];
-                        prevChild.RemoveAreas();
-                        prevChild.ResetMarker();
-                        prevChild.RemoveID(area.getIDReferences());
-                        _status = new Status(Status.AREA_FULL_SOME);
+                        this._marker = i;
+                        _status =
+                            new Status(Status.FORCE_PAGE_BREAK);
                         return _status;
-                    }
-                    if (bac.isLastColumn())
-                    {
-                        if (_status.getCode() == Status.FORCE_COLUMN_BREAK)
-                        {
-                            this.marker = i;
-                            _status =
-                                new Status(Status.FORCE_PAGE_BREAK);
-                            return _status;
-                        }
-                        else
-                        {
-                            this.marker = i;
-                            return _status;
-                        }
                     }
                     else
                     {
-                        if (_status.isPageBreak())
-                        {
-                            this.marker = i;
-                            return _status;
-                        }
-                        ((ColumnArea)currentArea).incrementSpanIndex();
-                        i--;
+                        this._marker = i;
+                        return _status;
                     }
-                }
-                if (_status.getCode() == Status.KEEP_WITH_NEXT)
-                {
-                    prevChildMustKeepWithNext = true;
                 }
                 else
                 {
-                    prevChildMustKeepWithNext = false;
+                    if (_status.IsPageBreak())
+                    {
+                        this._marker = i;
+                        return _status;
+                    }
+                    ((ColumnArea)currentArea).incrementSpanIndex();
+                    i--;
                 }
             }
-            return _status;
+            if (_status.GetCode() == Status.KEEP_WITH_NEXT)
+            {
+                prevChildMustKeepWithNext = true;
+            }
+            else
+            {
+                prevChildMustKeepWithNext = false;
+            }
         }
+        return _status;
+    }
 
-        protected void SetContentWidth(int contentWidth)
-        {
-            this.contentWidth = contentWidth;
-        }
+    protected void SetContentWidth(int contentWidth)
+    {
+        this.contentWidth = contentWidth;
+    }
 
-        public override int GetContentWidth()
-        {
-            return this.contentWidth;
-        }
+    public override int GetContentWidth()
+    {
+        return this.contentWidth;
+    }
 
-        protected virtual string GetElementName()
-        {
-            return "fo:flow";
-        }
+    protected virtual string GetElementName()
+    {
+        return "fo:flow";
+    }
 
-        public Status getStatus()
-        {
-            return _status;
-        }
+    public Status GetStatus()
+    {
+        return _status;
+    }
 
-        public override bool GeneratesReferenceAreas()
-        {
-            return true;
-        }
+    public override bool GeneratesReferenceAreas()
+    {
+        return true;
     }
 }

@@ -1,9 +1,3 @@
-namespace Fonet.Pdf
-{
-    public class PdfAnnotList : PdfArray
-    {
-        public PdfAnnotList(PdfObjectId objectId) : base(objectId)
-        {
-        }
-    }
-}
+namespace Genocs.Fonet.Pdf;
+
+public class PdfAnnotList(PdfObjectId objectId) : PdfArray(objectId);

@@ -1,65 +1,64 @@
 using System.Text;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class BorderAfterColorMaker : GenericColor
 {
-    internal class BorderAfterColorMaker : GenericColor
+    new public static PropertyMaker Maker(string propName)
     {
-        new public static PropertyMaker Maker(string propName)
+        return new BorderAfterColorMaker(propName);
+    }
+
+    protected BorderAfterColorMaker(string name) : base(name) { }
+
+    public override bool IsInherited()
+    {
+        return false;
+    }
+
+    public override bool IsCorrespondingForced(PropertyList propertyList)
+    {
+        StringBuilder sbExpr = new StringBuilder();
+
+        sbExpr.Length = 0;
+        sbExpr.Append("border-");
+        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
+        sbExpr.Append("-color");
+        if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
         {
-            return new BorderAfterColorMaker(propName);
+            return true;
         }
 
-        protected BorderAfterColorMaker(string name) : base(name) { }
+        return false;
+    }
 
-        public override bool IsInherited()
+
+    public override Property Compute(PropertyList propertyList)
+    {
+        FObj parentFO = propertyList.getParentFObj();
+        StringBuilder sbExpr = new StringBuilder();
+        Property p = null;
+        sbExpr.Append("border-");
+        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
+        sbExpr.Append("-color");
+        p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
+
+        if (p != null)
         {
-            return false;
+            p = ConvertProperty(p, propertyList, parentFO);
         }
 
-        public override bool IsCorrespondingForced(PropertyList propertyList)
+        return p;
+    }
+
+    private Property m_defaultProp = null;
+
+    public override Property Make(PropertyList propertyList)
+    {
+        if (m_defaultProp == null)
         {
-            StringBuilder sbExpr = new StringBuilder();
-
-            sbExpr.Length = 0;
-            sbExpr.Append("border-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
-            sbExpr.Append("-color");
-            if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
-            {
-                return true;
-            }
-
-            return false;
+            m_defaultProp = Make(propertyList, "black", propertyList.getParentFObj());
         }
-
-
-        public override Property Compute(PropertyList propertyList)
-        {
-            FObj parentFO = propertyList.getParentFObj();
-            StringBuilder sbExpr = new StringBuilder();
-            Property p = null;
-            sbExpr.Append("border-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
-            sbExpr.Append("-color");
-            p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
-
-            if (p != null)
-            {
-                p = ConvertProperty(p, propertyList, parentFO);
-            }
-
-            return p;
-        }
-
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "black", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-        }
+        return m_defaultProp;
     }
 }

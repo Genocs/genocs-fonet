@@ -1,31 +1,24 @@
-using Fonet.Layout;
+using Genocs.Fonet.Layout;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class Unknown : FObj
 {
-    internal class Unknown : FObj
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
-        {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new Unknown(parent, propertyList);
-            }
-        }
-
-        new public static FObj.Maker GetMaker()
-        {
-            return new Maker();
-        }
-
-        protected Unknown(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            this.name = "unknown";
-        }
-
-        public override Status Layout(Area area)
-        {
-            return new Status(Status.OK);
-        }
+        public override FObj Make(FObj parent, PropertyList propertyList)
+            => new Unknown(parent, propertyList);
     }
+
+    new public static FObj.Maker GetMaker()
+        => new Maker();
+
+    protected Unknown(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        _name = "unknown";
+    }
+
+    public override Status Layout(Area area)
+        => new Status(Status.OK);
 }

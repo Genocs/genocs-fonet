@@ -1,4 +1,6 @@
-namespace Fonet.Fo;
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.Fo;
 
 internal class CharacterProperty : Property
 {

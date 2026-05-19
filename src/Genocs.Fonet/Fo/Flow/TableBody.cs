@@ -1,4 +1,6 @@
-namespace Fonet.Fo.Flow
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.Fo.Flow
 {
     internal class TableBody : AbstractTableBody
     {
@@ -18,7 +20,7 @@ namespace Fonet.Fo.Flow
         public TableBody(FObj parent, PropertyList propertyList)
             : base(parent, propertyList)
         {
-            this.name = "fo:table-body";
+            this._name = "fo:table-body";
         }
 
     }

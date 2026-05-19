@@ -1,4 +1,6 @@
-namespace Fonet.Fo;
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.Fo;
 
 internal class ColorProfile : ToBeImplementedElement
 {
@@ -18,7 +20,7 @@ internal class ColorProfile : ToBeImplementedElement
     protected ColorProfile(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this.name = "fo:color-profile";
+        this._name = "fo:color-profile";
     }
 
 }

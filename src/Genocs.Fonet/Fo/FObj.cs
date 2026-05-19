@@ -1,150 +1,146 @@
-using System;
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Layout;
 using System.Collections;
-using Fonet.DataTypes;
-using Fonet.Layout;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class FObj : FONode
 {
-    internal class FObj : FONode
+    internal class Maker
     {
-        internal class Maker
+        public virtual FObj Make(FObj parent, PropertyList propertyList)
         {
-            public virtual FObj Make(FObj parent, PropertyList propertyList)
+            return new FObj(parent, propertyList);
+        }
+    }
+
+    public static Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    public PropertyList _properties;
+
+    protected PropertyManager _propertyManager;
+
+    protected string _name;
+
+    private Hashtable markerClassNames;
+
+    protected FObj(FObj parent, PropertyList propertyList)
+        : base(parent)
+    {
+        propertyList.FObj = this;
+        _properties = propertyList;
+        _propertyManager = MakePropertyManager(propertyList);
+        _name = "default FO";
+        SetWritingMode();
+    }
+
+    protected PropertyManager MakePropertyManager(PropertyList propertyList)
+        => new(propertyList);
+
+    protected internal virtual void AddCharacters(char[] data, int start, int length)
+    {
+        // ignore
+    }
+
+    public override Status Layout(Area area)
+    {
+        return new Status(Status.OK);
+    }
+
+    public string GetName()
+    {
+        return _name;
+    }
+
+    protected internal virtual void Start()
+    {
+        // do nothing by default
+    }
+
+    protected internal virtual void End()
+    {
+        // do nothing by default
+    }
+
+    public override Property GetProperty(string name)
+    {
+        return (_properties.GetProperty(name));
+    }
+
+    public virtual int GetContentWidth()
+    {
+        return 0;
+    }
+
+    public virtual void RemoveID(IDReferences idReferences)
+    {
+        if (((FObj)this)._properties.GetProperty("id") == null
+            || ((FObj)this)._properties.GetProperty("id").GetString() == null)
+        {
+            return;
+        }
+        idReferences.RemoveID(((FObj)this)._properties.GetProperty("id").GetString());
+        int numChildren = this._children.Count;
+        for (int i = 0; i < numChildren; i++)
+        {
+            FONode child = (FONode)_children[i];
+            if ((child is FObj))
             {
-                return new FObj(parent, propertyList);
+                ((FObj)child).RemoveID(idReferences);
             }
         }
+    }
 
-        public static Maker GetMaker()
+    public virtual bool GeneratesReferenceAreas()
+    {
+        return false;
+    }
+
+    protected virtual void SetWritingMode()
+    {
+        FObj p;
+        FObj parent;
+        for (p = this;
+            !p.GeneratesReferenceAreas() && (parent = p.getParent()) != null;
+            p = parent)
         {
-            return new Maker();
+            ;
         }
+        _properties.SetWritingMode(p.GetProperty("writing-mode").GetEnum());
+    }
 
-        public PropertyList properties;
-
-        protected PropertyManager propMgr;
-
-        protected string name;
-
-        private Hashtable markerClassNames;
-
-        protected FObj(FObj parent, PropertyList propertyList)
-            : base(parent)
+    public void AddMarker(string markerClassName)
+    {
+        if (_children != null)
         {
-            this.properties = propertyList;
-            propertyList.FObj = this;
-            this.propMgr = MakePropertyManager(propertyList);
-            this.name = "default FO";
-            SetWritingMode();
-        }
-
-        protected PropertyManager MakePropertyManager(PropertyList propertyList)
-        {
-            return new PropertyManager(propertyList);
-        }
-
-        protected internal virtual void AddCharacters(char[] data, int start, int length)
-        {
-            // ignore
-        }
-
-        public override Status Layout(Area area)
-        {
-            return new Status(Status.OK);
-        }
-
-        public string GetName()
-        {
-            return name;
-        }
-
-        protected internal virtual void Start()
-        {
-            // do nothing by default
-        }
-
-        protected internal virtual void End()
-        {
-            // do nothing by default
-        }
-
-        public override Property GetProperty(string name)
-        {
-            return (properties.GetProperty(name));
-        }
-
-        public virtual int GetContentWidth()
-        {
-            return 0;
-        }
-
-        public virtual void RemoveID(IDReferences idReferences)
-        {
-            if (((FObj)this).properties.GetProperty("id") == null
-                || ((FObj)this).properties.GetProperty("id").GetString() == null)
+            for (int i = 0; i < _children.Count; i++)
             {
-                return;
-            }
-            idReferences.RemoveID(((FObj)this).properties.GetProperty("id").GetString());
-            int numChildren = this.children.Count;
-            for (int i = 0; i < numChildren; i++)
-            {
-                FONode child = (FONode)children[i];
-                if ((child is FObj))
+                FONode child = (FONode)_children[i];
+                if (!child.MayPrecedeMarker())
                 {
-                    ((FObj)child).RemoveID(idReferences);
+                    throw new FonetException($"A fo:marker must be an initial child of '{GetName()}'");
                 }
             }
         }
 
-        public virtual bool GeneratesReferenceAreas()
+        if (markerClassNames == null)
         {
-            return false;
+            markerClassNames = new Hashtable
+            {
+                { markerClassName, String.Empty }
+            };
         }
 
-        protected virtual void SetWritingMode()
+        else if (!markerClassNames.ContainsKey(markerClassName))
         {
-            FObj p;
-            FObj parent;
-            for (p = this;
-                !p.GeneratesReferenceAreas() && (parent = p.getParent()) != null;
-                p = parent)
-            {
-                ;
-            }
-            this.properties.SetWritingMode(p.GetProperty("writing-mode").GetEnum());
+            markerClassNames.Add(markerClassName, String.Empty);
         }
-
-        public void AddMarker(string markerClassName)
+        else
         {
-            if (children != null)
-            {
-                for (int i = 0; i < children.Count; i++)
-                {
-                    FONode child = (FONode)children[i];
-                    if (!child.MayPrecedeMarker())
-                    {
-                        throw new FonetException(
-                            String.Format("A fo:marker must be an initial child of '{0}'", GetName()));
-                    }
-                }
-            }
-            if (markerClassNames == null)
-            {
-                markerClassNames = new Hashtable();
-                markerClassNames.Add(markerClassName, String.Empty);
-            }
-            else if (!markerClassNames.ContainsKey(markerClassName))
-            {
-                markerClassNames.Add(markerClassName, String.Empty);
-            }
-            else
-            {
-                throw new FonetException(
-                    String.Format("marker-class-name '{0}' already exists for this parent",
-                                  markerClassName));
-            }
+            throw new FonetException($"marker-class-name '{markerClassName}' already exists for this parent");
         }
-
     }
 }

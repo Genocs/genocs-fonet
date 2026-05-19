@@ -1,39 +1,40 @@
-namespace Fonet.Pdf.Filter
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf.Filter;
+
+public class RunLengthFilter : IFilter
 {
-    public class RunLengthFilter : IFilter
+    public RunLengthFilter()
     {
-        public RunLengthFilter()
-        {
-            throw new UnsupportedFilterException("RunLengthDecode");
-        }
+        throw new UnsupportedFilterException("RunLengthDecode");
+    }
 
-        public PdfObject Name
+    public PdfObject Name
+    {
+        get
         {
-            get
-            {
-                return PdfName.Names.RunLengthDecode;
-            }
+            return PdfName.Names.RunLengthDecode;
         }
+    }
 
-        public PdfObject DecodeParms
+    public PdfObject DecodeParms
+    {
+        get
         {
-            get
-            {
-                return PdfNull.Null;
-            }
+            return PdfNull.Null;
         }
+    }
 
-        public bool HasDecodeParams
+    public bool HasDecodeParams
+    {
+        get
         {
-            get
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        public byte[] Encode(byte[] data)
-        {
-            return data;
-        }
+    public byte[] Encode(byte[] data)
+    {
+        return data;
     }
 }

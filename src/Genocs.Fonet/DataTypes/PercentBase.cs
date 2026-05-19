@@ -1,11 +1,8 @@
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal interface IPercentBase
 {
-    internal interface IPercentBase
-    {
-        int GetDimension();
-
-        double GetBaseValue();
-
-        int GetBaseLength();
-    }
+    int GetDimension();
+    double GetBaseValue();
+    int GetBaseLength();
 }

@@ -1,6 +1,7 @@
-namespace Fonet.Fo.Flow
+namespace Genocs.Fonet.Fo.Flow
 {
-    using Fonet.Layout;
+    using Genocs.Fonet.Layout;
+    using Genocs.Fonet.Fo;
 
     internal class InlineContainer : ToBeImplementedElement
     {
@@ -20,12 +21,12 @@ namespace Fonet.Fo.Flow
         protected InlineContainer(FObj parent, PropertyList propertyList)
             : base(parent, propertyList)
         {
-            this.name = "fo:inline-container";
+            this._name = "fo:inline-container";
 
-            BorderAndPadding bap = propMgr.GetBorderAndPadding();
-            BackgroundProps bProps = propMgr.GetBackgroundProps();
-            MarginInlineProps mProps = propMgr.GetMarginInlineProps();
-            RelativePositionProps mRelProps = propMgr.GetRelativePositionProps();
+            BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+            BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+            MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
+            RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
         }
     }
 }

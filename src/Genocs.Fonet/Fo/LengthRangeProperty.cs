@@ -1,31 +1,19 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class LengthRangeProperty(LengthRange lengthRange) : Property
 {
-    internal class LengthRangeProperty : Property
+    private readonly LengthRange _lengthRange = lengthRange;
+
+    internal class Maker : LengthProperty.Maker
     {
-        internal class Maker : LengthProperty.Maker
-        {
-            protected Maker(string name) : base(name) { }
-
-        }
-
-        private LengthRange lengthRange;
-
-        public LengthRangeProperty(LengthRange lengthRange)
-        {
-            this.lengthRange = lengthRange;
-        }
-
-        public override LengthRange GetLengthRange()
-        {
-            return this.lengthRange;
-        }
-
-        public override object GetObject()
-        {
-            return this.lengthRange;
-        }
-
+        protected Maker(string name) : base(name) { }
     }
+
+    public override LengthRange GetLengthRange() 
+        => _lengthRange;
+
+    public override object GetObject() 
+        => _lengthRange;
 }

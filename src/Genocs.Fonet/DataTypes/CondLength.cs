@@ -1,60 +1,51 @@
-namespace Fonet.DataTypes
+using Genocs.Fonet.Fo;
+using Genocs.Fonet.Fo.Properties;
+
+namespace Genocs.Fonet.DataTypes;
+
+internal class CondLength : ICompoundDatatype
 {
-    using Fonet.Fo;
-    using Fonet.Fo.Properties;
+    private Property? _length;
 
-    internal class CondLength : ICompoundDatatype
+    private Property? _conditionality;
+
+    public void SetComponent(string sCmpnName, Property cmpnValue, bool bIsDefault)
     {
-        private Property length;
-
-        private Property conditionality;
-
-        public void SetComponent(string sCmpnName, Property cmpnValue, bool bIsDefault)
+        if (sCmpnName.Equals("length"))
         {
-            if (sCmpnName.Equals("length"))
-            {
-                length = cmpnValue;
-            }
-            else if (sCmpnName.Equals("conditionality"))
-            {
-                conditionality = cmpnValue;
-            }
+            _length = cmpnValue;
         }
-
-        public Property GetComponent(string sCmpnName)
+        else if (sCmpnName.Equals("conditionality"))
         {
-            if (sCmpnName.Equals("length"))
-            {
-                return length;
-            }
-            else if (sCmpnName.Equals("conditionality"))
-            {
-                return conditionality;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public Property GetConditionality()
-        {
-            return conditionality;
-        }
-
-        public Property GetLength()
-        {
-            return length;
-        }
-
-        public bool IsDiscard()
-        {
-            return conditionality.GetEnum() == Constants.DISCARD;
-        }
-
-        public int MValue()
-        {
-            return length.GetLength().MValue();
+            _conditionality = cmpnValue;
         }
     }
+
+    public Property? GetComponent(string name)
+    {
+        if (name.Equals("length"))
+        {
+            return _length;
+        }
+        else if (name.Equals("conditionality"))
+        {
+            return _conditionality;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public Property? GetConditionality()
+        => _conditionality;
+
+    public Property? GetLength()
+        => _length;
+
+    public bool IsDiscard()
+        => _conditionality?.GetEnum() == Constants.DISCARD;
+
+    public int MValue()
+        => _length?.GetLength().MValue() ?? 0;
 }

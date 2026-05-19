@@ -1,8 +1,8 @@
 using System.IO;
 using System.Text;
-using Fonet.Pdf.Security;
+using Genocs.Fonet.Pdf.Security;
 
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     public sealed class PdfString : PdfObject
     {
@@ -108,8 +108,8 @@ namespace Fonet.Pdf
         ///     Returns this PdfString expressed using the 'literal' convention.
         /// </summary>
         /// <remarks>
-        ///     A literal string is written as an arbitrary number of characters 
-        ///     enclosed in parentheses.  Any characters may appear in a string 
+        ///     A literal string is written as an arbitrary number of _characters 
+        ///     enclosed in parentheses.  Any _characters may appear in a string 
         ///     except unbalanced parentheses and the backslash, which must be 
         ///     treated specially. Balanced pairs of parentheses within a string 
         ///     require no special treatment.
@@ -118,7 +118,7 @@ namespace Fonet.Pdf
         {
             // We size the memory stream to be slighly larger than
             // encodedString to account for the enclosing parentheses
-            // and the possiblilty of escaped characters.
+            // and the possiblilty of escaped _characters.
             MemoryStream ms = new MemoryStream(data.Length + 10);
 
             // 0x28 == '('
@@ -127,7 +127,7 @@ namespace Fonet.Pdf
             // 0x0a == LF
             // 0x0d == CR
 
-            // CR and LF characters are also escaped to prevent them from being normalised.
+            // CR and LF _characters are also escaped to prevent them from being normalised.
 
             ms.WriteByte(0x28);
             ms.Write(preamble, 0, preamble.Length);

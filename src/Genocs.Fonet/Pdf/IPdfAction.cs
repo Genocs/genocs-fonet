@@ -1,7 +1,6 @@
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf;
+
+public interface IPdfAction
 {
-    public interface IPdfAction
-    {
-        PdfObject GetAction();
-    }
+    PdfObject GetAction();
 }

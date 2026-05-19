@@ -1,8 +1,9 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     using System.Collections;
-    using Fonet.Layout.Inline;
-    using Fonet.Util;
+    using Genocs.Fonet.Layout.Inline;
+    using Genocs.Fonet.Layout;
+    using Genocs.Fonet.Util;
 
     internal class LinkSet
     {

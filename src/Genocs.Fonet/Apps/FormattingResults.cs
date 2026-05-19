@@ -1,45 +1,38 @@
-namespace Fonet.Apps
+using Genocs.Fonet.Fo.Pagination;
+using System.Collections;
+
+namespace Genocs.Fonet.Apps;
+
+internal class FormattingResults
 {
-    using System.Collections;
-    using Fonet.Fo.Pagination;
+    private int _pageCount;
 
-    internal class FormattingResults
+    private ArrayList? _pageSequences;
+
+    internal int GetPageCount()
     {
-        private int pageCount = 0;
+        return _pageCount;
+    }
 
-        private ArrayList pageSequences = null;
+    internal ArrayList? GetPageSequences()
+    {
+        return _pageSequences;
+    }
 
-        internal int GetPageCount()
-        {
-            return this.pageCount;
-        }
+    internal void Reset()
+    {
+        _pageCount = 0;
+        _pageSequences?.Clear();
+    }
 
-        internal ArrayList GetPageSequences()
-        {
-            return this.pageSequences;
-        }
+    internal void HaveFormattedPageSequence(PageSequence pageSequence)
+    {
+        _pageCount += pageSequence.PageCount;
+        _pageSequences ??= [];
 
-        internal void Reset()
-        {
-            this.pageCount = 0;
-            if (this.pageSequences != null)
-            {
-                this.pageSequences.Clear();
-            }
-        }
-
-        internal void HaveFormattedPageSequence(PageSequence pageSequence)
-        {
-            this.pageCount += pageSequence.PageCount;
-            if (this.pageSequences == null)
-            {
-                this.pageSequences = new ArrayList();
-            }
-
-            this.pageSequences.Add(
-                new PageSequenceResults(
-                    pageSequence.GetProperty("id").GetString(),
-                    pageSequence.PageCount));
-        }
+        _pageSequences.Add(
+            new PageSequenceResults(
+                pageSequence.GetProperty("id").GetString(),
+                pageSequence.PageCount));
     }
 }

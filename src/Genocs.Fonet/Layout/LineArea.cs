@@ -1,13 +1,15 @@
-namespace Fonet.Layout
+namespace Genocs.Fonet.Layout
 {
     using System;
     using System.Collections;
     using System.Text;
-    using Fonet.Fo.Flow;
-    using Fonet.Fo.Properties;
-    using Fonet.Layout.Inline;
-    using Fonet.Render.Pdf;
-    using Fonet.Util;
+    using Genocs.Fonet.Fo.Flow;
+    using Genocs.Fonet.Fo.Properties;
+    using Genocs.Fonet.Layout.Inline;
+    using Genocs.Fonet;
+    using Genocs.Fonet.Layout;
+    using Genocs.Fonet.Render.Pdf;
+    using Genocs.Fonet.Util;
 
     internal class LineArea : Area
     {
@@ -39,7 +41,7 @@ namespace Fonet.Layout
         protected bool prevOlState = false;
         protected bool prevLTState = false;
 
-        public LineArea(FontState fontState, int lineHeight, int halfLeading,
+        public LineArea(FontState? fontState, int lineHeight, int halfLeading,
                         int allocationWidth, int startIndent, int endIndent,
                         LineArea prevLineArea)
             : base(fontState)
@@ -52,7 +54,8 @@ namespace Fonet.Layout
             this.placementOffset = fontState.Ascender;
             this.contentRectangleWidth = allocationWidth - startIndent
                 - endIndent;
-            this.fontState = fontState;
+
+            FontState = fontState;
 
             this.allocationHeight = this.nominalGlyphHeight;
             this.halfLeading = this.lineHeight - this.allocationHeight;
@@ -112,7 +115,7 @@ namespace Fonet.Layout
             }
         }
 
-        public override void render(PdfRenderer renderer)
+        public override void Render(PdfRenderer renderer)
         {
             renderer.RenderLineArea(this);
         }
@@ -196,7 +199,7 @@ namespace Fonet.Layout
                             {
                                 if (spaceWidth > 0)
                                 {
-                                    InlineSpace isp = new InlineSpace(spaceWidth);
+                                    InlineSpace isp = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
                                     isp.setUnderlined(textState.getUnderlined());
                                     isp.setOverlined(textState.getOverlined());
                                     isp.setLineThrough(textState.getLineThrough());
@@ -215,7 +218,7 @@ namespace Fonet.Layout
                         {
                             if (spaceWidth > 0)
                             {
-                                InlineSpace isp = new InlineSpace(spaceWidth);
+                                InlineSpace isp = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
                                 isp.setUnderlined(textState.getUnderlined());
                                 isp.setOverlined(textState.getOverlined());
                                 isp.setLineThrough(textState.getLineThrough());
@@ -231,7 +234,7 @@ namespace Fonet.Layout
                     {
                         if (spaceWidth > 0)
                         {
-                            InlineSpace isp = new InlineSpace(spaceWidth);
+                            InlineSpace isp = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
                             if (prevUlState)
                             {
                                 isp.setUnderlined(textState.getUnderlined());
@@ -260,7 +263,7 @@ namespace Fonet.Layout
                                     IntRectangle lr =
                                         new IntRectangle(finalWidth, 0,
                                                       ((InlineArea)box).getContentWidth(),
-                                                      fontState.FontSize);
+                                                      FontState?.FontSize ?? 0);
                                     ls.addRect(lr, this, (InlineArea)box);
                                 }
                             }
@@ -314,7 +317,7 @@ namespace Fonet.Layout
                             }
                             else if (c == '\n')
                             {
-                                InlineSpace isp = new InlineSpace(spaceWidth);
+                                InlineSpace isp = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
                                 addChild(isp);
                                 return i + 1;
                             }
@@ -366,7 +369,7 @@ namespace Fonet.Layout
                         }
                         else
                         {
-                            InlineSpace isp = new InlineSpace(spaceWidth);
+                            InlineSpace isp = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
                             if (prevUlState)
                             {
                                 isp.setUnderlined(textState.getUnderlined());
@@ -394,7 +397,7 @@ namespace Fonet.Layout
                                         IntRectangle lr =
                                             new IntRectangle(finalWidth, 0,
                                                           ((InlineArea)box).getContentWidth(),
-                                                          fontState.FontSize);
+                                                          FontState.FontSize);
                                         ls.addRect(lr, this, (InlineArea)box);
                                     }
                                 }
@@ -454,7 +457,7 @@ namespace Fonet.Layout
             {
                 if (spaceWidth > 0)
                 {
-                    InlineSpace pis = new InlineSpace(spaceWidth);
+                    InlineSpace pis = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
                     pis.setEatable(true);
                     if (prevUlState)
                     {
@@ -533,7 +536,7 @@ namespace Fonet.Layout
                     pendingAreas.Add(spaceArea);
                     break;
                 case LeaderPattern.RULE:
-                    LeaderArea leaderArea = new LeaderArea(fontState, red, green,
+                    LeaderArea leaderArea = new LeaderArea(FontState, red, green,
                                                            blue, "", leaderLength,
                                                            leaderPattern,
                                                            ruleThickness, ruleStyle);
@@ -600,7 +603,7 @@ namespace Fonet.Layout
         {
             if (spaceWidth > 0)
             {
-                addChild(new InlineSpace(spaceWidth));
+                addChild(new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth)));
                 finalWidth += spaceWidth;
                 spaceWidth = 0;
             }
@@ -637,7 +640,7 @@ namespace Fonet.Layout
                     break;
                 case TextAlign.JUSTIFY:
                     int spaceCount = 0;
-                    foreach (Box b in children)
+                    foreach (Box b in _children)
                     {
                         if (b is InlineSpace)
                         {
@@ -657,7 +660,7 @@ namespace Fonet.Layout
                         padding = 0;
                     }
                     spaceCount = 0;
-                    foreach (Box b in children)
+                    foreach (Box b in _children)
                     {
                         if (b is InlineSpace)
                         {
@@ -682,7 +685,7 @@ namespace Fonet.Layout
         {
             int superHeight = -this.placementOffset;
             int maxHeight = this.allocationHeight;
-            foreach (Box b in children)
+            foreach (Box b in _children)
             {
                 if (b is InlineArea)
                 {
@@ -698,12 +701,12 @@ namespace Fonet.Layout
                     int vert = ia.getVerticalAlign();
                     if (vert == VerticalAlign.SUPER)
                     {
-                        int fh = fontState.Ascender;
+                        int fh = FontState.Ascender;
                         ia.setYOffset((int)(placementOffset - (2 * fh / 3.0)));
                     }
                     else if (vert == VerticalAlign.SUB)
                     {
-                        int fh = fontState.Ascender;
+                        int fh = FontState.Ascender;
                         ia.setYOffset((int)(placementOffset + (2 * fh / 3.0)));
                     }
                 }
@@ -763,7 +766,7 @@ namespace Fonet.Layout
 
         public bool isEmpty()
         {
-            return !(pendingAreas.Count > 0 || children.Count > 0);
+            return !(pendingAreas.Count > 0 || _children.Count > 0);
         }
 
         public ArrayList getPendingAreas()
@@ -1142,7 +1145,7 @@ namespace Fonet.Layout
                     int spaceWidth = getCharWidth(currentWord[0]);
                     if (spaceWidth > 0)
                     {
-                        InlineSpace ispace = new InlineSpace(spaceWidth);
+                        InlineSpace ispace = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
                         extraw += spaceWidth;
                         if (prevUlState)
                         {
@@ -1196,11 +1199,21 @@ namespace Fonet.Layout
                     {
                         IntRectangle lr = new IntRectangle(startw + extraw, spacew,
                                                         ia.getContentWidth(),
-                                                        fontState.FontSize);
+                                                        FontState?.FontSize ?? 0);
                         ls.addRect(lr, this, ia);
                     }
                 }
             }
+        }
+
+        private int AdjustSpaceForWordSpacing(int spaceWidth)
+        {
+            if (spaceWidth <= 0 || currentFontState == null)
+            {
+                return spaceWidth;
+            }
+
+            return spaceWidth + currentFontState.WordSpacing;
         }
     }
 }

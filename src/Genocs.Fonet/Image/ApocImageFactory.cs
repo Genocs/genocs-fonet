@@ -1,158 +1,170 @@
-namespace Fonet.Image
+using System.Net;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Security;
+
+namespace Genocs.Fonet.Image;
+
+/// <summary>
+/// Creates FonetImage instances.
+/// </summary>
+internal class FonetImageFactory
 {
-    using System;
-    using System.IO;
-    using System.Net;
-    using System.Reflection;
-    using System.Security;
+    private static readonly HttpClient SharedHttpClient = CreateSharedHttpClient();
+
+    private static HttpClient CreateSharedHttpClient()
+    {
+        var handler = new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.All
+        };
+        return new HttpClient(handler, disposeHandler: true);
+    }
+
+    internal static FonetImage MakeFromResource(string key)
+    {
+        Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream(key)
+            ?? throw new FonetImageException($"Embedded image resource not found: {key}");
+
+        byte[] buffer = new byte[s.Length];
+        s.ReadExactly(buffer);
+
+        return new FonetImage("file://" + key, buffer);
+    }
 
     /// <summary>
-    /// Creates FonetImage instances.
+    ///     Creates a FonetImage from the supplied resource locator.  The 
+    ///     FonetImageFactory does cache images, therefore this method may 
+    ///     return a reference to an existing FonetImage
     /// </summary>
-    internal class FonetImageFactory
+    /// <param name="href">A Uniform Resource Identifier</param>
+    /// <returns>A reference to a  FonetImage</returns>
+    /// <exception cref="FonetImageException"></exception>
+    public static FonetImage Make(string href)
     {
-
-        internal static FonetImage MakeFromResource(string key)
+        if (FonetDriver.ActiveDriver?.ImageHandler != null)
         {
-
-            Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream(key);
-
-            byte[] buffer = new byte[s.Length];
-            s.Read(buffer, 0, buffer.Length);
-
-            return new FonetImage("file://" + key, buffer);
+            byte[] data = FonetDriver.ActiveDriver.ImageHandler(href);
+            if (data != null)
+            {
+                return new FonetImage(href, data);
+            }
         }
 
-        /// <summary>
-        ///     Creates a FonetImage from the supplied resource locator.  The 
-        ///     FonetImageFactory does cache images, therefore this method may 
-        ///     return a reference to an existing FonetImage
-        /// </summary>
-        /// <param name="href">A Uniform Resource Identifier</param>
-        /// <returns>A reference to a  FonetImage</returns>
-        /// <exception cref="FonetImageException"></exception>
-        public static FonetImage Make(string href)
+        Uri? absoluteURL;
+        UriSpecificationParser up = new UriSpecificationParser(href);
+        string path = up.Uri;
+
+        try
         {
-            // If an image handler has been registered on the driver, then
-            // give it a chance to handle the loading of image data.
-            if (FonetDriver.ActiveDriver.ImageHandler != null)
+            absoluteURL = new Uri(path);
+        }
+        catch
+        {
+            if (File.Exists(path))
             {
-                byte[] data = FonetDriver.ActiveDriver.ImageHandler(href);
-                if (data != null)
-                {
-                    return new FonetImage(href, data);
-                }
+                absoluteURL = new Uri("file://" + Path.Combine(Directory.GetCurrentDirectory(), path));
             }
-
-            Uri absoluteURL = null;
-            UriSpecificationParser up = new UriSpecificationParser(href);
-            string path = up.Uri;
-
-            try
+            else
             {
-                absoluteURL = new Uri(path);
-            }
-            catch
-            {
-                // If the href contains only a path then file is assumed
-                if (File.Exists(path))
+                string baseDir = FonetDriver.ActiveDriver?.BaseDirectory.FullName;
+                string baseDirPath = Path.Combine(baseDir, path);
+                if (File.Exists(baseDirPath))
                 {
-                    absoluteURL = new Uri("file://" + Path.Combine(Directory.GetCurrentDirectory(), path));
-
+                    absoluteURL = new Uri("file://" + Path.Combine(Directory.GetCurrentDirectory(), baseDirPath));
                 }
                 else
                 {
-                    // Examine base directory which is specified by the user via the 
-                    // FonetDriver.BaseDirectory property
-                    string baseDir = FonetDriver.ActiveDriver.BaseDirectory.FullName;
-
-                    string baseDirPath = Path.Combine(baseDir, path);
-                    if (File.Exists(baseDirPath))
-                    {
-                        absoluteURL = new Uri("file://" + Path.Combine(Directory.GetCurrentDirectory(), baseDirPath));
-
-                    }
-                    else
-                    {
-                        throw new FonetImageException("Unable to retrieve graphic from " + path);
-                    }
+                    throw new FonetImageException("Unable to retrieve graphic from " + path);
                 }
             }
-
-            return new FonetImage(
-                absoluteURL.AbsoluteUri,
-                ExtractImageData(absoluteURL));
         }
 
-        private static Stream GetImageStream(Uri uri)
+        return new FonetImage(
+            absoluteURL.AbsoluteUri,
+            ExtractImageData(absoluteURL));
+    }
+
+    private static Stream GetImageStream(Uri uri)
+    {
+        try
         {
-            try
+            if (uri.IsFile)
             {
-                WebRequest request = WebRequest.CreateDefault(uri);
-
-                // Apply user specified timeout.
-                request.Timeout = FonetDriver.ActiveDriver.Timeout;
-
-                // Apply authentication credentials.
-                request.Credentials = FonetDriver.ActiveDriver.Credentials;
-
-                WebResponse response = request.GetResponse();
-
-                return response.GetResponseStream();
+                return File.OpenRead(uri.LocalPath);
             }
-            catch (SecurityException se)
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            var credential = FonetDriver.ActiveDriver.Credentials?.GetCredential(uri, "Basic")
+                ?? FonetDriver.ActiveDriver.Credentials?.GetCredential(uri, "Digest");
+            if (credential != null)
             {
-                throw new FonetImageException(
-                    String.Format("Detected security exception while fetching image from {0}: {1}", uri, se.Message));
+                string authValue = Convert.ToBase64String(
+                    System.Text.Encoding.ASCII.GetBytes(
+                        $"{credential.UserName}:{credential.Password}"));
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authValue);
             }
-            catch (UriFormatException ue)
-            {
-                throw new FonetImageException(
-                    String.Format("Badly formed Uri {0}: {1}", uri, ue.Message));
-            }
-            catch (WebException we)
+
+            using var cts = new CancellationTokenSource(FonetDriver.ActiveDriver.Timeout);
+            var response = SharedHttpClient.Send(
+                request,
+                HttpCompletionOption.ResponseHeadersRead,
+                cts.Token);
+
+            if (!response.IsSuccessStatusCode)
             {
                 throw new FonetImageException(
-                    String.Format("Encountered web exception while fetching image from {0}: {1}", uri, we.Message));
-            }
-            catch (Exception e)
-            {
-                throw new FonetImageException(
-                    String.Format("Encountered unexpected exception while fetching image from {0}: {1}", uri, e.Message));
+                    $"HTTP {(int)response.StatusCode} while fetching image from {uri}");
             }
 
+            return response.Content.ReadAsStream();
         }
-
-        private static byte[] ExtractImageData(Uri absoluteURL)
+        catch (FonetImageException)
         {
-            // Otherwise load the image data using a WebRequest.
-            Stream imageStream = GetImageStream(absoluteURL);
+            throw;
+        }
+        catch (SecurityException se)
+        {
+            throw new FonetImageException(
+                String.Format("Detected security exception while fetching image from {0}: {1}", uri, se.Message));
+        }
+        catch (UriFormatException ue)
+        {
+            throw new FonetImageException(
+                String.Format("Badly formed Uri {0}: {1}", uri, ue.Message));
+        }
+        catch (HttpRequestException we)
+        {
+            throw new FonetImageException(
+                String.Format("Encountered web exception while fetching image from {0}: {1}", uri, we.Message));
+        }
+        catch (Exception e)
+        {
+            throw new FonetImageException(
+                String.Format("Encountered unexpected exception while fetching image from {0}: {1}", uri, e.Message));
+        }
+    }
 
-            // Read the data stream into a byte array.
-            try
+    private static byte[] ExtractImageData(Uri absoluteURL)
+    {
+        Stream imageStream = GetImageStream(absoluteURL);
+
+        try
+        {
+            using var ms = new MemoryStream();
+            byte[] buf = new byte[4096];
+            int numBytesRead;
+
+            while ((numBytesRead = imageStream.Read(buf, 0, 4096)) != 0)
             {
-                MemoryStream ms = new MemoryStream();
-                byte[] buf = new byte[4096];
-                int numBytesRead = 0;
-
-                // Read contents of JPEG into MemoryStream
-                while ((numBytesRead = imageStream.Read(buf, 0, 4096)) != 0)
-                {
-                    ms.Write(buf, 0, numBytesRead);
-                }
-
-                ms.Flush();
-                ms.Close();
-
-                return ms.ToArray();
-
+                ms.Write(buf, 0, numBytesRead);
             }
-            finally
-            {
-                imageStream.Flush();
-                imageStream.Close();
-                imageStream = null;
-            }
+
+            return ms.ToArray();
+        }
+        finally
+        {
+            imageStream.Dispose();
         }
     }
 }

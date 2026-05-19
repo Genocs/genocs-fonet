@@ -1,40 +1,40 @@
-namespace Fonet.Pdf.Filter
+using Genocs.Fonet.Pdf;
+
+namespace Genocs.Fonet.Pdf.Filter;
+
+public class Ascii85Filter : IFilter
 {
-    public class Ascii85Filter : IFilter
+    public Ascii85Filter()
     {
-        public Ascii85Filter()
-        {
-            throw new UnsupportedFilterException("ASCII85Decode");
-        }
+        throw new UnsupportedFilterException("ASCII85Decode");
+    }
 
-        public PdfObject Name
+    public PdfObject Name
+    {
+        get
         {
-            get
-            {
-                return PdfName.Names.ASCII85Decode;
-            }
+            return PdfName.Names.ASCII85Decode;
         }
+    }
 
-        public PdfObject DecodeParms
+    public PdfObject DecodeParms
+    {
+        get
         {
-            get
-            {
-                return PdfNull.Null;
-            }
+            return PdfNull.Null;
         }
+    }
 
-        public bool HasDecodeParams
+    public bool HasDecodeParams
+    {
+        get
         {
-            get
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        public byte[] Encode(byte[] data)
-        {
-            return data;
-        }
-
+    public byte[] Encode(byte[] data)
+    {
+        return data;
     }
 }

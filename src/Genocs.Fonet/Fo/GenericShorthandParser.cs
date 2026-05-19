@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo
 {
     internal class GenericShorthandParser : IShorthandParser
     {

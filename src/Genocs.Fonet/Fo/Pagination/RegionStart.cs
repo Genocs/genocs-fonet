@@ -1,85 +1,84 @@
-using Fonet.Layout;
+using Genocs.Fonet.Layout;
 
-namespace Fonet.Fo.Pagination
+namespace Genocs.Fonet.Fo.Pagination;
+
+internal class RegionStart : Region
 {
-    internal class RegionStart : Region
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new RegionStart(parent, propertyList);
-            }
+            return new RegionStart(parent, propertyList);
+        }
+    }
+
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
+
+    public const string REGION_CLASS = "start";
+
+    protected RegionStart(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList) { }
+
+    internal RegionArea MakeRegionArea(
+        int allocationRectangleXPosition,
+        int allocationRectangleYPosition,
+        int allocationRectangleWidth,
+        int allocationRectangleHeight,
+        bool beforePrecedence,
+        bool afterPrecedence,
+        int beforeHeight,
+        int afterHeight)
+    {
+        int extent = this._properties.GetProperty("extent").GetLength().MValue();
+        int startY = allocationRectangleYPosition;
+        int startH = allocationRectangleHeight;
+        if (beforePrecedence)
+        {
+            startY -= beforeHeight;
+            startH -= beforeHeight;
+        }
+        if (afterPrecedence)
+        {
+            startH -= afterHeight;
         }
 
-        new public static FObj.Maker GetMaker()
-        {
-            return new Maker();
-        }
+        RegionArea area = new RegionArea(
+            allocationRectangleXPosition, startY, extent, startH);
+        area.setBackground(_propertyManager.GetBackgroundProps());
 
-        public const string REGION_CLASS = "start";
+        return area;
+    }
 
-        protected RegionStart(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList) { }
+    public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
+                                              int allocationRectangleYPosition,
+                                              int allocationRectangleWidth,
+                                              int allocationRectangleHeight)
+    {
+        BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+        BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+        int extent = this._properties.GetProperty("extent").GetLength().MValue();
 
-        internal RegionArea MakeRegionArea(
-            int allocationRectangleXPosition,
-            int allocationRectangleYPosition,
-            int allocationRectangleWidth,
-            int allocationRectangleHeight,
-            bool beforePrecedence,
-            bool afterPrecedence,
-            int beforeHeight,
-            int afterHeight)
-        {
-            int extent = this.properties.GetProperty("extent").GetLength().MValue();
-            int startY = allocationRectangleYPosition;
-            int startH = allocationRectangleHeight;
-            if (beforePrecedence)
-            {
-                startY -= beforeHeight;
-                startH -= beforeHeight;
-            }
-            if (afterPrecedence)
-            {
-                startH -= afterHeight;
-            }
+        return MakeRegionArea(allocationRectangleXPosition,
+                              allocationRectangleYPosition,
+                              allocationRectangleWidth, extent, false, false,
+                              0, 0);
+    }
 
-            RegionArea area = new RegionArea(
-                allocationRectangleXPosition, startY, extent, startH);
-            area.setBackground(propMgr.GetBackgroundProps());
+    protected override string GetDefaultRegionName()
+    {
+        return "xsl-region-start";
+    }
 
-            return area;
-        }
+    protected override string GetElementName()
+    {
+        return "fo:region-start";
+    }
 
-        public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
-                                                  int allocationRectangleYPosition,
-                                                  int allocationRectangleWidth,
-                                                  int allocationRectangleHeight)
-        {
-            BorderAndPadding bap = propMgr.GetBorderAndPadding();
-            BackgroundProps bProps = propMgr.GetBackgroundProps();
-            int extent = this.properties.GetProperty("extent").GetLength().MValue();
-
-            return MakeRegionArea(allocationRectangleXPosition,
-                                  allocationRectangleYPosition,
-                                  allocationRectangleWidth, extent, false, false,
-                                  0, 0);
-        }
-
-        protected override string GetDefaultRegionName()
-        {
-            return "xsl-region-start";
-        }
-
-        protected override string GetElementName()
-        {
-            return "fo:region-start";
-        }
-
-        public override string GetRegionClass()
-        {
-            return REGION_CLASS;
-        }
+    public override string GetRegionClass()
+    {
+        return REGION_CLASS;
     }
 }

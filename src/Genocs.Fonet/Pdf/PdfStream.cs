@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
-using Fonet.Pdf.Filter;
-using Fonet.Pdf.Security;
+using Genocs.Fonet.Pdf.Security;
+using Genocs.Fonet.Pdf;
+using Genocs.Fonet.Pdf.Filter;
 
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     public class PdfStream : PdfObject
     {

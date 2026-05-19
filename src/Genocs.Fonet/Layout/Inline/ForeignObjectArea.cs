@@ -1,6 +1,7 @@
-namespace Fonet.Layout.Inline
+namespace Genocs.Fonet.Layout.Inline
 {
-    using Fonet.Render.Pdf;
+    using Genocs.Fonet.Layout;
+    using Genocs.Fonet.Render.Pdf;
 
     internal class ForeignObjectArea : InlineArea
     {
@@ -25,7 +26,7 @@ namespace Fonet.Layout.Inline
         {
         }
 
-        public override void render(PdfRenderer renderer)
+        public override void Render(PdfRenderer renderer)
         {
             if (foreignObject != null)
             {

@@ -1,94 +1,36 @@
-using System;
+using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo.Expr;
 using System.Collections;
-using Fonet.DataTypes;
-using Fonet.Fo.Expr;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+/// <summary>
+/// Represents a property in the formatting object model. 
+/// This abstract class serves as a base for various property types, 
+/// providing methods to retrieve specific property values such as length, color, space, and more.
+/// Each derived class can override these methods to provide the appropriate behavior for its specific property type.
+/// </summary>
+internal abstract class Property
 {
-    internal class Property
+    public string SpecifiedValue { get; set; }
+    public virtual Length? GetLength() => null;
+    public virtual ColorType? GetColorType() => null;
+    public virtual CondLength? GetCondLength() => null;
+    public virtual LengthRange? GetLengthRange() => null;
+    public virtual LengthPair? GetLengthPair() => null;
+    public virtual Space? GetSpace() => null;
+    public virtual Keep? GetKeep() => null;
+    public virtual int GetEnum() => 0;
+    public virtual char GetCharacter() => (char)0;
+    public virtual ArrayList? GetList() => null;
+    public virtual Number? GetNumber() => null;
+    public virtual Numeric? GetNumeric() => null;
+    public virtual string? GetNCname() => null;
+    public virtual object? GetObject() => null;
+
+    public virtual string? GetString()
     {
-        private string specVal;
-
-        public string SpecifiedValue
-        {
-            get { return specVal; }
-            set { specVal = value; }
-        }
-
-        public virtual Length GetLength()
-        {
-            return null;
-        }
-
-        public virtual ColorType GetColorType()
-        {
-            return null;
-        }
-
-        public virtual CondLength GetCondLength()
-        {
-            return null;
-        }
-
-        public virtual LengthRange GetLengthRange()
-        {
-            return null;
-        }
-
-        public virtual LengthPair GetLengthPair()
-        {
-            return null;
-        }
-
-        public virtual Space GetSpace()
-        {
-            return null;
-        }
-
-        public virtual Keep GetKeep()
-        {
-            return null;
-        }
-
-        public virtual int GetEnum()
-        {
-            return 0;
-        }
-
-        public virtual char GetCharacter()
-        {
-            return (char)0;
-        }
-
-        public virtual ArrayList GetList()
-        {
-            return null;
-        }
-
-        public virtual Number GetNumber()
-        {
-            return null;
-        }
-
-        public virtual Numeric GetNumeric()
-        {
-            return null;
-        }
-
-        public virtual string GetNCname()
-        {
-            return null;
-        }
-
-        public virtual object GetObject()
-        {
-            return null;
-        }
-
-        public virtual String GetString()
-        {
-            object o = GetObject();
-            return (o == null) ? null : o.ToString();
-        }
+        object? o = GetObject();
+        return o?.ToString();
     }
 }

@@ -1,48 +1,47 @@
-namespace Fonet.Pdf.Filter
+using Genocs.Fonet.Pdf;
+using System.IO.Compression;
+
+namespace Genocs.Fonet.Pdf.Filter;
+
+public class FlateFilter : IFilter
 {
-    using System.IO;
-    using System.IO.Compression;
 
-    public class FlateFilter : IFilter
+    public FlateFilter()
     {
+    }
 
-        public FlateFilter()
+    public PdfObject Name
+    {
+        get
         {
+            return PdfName.Names.FlateDecode;
         }
+    }
 
-        public PdfObject Name
+    public PdfObject DecodeParms
+    {
+        get
         {
-            get
-            {
-                return PdfName.Names.FlateDecode;
-            }
+            return PdfNull.Null;
         }
+    }
 
-        public PdfObject DecodeParms
+    public bool HasDecodeParams
+    {
+        get
         {
-            get
-            {
-                return PdfNull.Null;
-            }
+            return false;
         }
+    }
 
-        public bool HasDecodeParams
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public byte[] Encode(byte[] data)
-        {
-            MemoryStream ms = new MemoryStream(data.Length);
-            ms.WriteByte(0x78); // ZLib Header for compression level 3.
-            ms.WriteByte(0x5e);
-            DeflateStream ds = new DeflateStream(ms, CompressionMode.Compress);
-            ds.Write(data, 0, data.Length);
-            ds.Close();
-            return ms.ToArray();
-        }
+    public byte[] Encode(byte[] data)
+    {
+        MemoryStream ms = new MemoryStream(data.Length);
+        ms.WriteByte(0x78); // ZLib Header for compression level 3.
+        ms.WriteByte(0x5e);
+        DeflateStream ds = new DeflateStream(ms, CompressionMode.Compress);
+        ds.Write(data, 0, data.Length);
+        ds.Close();
+        return ms.ToArray();
     }
 }

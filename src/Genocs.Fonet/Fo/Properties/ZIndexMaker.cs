@@ -1,31 +1,15 @@
-using Fonet.DataTypes;
+namespace Genocs.Fonet.Fo.Properties;
 
-namespace Fonet.Fo.Properties
+internal class ZIndexMaker : LengthProperty.Maker
 {
-    internal class ZIndexMaker : ToBeImplementedProperty.Maker
-    {
-        new public static PropertyMaker Maker(string propName)
-        {
-            return new ZIndexMaker(propName);
-        }
+    public static PropertyMaker Maker(string propName) => new ZIndexMaker(propName);
 
-        protected ZIndexMaker(string name) : base(name) { }
+    protected ZIndexMaker(string name) : base(name) { }
 
-        public override bool IsInherited()
-        {
-            return false;
-        }
+    protected override bool IsAutoLengthAllowed() => true;
 
-        private Property m_defaultProp = null;
+    public override bool IsInherited() => false;
 
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "auto", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-        }
-
-    }
+    public override Property Make(PropertyList propertyList) =>
+        Make(propertyList, "auto", propertyList.getParentFObj());
 }

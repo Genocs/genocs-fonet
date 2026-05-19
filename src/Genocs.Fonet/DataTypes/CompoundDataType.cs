@@ -1,11 +1,10 @@
-namespace Fonet.DataTypes
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.DataTypes;
+
+internal interface ICompoundDatatype
 {
-    using Fonet.Fo;
+    void SetComponent(string componentName, Property componentValue, bool isDefault);
 
-    internal interface ICompoundDatatype
-    {
-        void SetComponent(string componentName, Property componentValue, bool isDefault);
-
-        Property GetComponent(string componentName);
-    }
+    Property? GetComponent(string componentName);
 }

@@ -1,32 +1,24 @@
-namespace Fonet.DataTypes
+using Genocs.Fonet.Fo;
+
+namespace Genocs.Fonet.DataTypes;
+
+internal class ToBeImplementedProperty : Property
 {
-    using Fonet.Fo;
-
-    internal class ToBeImplementedProperty : Property
+    internal class Maker(string propName) : PropertyMaker(propName)
     {
-        internal class Maker : PropertyMaker
+        public override Property ConvertProperty(Property p, PropertyList propertyList, FObj fo)
         {
-            public Maker(string propName) : base(propName)
+            if (p is ToBeImplementedProperty)
             {
+                return p;
             }
-
-            public override Property ConvertProperty(
-                Property p, PropertyList propertyList, FObj fo)
-            {
-                if (p is ToBeImplementedProperty)
-                {
-                    return p;
-                }
-                ToBeImplementedProperty val = new ToBeImplementedProperty(PropName);
-                return val;
-            }
+            ToBeImplementedProperty val = new(PropName);
+            return val;
         }
+    }
 
-        public ToBeImplementedProperty(string propName)
-        {
-            FonetDriver.ActiveDriver.FireFonetWarning(
-                "property - \"" + propName + "\" is not implemented yet.");
-        }
-
+    public ToBeImplementedProperty(string propName)
+    {
+        FonetDriver.ActiveDriver?.FireFonetWarning($"property - \"{propName}\" is not implemented yet.");
     }
 }

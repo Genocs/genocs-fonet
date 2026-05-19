@@ -1,5 +1,6 @@
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties
 {
     internal class BorderBottomStyle
-        : GenericBorderStyle.Enums { }
+        : GenericBorderStyle.Enums
+    { }
 }

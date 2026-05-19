@@ -1,93 +1,89 @@
+using Genocs.Fonet.Fo;
 using System.Text;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class BorderLeftColorMaker : GenericColor
 {
-    internal class BorderLeftColorMaker : GenericColor
+    new public static PropertyMaker Maker(string propName)
     {
-        new public static PropertyMaker Maker(string propName)
+        return new BorderLeftColorMaker(propName);
+    }
+
+    protected BorderLeftColorMaker(string name) : base(name) { }
+
+
+    public override bool IsInherited()
+    {
+        return false;
+    }
+
+
+    public override Property Compute(PropertyList propertyList)
+    {
+        FObj parentFO = propertyList.getParentFObj();
+        StringBuilder sbExpr = new StringBuilder();
+        Property p = null;
+        sbExpr.Append("border-");
+        sbExpr.Append(propertyList.wmAbsToRel(PropertyList.LEFT));
+        sbExpr.Append("-color");
+        p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
+
+        if (p != null)
         {
-            return new BorderLeftColorMaker(propName);
+            p = ConvertProperty(p, propertyList, parentFO);
         }
 
-        protected BorderLeftColorMaker(string name) : base(name) { }
+        return p;
+    }
 
+    public override Property GetShorthand(PropertyList propertyList)
+    {
+        Property p = null;
+        ListProperty listprop;
 
-        public override bool IsInherited()
+        if (p == null)
         {
-            return false;
+            listprop = (ListProperty)propertyList.GetExplicitProperty("border-left");
+            if (listprop != null)
+            {
+                // Get a parser for the shorthand to set the individual properties
+                IShorthandParser shparser = new GenericShorthandParser(listprop);
+                p = shparser.GetValueForProperty(PropName, this, propertyList);
+            }
         }
 
-
-        public override Property Compute(PropertyList propertyList)
+        if (p == null)
         {
-            FObj parentFO = propertyList.getParentFObj();
-            StringBuilder sbExpr = new StringBuilder();
-            Property p = null;
-            sbExpr.Append("border-");
-            sbExpr.Append(propertyList.wmAbsToRel(PropertyList.LEFT));
-            sbExpr.Append("-color");
-            p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
-
-            if (p != null)
+            listprop = (ListProperty)propertyList.GetExplicitProperty("border-color");
+            if (listprop != null)
             {
-                p = ConvertProperty(p, propertyList, parentFO);
+                // Get a parser for the shorthand to set the individual properties
+                IShorthandParser shparser = new BoxPropShorthandParser(listprop);
+                p = shparser.GetValueForProperty(PropName, this, propertyList);
             }
-
-            return p;
         }
 
-        public override Property GetShorthand(PropertyList propertyList)
+        if (p == null)
         {
-            Property p = null;
-            ListProperty listprop;
-
-            if (p == null)
+            listprop = (ListProperty)propertyList.GetExplicitProperty("border");
+            if (listprop != null)
             {
-                listprop = (ListProperty)propertyList.GetExplicitProperty("border-left");
-                if (listprop != null)
-                {
-                    // Get a parser for the shorthand to set the individual properties
-                    IShorthandParser shparser = new GenericShorthandParser(listprop);
-                    p = shparser.GetValueForProperty(PropName, this, propertyList);
-                }
+                // Get a parser for the shorthand to set the individual properties
+                IShorthandParser shparser = new GenericShorthandParser(listprop);
+                p = shparser.GetValueForProperty(PropName, this, propertyList);
             }
-
-            if (p == null)
-            {
-                listprop = (ListProperty)propertyList.GetExplicitProperty("border-color");
-                if (listprop != null)
-                {
-                    // Get a parser for the shorthand to set the individual properties
-                    IShorthandParser shparser = new BoxPropShorthandParser(listprop);
-                    p = shparser.GetValueForProperty(PropName, this, propertyList);
-                }
-            }
-
-            if (p == null)
-            {
-                listprop = (ListProperty)propertyList.GetExplicitProperty("border");
-                if (listprop != null)
-                {
-                    // Get a parser for the shorthand to set the individual properties
-                    IShorthandParser shparser = new GenericShorthandParser(listprop);
-                    p = shparser.GetValueForProperty(PropName, this, propertyList);
-                }
-            }
-
-            return p;
         }
 
-        private Property m_defaultProp = null;
+        return p;
+    }
 
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "black", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
+    private Property m_defaultProp = null;
 
-        }
+    public override Property Make(PropertyList propertyList)
+    {
+        m_defaultProp ??= Make(propertyList, "black", propertyList.getParentFObj());
+        return m_defaultProp;
 
     }
 }

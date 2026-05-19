@@ -1,36 +1,34 @@
-using Fonet.Fo.Flow;
+using Genocs.Fonet.Fo.Flow;
 
-namespace Fonet.Fo.Expr
+namespace Genocs.Fonet.Fo.Expr;
+
+internal class BodyStartFunction : FunctionBase
 {
-    internal class BodyStartFunction : FunctionBase
+    public override int NumArgs
     {
-        public override int NumArgs
+        get
         {
-            get
-            {
-                return 0;
-            }
+            return 0;
+        }
+    }
+
+    public override Property Eval(Property[] args, PropertyInfo pInfo)
+    {
+        Numeric distance = pInfo.getPropertyList().GetProperty("provisional-distance-between-starts").GetNumeric();
+
+        FObj item = pInfo.getFO();
+        while (item != null && !(item is ListItem))
+        {
+            item = item.getParent();
+        }
+        if (item == null)
+        {
+            throw new PropertyException("body-start() called from outside an fo:list-item");
         }
 
-        public override Property Eval(Property[] args, PropertyInfo pInfo)
-        {
-            Numeric distance = pInfo.getPropertyList().GetProperty("provisional-distance-between-starts").GetNumeric();
+        Numeric startIndent =
+            item._properties.GetProperty("start-indent").GetNumeric();
 
-            FObj item = pInfo.getFO();
-            while (item != null && !(item is ListItem))
-            {
-                item = item.getParent();
-            }
-            if (item == null)
-            {
-                throw new PropertyException("body-start() called from outside an fo:list-item");
-            }
-
-            Numeric startIndent =
-                item.properties.GetProperty("start-indent").GetNumeric();
-
-            return new NumericProperty(distance.add(startIndent));
-        }
-
+        return new NumericProperty(distance.Add(startIndent));
     }
 }

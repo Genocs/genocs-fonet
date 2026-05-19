@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
-using Fonet.Fo.Properties;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet;
+using Genocs.Fonet.Fo;
 
-namespace Fonet.Fo
+namespace Genocs.Fonet.Fo
 {
     internal class PropertyList : Hashtable
     {

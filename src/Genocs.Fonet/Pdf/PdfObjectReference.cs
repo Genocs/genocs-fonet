@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Fonet.Pdf
+namespace Genocs.Fonet.Pdf
 {
     public sealed class PdfObjectReference : PdfObject
     {

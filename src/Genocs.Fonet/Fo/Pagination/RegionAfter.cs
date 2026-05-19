@@ -1,71 +1,70 @@
-using Fonet.Fo.Properties;
-using Fonet.Layout;
+using Genocs.Fonet.Fo.Properties;
+using Genocs.Fonet.Layout;
 
-namespace Fonet.Fo.Pagination
+namespace Genocs.Fonet.Fo.Pagination;
+
+internal class RegionAfter : Region
 {
-    internal class RegionAfter : Region
+    new internal class Maker : FObj.Maker
     {
-        new internal class Maker : FObj.Maker
+        public override FObj Make(FObj parent, PropertyList propertyList)
         {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new RegionAfter(parent, propertyList);
-            }
+            return new RegionAfter(parent, propertyList);
         }
+    }
 
-        new public static FObj.Maker GetMaker()
-        {
-            return new Maker();
-        }
+    new public static FObj.Maker GetMaker()
+    {
+        return new Maker();
+    }
 
-        public const string REGION_CLASS = "after";
+    public const string REGION_CLASS = "after";
 
-        private int precedence;
+    private int precedence;
 
-        protected RegionAfter(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            precedence = this.properties.GetProperty("precedence").GetEnum();
-        }
+    protected RegionAfter(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+        precedence = this._properties.GetProperty("precedence").GetEnum();
+    }
 
-        public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
-                                                  int allocationRectangleYPosition,
-                                                  int allocationRectangleWidth,
-                                                  int allocationRectangleHeight)
-        {
-            BorderAndPadding bap = propMgr.GetBorderAndPadding();
-            BackgroundProps bProps = propMgr.GetBackgroundProps();
-            int extent = this.properties.GetProperty("extent").GetLength().MValue();
+    public override RegionArea MakeRegionArea(int allocationRectangleXPosition,
+                                              int allocationRectangleYPosition,
+                                              int allocationRectangleWidth,
+                                              int allocationRectangleHeight)
+    {
+        BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+        BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+        int extent = this._properties.GetProperty("extent").GetLength().MValue();
 
-            RegionArea area = new RegionArea(
-                allocationRectangleXPosition,
-                allocationRectangleYPosition - allocationRectangleHeight + extent,
-                allocationRectangleWidth,
-                extent);
-            area.setBackground(bProps);
+        RegionArea area = new RegionArea(
+            allocationRectangleXPosition,
+            allocationRectangleYPosition - allocationRectangleHeight + extent,
+            allocationRectangleWidth,
+            extent);
+        area.setBackground(bProps);
 
-            return area;
-        }
+        return area;
+    }
 
 
-        protected override string GetDefaultRegionName()
-        {
-            return "xsl-region-after";
-        }
+    protected override string GetDefaultRegionName()
+    {
+        return "xsl-region-after";
+    }
 
-        protected override string GetElementName()
-        {
-            return "fo:region-after";
-        }
+    protected override string GetElementName()
+    {
+        return "fo:region-after";
+    }
 
-        public override string GetRegionClass()
-        {
-            return REGION_CLASS;
-        }
+    public override string GetRegionClass()
+    {
+        return REGION_CLASS;
+    }
 
-        public bool getPrecedence()
-        {
-            return (precedence == Precedence.TRUE ? true : false);
-        }
+    public bool getPrecedence()
+    {
+        return (precedence == Precedence.TRUE ? true : false);
     }
 }

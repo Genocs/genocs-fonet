@@ -1,34 +1,33 @@
-using Fonet.Fo.Expr;
+using Genocs.Fonet.Fo.Expr;
 
-namespace Fonet.DataTypes
+namespace Genocs.Fonet.DataTypes;
+
+internal class TableColLength : Length
 {
-    internal class TableColLength : Length
+    private double _columns;
+
+    public TableColLength(double tcolUnits)
     {
-        private double tcolUnits;
+        _columns = tcolUnits;
+    }
 
-        public TableColLength(double tcolUnits)
-        {
-            this.tcolUnits = tcolUnits;
-        }
+    public override double GetTableUnits()
+    {
+        return _columns;
+    }
 
-        public override double GetTableUnits()
-        {
-            return tcolUnits;
-        }
+    public override void ResolveTableUnit(double mpointsPerUnit)
+    {
+        SetComputedValue((int)(_columns * mpointsPerUnit));
+    }
 
-        public override void ResolveTableUnit(double mpointsPerUnit)
-        {
-            SetComputedValue((int)(tcolUnits * mpointsPerUnit));
-        }
+    public override string ToString()
+    {
+        return $"{_columns} table-column-units";
+    }
 
-        public override string ToString()
-        {
-            return (tcolUnits.ToString() + " table-column-units");
-        }
-
-        public override Numeric AsNumeric()
-        {
-            return new Numeric(this);
-        }
+    public override Numeric AsNumeric()
+    {
+        return new Numeric(this);
     }
 }

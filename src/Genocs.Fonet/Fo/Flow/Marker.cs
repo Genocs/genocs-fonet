@@ -1,6 +1,8 @@
-namespace Fonet.Fo.Flow
+namespace Genocs.Fonet.Fo.Flow
 {
-    using Fonet.Layout;
+    using Genocs.Fonet;
+    using Genocs.Fonet.Fo;
+    using Genocs.Fonet.Layout;
 
     internal class Marker : FObjMixed
     {
@@ -28,11 +30,11 @@ namespace Fonet.Fo.Flow
         public Marker(FObj parent, PropertyList propertyList)
             : base(parent, propertyList)
         {
-            this.name = "fo:marker";
+            this._name = "fo:marker";
 
             this.markerClassName =
-                this.properties.GetProperty("marker-class-name").GetString();
-            ts = propMgr.getTextDecoration(parent);
+                this._properties.GetProperty("marker-class-name").GetString();
+            _textState = _propertyManager.getTextDecoration(parent);
 
             try
             {
@@ -52,20 +54,20 @@ namespace Fonet.Fo.Flow
 
         public Status LayoutMarker(Area area)
         {
-            if (this.marker == MarkerStart)
+            if (this._marker == MarkerStart)
             {
-                this.marker = 0;
+                this._marker = 0;
             }
 
-            int numChildren = this.children.Count;
-            for (int i = this.marker; i < numChildren; i++)
+            int numChildren = this._children.Count;
+            for (int i = this._marker; i < numChildren; i++)
             {
-                FONode fo = (FONode)children[i];
+                FONode fo = (FONode)_children[i];
 
                 Status status;
-                if ((status = fo.Layout(area)).isIncomplete())
+                if ((status = fo.Layout(area)).IsIncomplete())
                 {
-                    this.marker = i;
+                    this._marker = i;
                     return status;
                 }
             }
@@ -85,8 +87,8 @@ namespace Fonet.Fo.Flow
 
         public void releaseRegistryArea()
         {
-            isFirst = registryArea.isFirst();
-            isLast = registryArea.isLast();
+            isFirst = registryArea.IsFirst;
+            isLast = registryArea.IsLast;
             registryArea = null;
         }
 

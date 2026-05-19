@@ -1,33 +1,32 @@
-using Fonet.DataTypes;
+using Genocs.Fonet.DataTypes;
 
-namespace Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class BackgroundPositionMaker : ToBeImplementedProperty.Maker
 {
-    internal class BackgroundPositionMaker : ToBeImplementedProperty.Maker
+    new public static PropertyMaker Maker(string propName)
     {
-        new public static PropertyMaker Maker(string propName)
+        return new BackgroundPositionMaker(propName);
+    }
+
+    protected BackgroundPositionMaker(string name) : base(name) { }
+
+
+    public override bool IsInherited()
+    {
+        return false;
+    }
+
+    private Property m_defaultProp = null;
+
+    public override Property Make(PropertyList propertyList)
+    {
+        if (m_defaultProp == null)
         {
-            return new BackgroundPositionMaker(propName);
+            m_defaultProp = Make(propertyList, "0%", propertyList.getParentFObj());
         }
-
-        protected BackgroundPositionMaker(string name) : base(name) { }
-
-
-        public override bool IsInherited()
-        {
-            return false;
-        }
-
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "0%", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-
-        }
+        return m_defaultProp;
 
     }
+
 }
