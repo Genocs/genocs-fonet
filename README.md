@@ -1,5 +1,12 @@
 # Genocs.Fonet (genocs-fonet)
 
+## Purpose
+
+Genocs.Fonet is a .NET port of **Fonet**, an XSL-FO (Extensible Stylesheet Language Formatting Objects) formatter that produces PDF output. The original implementation relied on **Windows GDI** for font enumeration, metrics, glyph mapping, and image decoding. This port aims to run on **modern .NET without Windows graphics dependencies**.
+
+
+![Genocs.Fonet](./assets/banner.png)
+
 Genocs.Fonet is an XSL-FO → PDF library (a fork/derivative of “Fonet”) with a work-in-progress focus on **cross-platform** font and image handling.
 
 For migration status, known issues, and the phased roadmap see the [docs/](./docs/) folder.
