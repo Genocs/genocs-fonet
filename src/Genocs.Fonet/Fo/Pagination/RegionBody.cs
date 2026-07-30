@@ -5,18 +5,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class RegionBody : Region
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new RegionBody(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new RegionBody(parent, props));
 
     public const string REGION_CLASS = "body";
 
@@ -44,9 +34,9 @@ internal class RegionBody : Region
 
         body.setBackground(_propertyManager.GetBackgroundProps());
 
-        int overflow = this._properties.GetProperty("overflow").GetEnum();
+        int overflow = this.Properties.GetProperty("overflow").GetEnum();
         string columnCountAsString =
-            this._properties.GetProperty("column-count").GetString();
+            this.Properties.GetProperty("column-count").GetString();
         int columnCount = 1;
         try
         {
@@ -67,7 +57,7 @@ internal class RegionBody : Region
         body.setColumnCount(columnCount);
 
         int columnGap =
-            this._properties.GetProperty("column-gap").GetLength().MValue();
+            this.Properties.GetProperty("column-gap").GetLength().MValue();
         body.setColumnGap(columnGap);
 
         return body;

@@ -4,18 +4,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class LayoutMasterSet : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new LayoutMasterSet(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new LayoutMasterSet(parent, props));
 
     private Hashtable simplePageMasters;
     private Hashtable pageSequenceMasters;
@@ -26,19 +16,18 @@ internal class LayoutMasterSet : FObj
     protected internal LayoutMasterSet(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:layout-master-set";
+        Name = "fo:layout-master-set";
         this.simplePageMasters = new Hashtable();
         this.pageSequenceMasters = new Hashtable();
 
-        if (parent.GetName().Equals("fo:root"))
+        if (parent.Name.Equals("fo:root"))
         {
             this.root = (Root)parent;
             root.LayoutMasterSet = this;
         }
         else
         {
-            throw new FonetException("fo:layout-master-set must be child of fo:root, not "
-                + parent.GetName());
+            throw new FonetException("fo:layout-master-set must be child of fo:root, not " + parent.Name);
         }
         allRegions = new Hashtable();
 
@@ -48,13 +37,9 @@ internal class LayoutMasterSet : FObj
     {
         if (ExistsName(simplePageMaster.GetMasterName()))
         {
-            throw new FonetException("'master-name' ("
-                + simplePageMaster.GetMasterName()
-                + ") must be unique "
-                + "across page-masters and page-sequence-masters");
+            throw new FonetException("'master-name' (" + simplePageMaster.GetMasterName() + ") must be unique " + "across page-masters and page-sequence-masters");
         }
-        this.simplePageMasters.Add(simplePageMaster.GetMasterName(),
-                                   simplePageMaster);
+        this.simplePageMasters.Add(simplePageMaster.GetMasterName(), simplePageMaster);
     }
 
     protected internal SimplePageMaster getSimplePageMaster(string masterName)

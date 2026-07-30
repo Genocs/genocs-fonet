@@ -4,11 +4,23 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Folder Name="/_Solution Items/">
-    <File Path="README.md" />
+  <Folder Name="/Console/">
+    <Project Path="src/Console/Host.csproj" />
+  </Folder>
+  <Folder Name="/WebApi/">
+    <Project Path="src/WebApi/Host.csproj" />
+  </Folder>  
+  <Folder Name="/tests/">
+    <Project Path="src/tests/Genocs.Fonet.Tests/Genocs.Fonet.Tests.csproj" />
   </Folder>
   <Project Path="src/Genocs.Fonet.XsltTransformer/Genocs.Fonet.XsltTransformer.csproj" Id="c6c7e766-11cc-446f-8eb5-d7700217f9a1" />
   <Project Path="src/Genocs.Fonet/Genocs.Fonet.csproj" />
-  <Project Path="src/Host/Host.csproj" />
-  <Project Path="src/tests/Genocs.Fonet.Tests/Genocs.Fonet.Tests.csproj" />
+  
+  <Folder Name="/_Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="README.md" />
+	<File Path="Directory.Build.props" />
+	<File Path="Directory.Build.targets" />
+	
+  </Folder>
 </Solution>

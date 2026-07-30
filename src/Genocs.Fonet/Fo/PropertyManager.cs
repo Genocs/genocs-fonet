@@ -1,3 +1,4 @@
+using Genocs.Fonet.DataTypes;
 using Genocs.Fonet.Fo.Properties;
 using Genocs.Fonet.Image;
 using Genocs.Fonet.Layout;
@@ -6,16 +7,16 @@ namespace Genocs.Fonet.Fo;
 
 internal class PropertyManager(PropertyList pList)
 {
-    private PropertyList properties = pList;
-    private FontState fontState = null;
-    private BorderAndPadding borderAndPadding = null;
-    private HyphenationProps hyphProps = null;
-    private BackgroundProps bgProps = null;
+    private readonly PropertyList _propertyList = pList;
+    private FontState? fontState = null;
+    private BorderAndPadding? borderAndPadding = null;
+    private HyphenationProps? hyphProps = null;
+    private BackgroundProps? bgProps = null;
 
-    private string saLeft;
-    private string saRight;
-    private string saTop;
-    private string saBottom;
+    private string? saLeft;
+    private string? saRight;
+    private string? saTop;
+    private string? saBottom;
 
     private static string msgColorFmt = "border-{0}-color";
     private static string msgStyleFmt = "border-{0}-style";
@@ -24,23 +25,23 @@ internal class PropertyManager(PropertyList pList)
 
     private void InitDirections()
     {
-        saTop = properties.wmAbsToRel(PropertyList.TOP);
-        saBottom = properties.wmAbsToRel(PropertyList.BOTTOM);
-        saLeft = properties.wmAbsToRel(PropertyList.LEFT);
-        saRight = properties.wmAbsToRel(PropertyList.RIGHT);
+        saTop = _propertyList.AbsoluteToRelative(PropertyList.TOP);
+        saBottom = _propertyList.AbsoluteToRelative(PropertyList.BOTTOM);
+        saLeft = _propertyList.AbsoluteToRelative(PropertyList.LEFT);
+        saRight = _propertyList.AbsoluteToRelative(PropertyList.RIGHT);
     }
 
     public FontState GetFontState(FontInfo fontInfo)
     {
         if (fontState == null)
         {
-            string fontFamily = properties.GetProperty("font-family").GetString();
-            string fontStyle = properties.GetProperty("font-style").GetString();
-            string fontWeight = properties.GetProperty("font-weight").GetString();
-            int fontSize = properties.GetProperty("font-size").GetLength().MValue();
-            int fontVariant = properties.GetProperty("font-variant").GetEnum();
-            fontState = new FontState(fontInfo, fontFamily, fontStyle,
-                                      fontWeight, fontSize, fontVariant);
+            string? fontFamily = _propertyList.GetProperty("font-family")?.GetString();
+            string? fontStyle = _propertyList.GetProperty("font-style")?.GetString();
+            string? fontWeight = _propertyList.GetProperty("font-weight")?.GetString();
+            int fontSize = _propertyList.GetProperty("font-size")?.GetLength()?.MValue() ?? 0;
+            int fontVariant = _propertyList.GetProperty("font-variant")?.GetEnum() ?? 0;
+
+            fontState = new FontState(fontInfo, fontFamily, fontStyle, fontWeight, fontSize, fontVariant);
         }
         return fontState;
     }
@@ -64,13 +65,13 @@ internal class PropertyManager(PropertyList pList)
     private void InitBorderInfo(int whichSide, string saSide)
     {
         borderAndPadding.SetPadding(
-            whichSide, properties.GetProperty(String.Format(msgPaddingFmt, saSide)).GetCondLength());
-        int style = properties.GetProperty(String.Format(msgStyleFmt, saSide)).GetEnum();
+            whichSide, _propertyList.GetProperty(String.Format(msgPaddingFmt, saSide)).GetCondLength());
+        int style = _propertyList.GetProperty(String.Format(msgStyleFmt, saSide)).GetEnum();
         if (style != Constants.NONE)
         {
             borderAndPadding.SetBorder(whichSide, style,
-                                       properties.GetProperty(String.Format(msgWidthFmt, saSide)).GetCondLength(),
-                                       properties.GetProperty(String.Format(msgColorFmt, saSide)).GetColorType());
+                                       _propertyList.GetProperty(String.Format(msgWidthFmt, saSide)).GetCondLength(),
+                                       _propertyList.GetProperty(String.Format(msgColorFmt, saSide)).GetColorType());
         }
     }
 
@@ -79,15 +80,15 @@ internal class PropertyManager(PropertyList pList)
         if (hyphProps == null)
         {
             this.hyphProps = new HyphenationProps();
-            hyphProps.hyphenate = this.properties.GetProperty("hyphenate").GetEnum();
+            hyphProps.hyphenate = this._propertyList.GetProperty("hyphenate").GetEnum();
             hyphProps.hyphenationChar =
-                this.properties.GetProperty("hyphenation-character").GetCharacter();
+                this._propertyList.GetProperty("hyphenation-character").GetCharacter();
             hyphProps.hyphenationPushCharacterCount =
-                this.properties.GetProperty("hyphenation-push-character-count").GetNumber().IntValue();
+                this._propertyList.GetProperty("hyphenation-push-character-count").GetNumber().IntValue();
             hyphProps.hyphenationRemainCharacterCount =
-                this.properties.GetProperty("hyphenation-remain-character-count").GetNumber().IntValue();
-            hyphProps.language = this.properties.GetProperty("language").GetString();
-            hyphProps.country = this.properties.GetProperty("country").GetString();
+                this._propertyList.GetProperty("hyphenation-remain-character-count").GetNumber().IntValue();
+            hyphProps.language = this._propertyList.GetProperty("language").GetString();
+            hyphProps.country = this._propertyList.GetProperty("country").GetString();
         }
         return hyphProps;
     }
@@ -96,7 +97,7 @@ internal class PropertyManager(PropertyList pList)
     {
         if (!(area is ColumnArea))
         {
-            switch (properties.GetProperty("break-before").GetEnum())
+            switch (_propertyList.GetProperty("break-before").GetEnum())
             {
                 case BreakBefore.PAGE:
                     return Status.FORCE_PAGE_BREAK;
@@ -113,7 +114,7 @@ internal class PropertyManager(PropertyList pList)
         else
         {
             ColumnArea colArea = (ColumnArea)area;
-            switch (properties.GetProperty("break-before").GetEnum())
+            switch (_propertyList.GetProperty("break-before").GetEnum())
             {
                 case BreakBefore.PAGE:
                     if (!colArea.hasChildren() && (colArea.getColumnIndex() == 1))
@@ -126,7 +127,7 @@ internal class PropertyManager(PropertyList pList)
                     }
                 case BreakBefore.ODD_PAGE:
                     if (!colArea.hasChildren() && (colArea.getColumnIndex() == 1)
-                        && (colArea.getPage().getNumber() % 2 != 0))
+                        && (colArea.Page?.getNumber() % 2 != 0))
                     {
                         return Status.OK;
                     }
@@ -136,7 +137,7 @@ internal class PropertyManager(PropertyList pList)
                     }
                 case BreakBefore.EVEN_PAGE:
                     if (!colArea.hasChildren() && (colArea.getColumnIndex() == 1)
-                        && (colArea.getPage().getNumber() % 2 == 0))
+                        && (colArea.Page?.getNumber() % 2 == 0))
                     {
                         return Status.OK;
                     }
@@ -161,7 +162,7 @@ internal class PropertyManager(PropertyList pList)
 
     public int CheckBreakAfter(Area area)
     {
-        switch (properties.GetProperty("break-after").GetEnum())
+        switch (_propertyList.GetProperty("break-after").GetEnum())
         {
             case BreakAfter.PAGE:
                 return Status.FORCE_PAGE_BREAK;
@@ -180,21 +181,34 @@ internal class PropertyManager(PropertyList pList)
     {
         MarginProps props = new MarginProps();
 
-        props.marginTop =
-            this.properties.GetProperty("margin-top").GetLength().MValue();
-        props.marginBottom =
-            this.properties.GetProperty("margin-bottom").GetLength().MValue();
-        props.marginLeft =
-            this.properties.GetProperty("margin-left").GetLength().MValue();
-        props.marginRight =
-            this.properties.GetProperty("margin-right").GetLength().MValue();
+        props.marginTop = this._propertyList.GetProperty("margin-top").GetLength().MValue();
+        props.marginBottom = this._propertyList.GetProperty("margin-bottom").GetLength().MValue();
+        props.marginLeft = this._propertyList.GetProperty("margin-left").GetLength().MValue();
+        props.marginRight = this._propertyList.GetProperty("margin-right").GetLength().MValue();
         return props;
     }
 
     public bool IsVisible()
     {
-        int visibility = properties.GetProperty("visibility").GetEnum();
+        int visibility = _propertyList.GetProperty("visibility").GetEnum();
         return visibility == Visibility.VISIBLE;
+    }
+
+    public int GetFloatAlign()
+        => _propertyList.GetProperty("float").GetEnum();
+
+    public int GetClear()
+        => _propertyList.GetProperty("clear").GetEnum();
+
+    public int GetZIndex()
+    {
+        Length? zIndex = _propertyList.GetProperty("z-index")?.GetLength();
+        if (zIndex == null || zIndex.IsAuto())
+        {
+            return 0;
+        }
+
+        return zIndex.MValue();
     }
 
     public BackgroundProps GetBackgroundProps()
@@ -204,9 +218,9 @@ internal class PropertyManager(PropertyList pList)
             bgProps = new BackgroundProps();
 
             bgProps.backColor =
-                properties.GetProperty("background-color").GetColorType();
+                _propertyList.GetProperty("background-color").GetColorType();
 
-            string src = properties.GetProperty("background-image").GetString();
+            string src = _propertyList.GetProperty("background-image").GetString();
             if (src == "none")
             {
                 bgProps.backImage = null;
@@ -228,7 +242,7 @@ internal class PropertyManager(PropertyList pList)
                 }
             }
 
-            bgProps.backRepeat = properties.GetProperty("background-repeat").GetEnum();
+            bgProps.backRepeat = _propertyList.GetProperty("background-repeat").GetEnum();
         }
         return bgProps;
     }
@@ -241,26 +255,26 @@ internal class PropertyManager(PropertyList pList)
 
     public AccessibilityProps GetAccessibilityProps()
     {
-        AccessibilityProps props = new AccessibilityProps();
-        string str;
-        str = this.properties.GetProperty("source-document").GetString();
-        if (!"none".Equals(str))
+        AccessibilityProps props = new();
+        string? sourceDocument = _propertyList.GetProperty("source-document")?.GetString();
+
+        if (!"none".Equals(sourceDocument))
         {
-            props.sourceDoc = str;
+            props.SourceDoc = sourceDocument;
         }
-        str = this.properties.GetProperty("role").GetString();
-        if (!"none".Equals(str))
+
+        sourceDocument = _propertyList.GetProperty("role")?.GetString();
+
+        if (!"none".Equals(sourceDocument))
         {
-            props.role = str;
+            props.Role = sourceDocument;
         }
+
         return props;
     }
 
     public AuralProps GetAuralProps()
-    {
-        AuralProps props = new AuralProps();
-        return props;
-    }
+        => new();
 
     public RelativePositionProps GetRelativePositionProps()
     {
@@ -276,12 +290,12 @@ internal class PropertyManager(PropertyList pList)
 
     public TextState getTextDecoration(FObj parent)
     {
-        TextState tsp = null;
+        TextState? textState = null;
         bool found = false;
 
         do
         {
-            string fname = parent.GetName();
+            string fname = parent.Name;
             if (fname.Equals("fo:flow") || fname.Equals("fo:static-content"))
             {
                 found = true;
@@ -289,22 +303,22 @@ internal class PropertyManager(PropertyList pList)
             else if (fname.Equals("fo:block") || fname.Equals("fo:inline"))
             {
                 FObjMixed fom = (FObjMixed)parent;
-                tsp = fom.GetTextState();
+                textState = fom.GetTextState();
                 found = true;
             }
-            parent = parent.getParent();
+            parent = parent.Parent;
         } while (!found);
 
         TextState ts = new TextState();
 
-        if (tsp != null)
+        if (textState != null)
         {
-            ts.setUnderlined(tsp.getUnderlined());
-            ts.setOverlined(tsp.getOverlined());
-            ts.setLineThrough(tsp.getLineThrough());
+            ts.setUnderlined(textState.getUnderlined());
+            ts.setOverlined(textState.getOverlined());
+            ts.setLineThrough(textState.getLineThrough());
         }
 
-        int textDecoration = this.properties.GetProperty("text-decoration").GetEnum();
+        int textDecoration = this._propertyList.GetProperty("text-decoration").GetEnum();
 
         if (textDecoration == TextDecoration.UNDERLINE)
         {

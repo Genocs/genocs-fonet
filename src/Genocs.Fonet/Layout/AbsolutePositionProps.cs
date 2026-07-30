@@ -6,16 +6,12 @@ namespace Genocs.Fonet.Layout
     {
         public int absolutePosition = 0;
 
-        public Length top = null;
+        public Length? top;
 
-        public Length right = null;
+        public Length? right;
 
-        public Length bottom = null;
+        public Length? bottom;
 
-        public Length left = null;
-
-        public AbsolutePositionProps()
-        {
-        }
+        public Length? left;
     }
 }

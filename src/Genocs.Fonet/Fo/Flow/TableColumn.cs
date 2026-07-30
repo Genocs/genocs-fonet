@@ -6,6 +6,9 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class TableColumn : FObj
 {
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new TableColumn(parent, props));
+
     private Length columnWidthPropVal;
     private int columnWidth;
     private int columnOffset;
@@ -14,23 +17,12 @@ internal class TableColumn : FObj
     private bool setup = false;
     private AreaContainer areaContainer;
 
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new TableColumn(parent, propertyList);
-        }
-    }
 
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
 
     public TableColumn(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:table-column";
+        Name = "fo:table-column";
     }
 
     public Length GetColumnWidthAsLength()
@@ -63,18 +55,15 @@ internal class TableColumn : FObj
         BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
         BackgroundProps bProps = _propertyManager.GetBackgroundProps();
 
-        this.iColumnNumber =
-            this._properties.GetProperty("column-number").GetNumber().IntValue();
+        this.iColumnNumber = this.Properties.GetProperty("column-number").GetNumber().IntValue();
 
-        this.numColumnsRepeated =
-            this._properties.GetProperty("number-columns-repeated").GetNumber().IntValue();
+        this.numColumnsRepeated = this.Properties.GetProperty("number-columns-repeated").GetNumber().IntValue();
 
-        this.columnWidthPropVal =
-            this._properties.GetProperty("column-width").GetLength();
+        this.columnWidthPropVal = this.Properties.GetProperty("column-width").GetLength();
 
         this.columnWidth = columnWidthPropVal.MValue();
 
-        string id = this._properties.GetProperty("id").GetString();
+        string id = this.Properties.GetProperty("id").GetString();
         area.GetIDReferences().InitializeID(id, area);
 
         setup = true;
@@ -96,16 +85,18 @@ internal class TableColumn : FObj
         }
         if (columnWidth > 0)
         {
-            this.areaContainer =
-                new AreaContainer(_propertyManager.GetFontState(area.getFontInfo()),
+            this.areaContainer = new AreaContainer(_propertyManager.GetFontState(area.GetFontInfo()),
                                   columnOffset, 0, columnWidth,
-                                  area.getContentHeight(), Position.RELATIVE);
+                                  area.getContentHeight(),
+                                  Position.RELATIVE,
+                                  null);
+
             areaContainer.foCreator = this;
-            areaContainer.setPage(area.getPage());
+            areaContainer.Page = area.Page;
             areaContainer.setBorderAndPadding(_propertyManager.GetBorderAndPadding());
             areaContainer.setBackground(_propertyManager.GetBackgroundProps());
             areaContainer.SetHeight(area.GetHeight());
-            area.addChild(areaContainer);
+            area.AddChild(areaContainer);
         }
         return new Status(Status.OK);
     }

@@ -1,12 +1,16 @@
-namespace Genocs.Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class KeepWithPrevious
 {
-    internal class KeepWithPrevious
+    internal abstract class WithinPage : GenericKeep.Enums.WithinPage
     {
-        internal class WithinPage : GenericKeep.Enums.WithinPage { }
+    }
 
-        internal class WithinLine : GenericKeep.Enums.WithinLine { }
+    internal abstract class WithinLine : GenericKeep.Enums.WithinLine
+    { 
+    }
 
-        internal class WithinColumn : GenericKeep.Enums.WithinColumn { }
-
+    internal abstract class WithinColumn : GenericKeep.Enums.WithinColumn 
+    {
     }
 }

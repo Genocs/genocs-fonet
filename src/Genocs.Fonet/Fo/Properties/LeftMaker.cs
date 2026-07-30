@@ -1,36 +1,29 @@
-namespace Genocs.Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class LeftMaker : LengthProperty.Maker
 {
-    internal class LeftMaker : LengthProperty.Maker
+    private Property? _defaultProperty;
+
+    new public static PropertyMaker Maker(string propName)
     {
-        new public static PropertyMaker Maker(string propName)
-        {
-            return new LeftMaker(propName);
-        }
+        return new LeftMaker(propName);
+    }
 
-        protected LeftMaker(string name) : base(name) { }
+    protected LeftMaker(string name) 
+        : base(name)
+    { 
+    }
 
 
-        public override bool IsInherited()
-        {
-            return false;
-        }
+    public override bool IsInherited()
+        => false;
 
-        protected override bool IsAutoLengthAllowed()
-        {
-            return true;
-        }
+    protected override bool IsAutoLengthAllowed()
+        => true;
 
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "auto", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-
-        }
-
+    public override Property Make(PropertyList propertyList)
+    {
+        _defaultProperty ??= Make(propertyList, "auto", propertyList.GetParentFObj());
+        return _defaultProperty;
     }
 }

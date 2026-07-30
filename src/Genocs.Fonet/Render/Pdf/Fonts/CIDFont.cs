@@ -5,33 +5,33 @@ using Genocs.Fonet.Render.Pdf.Fonts;
 namespace Genocs.Fonet.Render.Pdf.Fonts
 {
     /// <summary>
-    ///     Base class for a CID (Character Indexed) font.
+    /// Base class for a CID (Character Indexed) font.
     /// </summary>
     /// <remarks>
-    ///     There are two types of CIDFont: Type 0 and Type 2.  A Type 0 CIDFont
-    ///     contains glyph description based on Adobe Type 1 font format; a 
-    ///     Type 2 CIDFont contains glyph descriptions based on the TrueType 
-    ///     font format.
-    ///     See page 338 of the Adode PDF 1.4 specification for futher details.
+    /// There are two types of CIDFont: Type 0 and Type 2.  A Type 0 CIDFont
+    /// contains glyph description based on Adobe Type 1 font format; a 
+    /// Type 2 CIDFont contains glyph descriptions based on the TrueType 
+    /// font format.
+    /// See page 338 of the Adode PDF 1.4 specification for futher details.
     /// </remarks>
     internal abstract class CIDFont : Font
     {
         public const int DefaultWidthConst = 1000;
 
         /// <summary>
-        ///     Gets the PostScript name of the font.
+        /// Gets the PostScript name of the font.
         /// </summary>
         public abstract string CidBaseFont { get; }
 
         public abstract PdfWArray WArray { get; }
 
         /// <summary>
-        ///     Gets a dictionary mapping character codes to unicode values
+        /// Gets a dictionary mapping character codes to unicode values
         /// </summary>
         public abstract IDictionary CMapEntries { get; }
 
         /// <summary>
-        ///     Returns <see cref="PdfFontTypeEnum.CIDFont"/>.
+        /// Returns <see cref="PdfFontTypeEnum.CIDFont"/>.
         /// </summary>
         public override PdfFontTypeEnum Type
         {
@@ -39,10 +39,10 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         }
 
         /// <summary>
-        ///     Gets a string identifying the issuer of the character collections.
+        /// Gets a string identifying the issuer of the character collections.
         /// </summary>
         /// <remarks>
-        ///     The default implementation returns <see cref="PdfCIDSystemInfo.DefaultRegistry"/>.
+        /// The default implementation returns <see cref="PdfCIDSystemInfo.DefaultRegistry"/>.
         /// </remarks>
         public virtual string Registry
         {
@@ -50,10 +50,10 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         }
 
         /// <summary>
-        ///     Gets a string that uniquely names the character collection.
+        /// Gets a string that uniquely names the character collection.
         /// </summary>
         /// <remarks>
-        ///     The default implementation returns <see cref="PdfCIDSystemInfo.DefaultOrdering"/>.
+        /// The default implementation returns <see cref="PdfCIDSystemInfo.DefaultOrdering"/>.
         /// </remarks>
         public virtual string Ordering
         {
@@ -61,10 +61,10 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         }
 
         /// <summary>
-        ///     Gets the supplement number of the character collection.
+        /// Gets the supplement number of the character collection.
         /// </summary>
         /// <remarks>
-        ///     The default implementation returns <see cref="PdfCIDSystemInfo.DefaultSupplement"/>.
+        /// The default implementation returns <see cref="PdfCIDSystemInfo.DefaultSupplement"/>.
         /// </remarks>
         public virtual int Supplement
         {
@@ -72,10 +72,10 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         }
 
         /// <summary>
-        ///     Gets the default width for all glyphs.
+        /// Gets the default width for all glyphs.
         /// </summary>
         /// <remarks>
-        ///     The default implementation returns <see cref="DefaultWidthConst"/>
+        /// The default implementation returns <see cref="DefaultWidthConst"/>
         /// </remarks>
         public virtual int DefaultWidth
         {

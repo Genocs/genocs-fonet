@@ -5,18 +5,13 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class TableAndCaption : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList) =>
-            new TableAndCaption(parent, propertyList);
-    }
-
-    new public static FObj.Maker GetMaker() => new Maker();
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new TableAndCaption(parent, props));
 
     protected TableAndCaption(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "fo:table-and-caption";
+        Name = "fo:table-and-caption";
     }
 
     public override Status Layout(Area area)
@@ -41,8 +36,8 @@ internal class TableAndCaption : FObj
         }
 
         int captionSide = caption != null
-            ? caption._properties.GetProperty("caption-side").GetEnum()
-            : _properties.GetProperty("caption-side").GetEnum();
+            ? caption.Properties.GetProperty("caption-side").GetEnum()
+            : Properties.GetProperty("caption-side").GetEnum();
         bool captionFirst = captionSide != CaptionSide.AFTER;
 
         if (captionFirst && caption != null)

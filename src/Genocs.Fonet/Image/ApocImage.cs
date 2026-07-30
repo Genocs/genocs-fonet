@@ -9,12 +9,17 @@ namespace Genocs.Fonet.Image;
 /// </summary>
 internal sealed class FonetImage
 {
-    public const int DEFAULT_BITPLANES = 8;    
+    public const int DEFAULT_BITPLANES = 8;
 
-    // image width
-    private int width = 0;
-    // image height
-    private int height = 0;
+    /// <summary>
+    /// The width of the image in pixels.
+    /// </summary>
+    public int Width { get; private set; }
+
+    /// <summary>
+    /// The height of the image in pixels.
+    /// </summary>
+    public int Height { get; private set; }
 
     // Bits per pixel
     private int _bitsPerPixel = 0;
@@ -22,15 +27,15 @@ internal sealed class FonetImage
     private byte[]? _bitmaps = null;
 
     /// <summary>
-    ///     Filter that will be applied to image data
+    /// Filter that will be applied to image data
     /// </summary>
     private IFilter? filter = null;
     /// <summary>
-    ///     Constructs a new FonetImage using the supplied bitmap.
+    /// Constructs a new FonetImage using the supplied bitmap.
     /// </summary>
     /// <remarks>
-    ///     Does not hold a reference to the passed bitmap.  Instead the
-    ///     image data is extracted from <b>bitmap</b> on construction.
+    /// Does not hold a reference to the passed bitmap.  Instead the
+    /// image data is extracted from <b>bitmap</b> on construction.
     /// </remarks>
     /// <param name="href">The location of <i>bitmap</i></param>
     /// <param name="imageData">The image data</param>
@@ -39,7 +44,7 @@ internal sealed class FonetImage
         Uri = href;
         ColorSpace = new ColorSpace(ColorSpace.DeviceRgb);
         _bitsPerPixel = DEFAULT_BITPLANES; // 8
-        
+
         // Detect image format and load image info using SkiaSharp
         using (var stream = new MemoryStream(imageData))
         using (var managedStream = new SKManagedStream(stream))
@@ -49,8 +54,8 @@ internal sealed class FonetImage
             {
                 throw new FonetImageException("Unsupported or invalid image format.");
             }
-            this.width = codec.Info.Width;
-            this.height = codec.Info.Height;
+            Width = codec.Info.Width;
+            Height = codec.Info.Height;
         }
 
         this._bitmaps = imageData;
@@ -63,29 +68,7 @@ internal sealed class FonetImage
     public string Uri { get; }
 
     /// <summary>
-    ///     Return the image width. 
-    /// </summary>
-    /// <returns>the image width</returns>
-    public int Width
-    {
-        get
-        {
-            return this.width;
-        }
-    }
-    /// <summary>
-    ///     Return the image height. 
-    /// </summary>
-    /// <returns>the image height</returns>
-    public int Height
-    {
-        get
-        {
-            return this.height;
-        }
-    }
-    /// <summary>
-    ///     Return the number of bits per pixel. 
+    /// Return the number of bits per pixel. 
     /// </summary>
     /// <returns>number of bits per pixel</returns>
     public int BitsPerPixel
@@ -95,6 +78,7 @@ internal sealed class FonetImage
             return _bitsPerPixel;
         }
     }
+
     /// <summary>
     /// Return the image data size
     /// </summary>
@@ -106,6 +90,7 @@ internal sealed class FonetImage
             return (_bitmaps != null) ? _bitmaps.Length : 0;
         }
     }
+
     /// <summary>
     /// Return the image data (uncompressed). 
     /// </summary>
@@ -117,6 +102,7 @@ internal sealed class FonetImage
             return _bitmaps;
         }
     }
+
     /// <summary>
     /// Return the image color space. 
     /// </summary>
@@ -133,6 +119,7 @@ internal sealed class FonetImage
             return filter;
         }
     }
+
     /// <summary>
     /// Extracts the raw data from the image into a byte array suitable
     /// for including in the PDF document.  The image is always extracted
@@ -147,7 +134,7 @@ internal sealed class FonetImage
         using var stream = new MemoryStream(imageData);
         using var managedStream = new SKManagedStream(stream);
         using var codec = SKCodec.Create(managedStream) ?? throw new FonetImageException("Unable to decode image data.");
-        
+
         // This should be a factory when we handle more image types
         if (String.Equals(codec.EncodedFormat.ToString(), "Jpeg", StringComparison.OrdinalIgnoreCase))
         {
@@ -155,8 +142,8 @@ internal sealed class FonetImage
             JpegInfo info = parser.Parse();
             _bitsPerPixel = info.BitsPerSample;
             ColorSpace = new ColorSpace(info.ColourSpace);
-            width = info.Width;
-            height = info.Height;
+            Width = info.Width;
+            Height = info.Height;
 
             // A "no-op" filter since the JPEG data is already compressed
             filter = new DctFilter();
@@ -174,18 +161,16 @@ internal sealed class FonetImage
         {
             using var source = SKBitmap.Decode(imageData) ?? throw new FonetImageException("Unable to decode image data.");
             using var bitmap = new SKBitmap(source.Width, source.Height, SKColorType.Rgb888x, SKAlphaType.Opaque);
-            if (!source.CopyTo(bitmap))
+
+            // Composite on white so transparent pixels do not become black in RGB output.
+            using (var canvas = new SKCanvas(bitmap))
             {
-                throw new FonetImageException("Unable to convert image to RGB.");
+                canvas.Clear(SKColors.White);
+                canvas.DrawBitmap(source, 0, 0);
             }
 
             _bitmaps = new byte[bitmap.Width * bitmap.Height * 3];
-            var pixmap = bitmap.PeekPixels();
-            if (pixmap == null)
-            {
-                throw new FonetImageException("Unable to access image pixels.");
-            }
-
+            var pixmap = bitmap.PeekPixels() ?? throw new FonetImageException("Unable to access image pixels.");
             var pixelSpan = pixmap.GetPixelSpan();
             int rowBytes = pixmap.RowBytes;
             int destinationIndex = 0;
@@ -201,8 +186,9 @@ internal sealed class FonetImage
                 }
             }
         }
-        catch (FonetImageException)
+        catch (FonetImageException fonetImageException)
         {
+            FonetDriver.ActiveDriver?.FireFonetError($"Image decode failed for {Uri}: Unable to decode image data: {fonetImageException.Message}");
             throw;
         }
         catch (Exception e)

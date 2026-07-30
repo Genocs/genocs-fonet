@@ -4,6 +4,9 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class FootnoteBody : FObj
 {
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new FootnoteBody(parent, props));
+
     private int align = 0;
 
     private int alignLast = 0;
@@ -16,23 +19,12 @@ internal class FootnoteBody : FObj
 
     private int textIndent = 0;
 
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new FootnoteBody(parent, propertyList);
-        }
-    }
 
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
 
     public FootnoteBody(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "fo:footnote-body";
+        Name = "fo:footnote-body";
         _areaClass = AreaClass.SetAreaClass(AreaClass.XSL_FOOTNOTE);
     }
 
@@ -43,16 +35,16 @@ internal class FootnoteBody : FObj
             _marker = 0;
         }
 
-        BlockArea blockArea =
-            new BlockArea(_propertyManager.GetFontState(area.getFontInfo()),
+        BlockArea blockArea = new BlockArea(_propertyManager.GetFontState(area.GetFontInfo()),
                           area.getAllocationWidth(), area.spaceLeft(),
                           startIndent, endIndent, textIndent, align,
-                          alignLast, lineHeight);
+                          alignLast, lineHeight, area)
+        {
+            GeneratedBy = this
+        };
 
-        blockArea.GeneratedBy = this;
         blockArea.IsFirst = true;
-        blockArea.setParent(area);
-        blockArea.setPage(area.getPage());
+        blockArea.Page = area.Page;
         blockArea.start();
 
         blockArea.setAbsoluteHeight(area.getAbsoluteHeight());
@@ -71,8 +63,9 @@ internal class FootnoteBody : FObj
                 return status;
             }
         }
+
         blockArea.end();
-        area.addChild(blockArea);
+        area.AddChild(blockArea);
         area.increaseHeight(blockArea.GetHeight());
         blockArea.IsLast = true;
         return new Status(Status.OK);

@@ -1,0 +1,42 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: fonet-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pdf-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: genocs/pdf-printer:local
+    container_name: fonet-pdf-api
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      mongoDb__connectionString: mongodb://mongo:27017
+      mongoDb__database: fonet_pdf
+      mongoDb__seed: "true"
+      pdfStorage__templatesPath: /app/data/templates
+      pdfStorage__fontsPath: /app/data/fonts
+      pdfStorage__assetsPath: /app/data/assets
+      logger__console__enabled: "true"
+    volumes:
+      # Persist / swap templates, fonts, and assets without rebuilding the image
+      - ./docker/data/templates:/app/data/templates:ro
+      - ./docker/data/fonts:/app/data/fonts:ro
+      - ./docker/data/assets:/app/data/assets:ro
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:

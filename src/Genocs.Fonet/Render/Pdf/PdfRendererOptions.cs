@@ -1,7 +1,7 @@
-using Genocs.Fonet.Pdf.Gdi;
 using System.Collections.Specialized;
 using System.Reflection;
 using System.Text;
+using Genocs.Fonet.Pdf.Gdi;
 
 namespace Genocs.Fonet.Render.Pdf;
 
@@ -97,7 +97,7 @@ public sealed class PdfRendererOptions
     {
         get
         {
-            StringBuilder sb = new ();
+            StringBuilder sb = new();
             if (keywords != null)
             {
                 for (int i = 0, j = keywords.Count; i < j; i++)
@@ -127,31 +127,31 @@ public sealed class PdfRendererOptions
     }
 
     /// <summary>
-    ///     Specifies the owner password that will protect full access to any generated PDF documents.
+    /// Specifies the owner password that will protect full access to any generated PDF documents.
     /// </summary>
     /// <remarks>
-    ///     If either the owner or the user password is specified, 
-    ///     then the document will be encrypted.
+    /// If either the owner or the user password is specified, 
+    /// then the document will be encrypted.
     /// </remarks>
     /// <value>
-    ///     The default value is null.
+    /// The default value is null.
     /// </value>
     public string? OwnerPassword { get; set; }
 
     /// <summary>
-    ///     Specifies the user password that will protect access to any generated PDF documents.
+    /// Specifies the user password that will protect access to any generated PDF documents.
     /// </summary>
     /// <remarks>
-    ///     If either the owner or the user password is specified, 
-    ///     then the document will be encrypted.
+    /// If either the owner or the user password is specified, 
+    /// then the document will be encrypted.
     /// </remarks>
     /// <value>
-    ///     The default value is null.
+    /// The default value is null.
     /// </value>
     public string? UserPassword { get; set; }
 
     /// <summary>
-    ///     Returns true if any permissions have been set.
+    /// Returns true if any permissions have been set.
     /// </summary>
     internal bool HasPermissions
     {
@@ -159,7 +159,7 @@ public sealed class PdfRendererOptions
     }
 
     /// <summary>
-    ///     Returns the PDF permissions encoded as an 32-bit integer.
+    /// Returns the PDF permissions encoded as an 32-bit integer.
     /// </summary>
     internal int Permissions
     {
@@ -167,10 +167,10 @@ public sealed class PdfRendererOptions
     }
 
     /// <summary>
-    ///     Enables or disables printing.
+    /// Enables or disables printing.
     /// </summary>
     /// <value>
-    ///     The default value is true.
+    /// The default value is true.
     /// </value>
     public bool EnablePrinting
     {
@@ -179,11 +179,11 @@ public sealed class PdfRendererOptions
     }
 
     /// <summary>
-    ///     Enables or disables modifying document contents (other than text annotations and 
-    ///     interactive form fields).
+    /// Enables or disables modifying document contents (other than text annotations and 
+    /// interactive form fields).
     /// </summary>
     /// <value>
-    ///     The default value is true.
+    /// The default value is true.
     /// </value>
     public bool EnableModify
     {
@@ -192,10 +192,10 @@ public sealed class PdfRendererOptions
     }
 
     /// <summary>
-    ///     Enables or disables copying of text and graphics.
+    /// Enables or disables copying of text and graphics.
     /// </summary>
     /// <value>
-    ///     The default value is true.
+    /// The default value is true.
     /// </value>
     public bool EnableCopy
     {
@@ -204,11 +204,11 @@ public sealed class PdfRendererOptions
     }
 
     /// <summary>
-    ///     Enables or disables adding or modifying text annotations and interactive
-    ///     form fields.
+    /// Enables or disables adding or modifying text annotations and interactive
+    /// form fields.
     /// </summary>
     /// <value>
-    ///     The default value is true.
+    /// The default value is true.
     /// </value>
     public bool EnableAdd
     {
@@ -217,39 +217,39 @@ public sealed class PdfRendererOptions
     }
 
     /// <summary>
-    ///     Specifies how FO.NET should treat fonts.
+    /// Specifies how FO.NET should treat fonts.
     /// </summary>
     /// <value>
-    ///     The default value is FontType.Link
+    /// The default value is FontType.Link
     /// </value>
-    public FontType FontType {  get; set; } = FontType.Link;
+    public FontType FontType { get; set; } = FontType.Link;
 
 
     /// <summary>
-    ///     Gets or sets a value that indicates whether to enable kerning.
+    /// Gets or sets a value that indicates whether to enable kerning.
     /// </summary>
     /// <value>
-    ///     The default value is <b>false</b>
+    /// The default value is <b>false</b>
     /// </value>
     public bool Kerning { get; set; }
 
     /// <summary>
-    ///     Adds <i>fileInfo</i> to the private font collection.
+    /// Adds <i>fileInfo</i> to the private font collection.
     /// </summary>
     /// <param name="fileInfo">
-    ///     Absolute path to a TrueType font or collection.
+    /// Absolute path to a TrueType font or collection.
     /// </param>
     /// <exception cref="ArgumentNullException">
-    ///     If <i>fileInfo</i> is null.
+    /// If <i>fileInfo</i> is null.
     /// </exception>
     /// <exception cref="FileNotFoundException">
-    ///     If <i>fileInfo</i> does not exist.
+    /// If <i>fileInfo</i> does not exist.
     /// </exception>
     /// <exception cref="ArgumentException">
-    ///     If <i>fileInfo</i> has already been added.
+    /// If <i>fileInfo</i> has already been added.
     /// </exception>
     /// <exception cref="ArgumentException">
-    ///     If <i>fileInfo</i> cannot be added to the system font collection.
+    /// If <i>fileInfo</i> cannot be added to the system font collection.
     /// </exception>
     public void AddPrivateFont(FileInfo fileInfo)
     {

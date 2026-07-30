@@ -1,6 +1,6 @@
-﻿using Genocs.Fonet.XsltTransformer.Options;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
+using Genocs.Fonet.XsltTransformer.Options;
 
 namespace Genocs.Fonet.XsltTransformer.Transformers;
 
@@ -36,6 +36,10 @@ public class XsltExtensions
         return filePath;
     }
 
+    /// <summary>
+    /// Returns the physical file path that corresponds to the specified relative path on the Web server.
+    /// </summary>
+    /// <returns>The assembly version as a string.</returns>
     public static string GetAssemblyVersion()
     {
         var assembly = Assembly.GetExecutingAssembly();

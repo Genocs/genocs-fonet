@@ -13,7 +13,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets a value representing the character encoding.
+        /// Sets a value representing the character encoding.
         /// </summary>
         public PdfName Encoding
         {

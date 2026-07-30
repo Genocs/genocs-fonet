@@ -7,18 +7,20 @@ internal class NumberProperty : Property
 {
     internal class Maker(string propName) : PropertyMaker(propName)
     {
-        public override Property ConvertProperty(Property p, PropertyList propertyList, FObj fo)
+        public override Property? ConvertProperty(Property property, PropertyList propertyList, FObj? fo)
         {
-            if (p is NumberProperty)
+            if (property is NumberProperty)
             {
-                return p;
+                return property;
             }
-            Number val = p.GetNumber();
-            if (val != null)
+
+            Number? number = property.GetNumber();
+            if (number != null)
             {
-                return new NumberProperty(val);
+                return new NumberProperty(number);
             }
-            return ConvertPropertyDatatype(p, propertyList, fo);
+
+            return ConvertPropertyDataType(property, propertyList, fo);
         }
     }
 

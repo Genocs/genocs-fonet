@@ -7,18 +7,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class PageSequence : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new PageSequence(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new PageSequence(parent, props));
 
     private const int EXPLICIT = 0;
     private const int AUTO = 1;
@@ -46,15 +36,15 @@ internal class PageSequence : FObj
     protected PageSequence(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "fo:page-sequence";
+        Name = "fo:page-sequence";
 
-        if (parent.GetName().Equals("fo:root"))
+        if (parent.Name.Equals("fo:root"))
         {
             _root = (Root)parent;
         }
         else
         {
-            throw new FonetException($"page-sequence must be child of root, not {parent.GetName()}");
+            throw new FonetException($"page-sequence must be child of root, not {parent.Name}");
         }
 
         layoutMasterSet = _root.LayoutMasterSet;
@@ -63,7 +53,7 @@ internal class PageSequence : FObj
         _flowMap = new Hashtable();
 
         thisIsFirstPage = true;
-        _initialPageNumber = _properties.GetProperty("initial-page-number").GetString();
+        _initialPageNumber = Properties.GetProperty("initial-page-number").GetString();
 
         if (_initialPageNumber.Equals("auto"))
         {
@@ -91,14 +81,14 @@ internal class PageSequence : FObj
             }
         }
 
-        masterName = _properties.GetProperty("master-reference").GetString();
+        masterName = Properties.GetProperty("master-reference").GetString();
 
-        this.pageNumberGenerator = new PageNumberGenerator(_properties.GetProperty("format").GetString(),
-                                    _properties.GetProperty("grouping-separator").GetCharacter(),
-                                    _properties.GetProperty("grouping-size").GetNumber().IntValue(),
-                                    _properties.GetProperty("letter-value").GetEnum());
+        this.pageNumberGenerator = new PageNumberGenerator(Properties.GetProperty("format").GetString(),
+                                    Properties.GetProperty("grouping-separator").GetCharacter(),
+                                    Properties.GetProperty("grouping-size").GetNumber().IntValue(),
+                                    Properties.GetProperty("letter-value").GetEnum());
 
-        this.forcePageCount = _properties.GetProperty("force-page-count").GetEnum();
+        this.forcePageCount = Properties.GetProperty("force-page-count").GetEnum();
     }
 
 
@@ -214,7 +204,7 @@ internal class PageSequence : FObj
 
             }
 
-            currentPage.setPageSequence(this);
+            currentPage.PageSequence = this;
             FormatStaticContent(areaTree);
 
             areaTree.addPage(currentPage);
@@ -308,20 +298,19 @@ internal class PageSequence : FObj
 
     }
 
-    private void LayoutStaticContent(Flow.Flow flow, Region region,
-                                     AreaContainer area)
+    private void LayoutStaticContent(Flow.Flow flow, Region region, AreaContainer area)
     {
-        if (flow is StaticContent)
+        if (flow is StaticContent content)
         {
-            ((StaticContent)flow).Layout(area, region);
+            content.Layout(area, region);
         }
         else
         {
-            FonetDriver.ActiveDriver.FireFonetError($"{region.GetName()} only supports static-content flows currently. Cannot use flow named '{flow.GetFlowName()}'");
+            FonetDriver.ActiveDriver?.FireFonetError($"{region.Name} only supports static-content flows currently. Cannot use flow named '{flow.GetFlowName()}'");
         }
     }
 
-    private ISubSequenceSpecifier GetNextSubsequence(PageSequenceMaster master)
+    private ISubSequenceSpecifier? GetNextSubsequence(PageSequenceMaster master)
     {
         if (master.GetSubSequenceSpecifierCount()
             > currentSubsequenceNumber + 1)
@@ -336,9 +325,7 @@ internal class PageSequence : FObj
         }
     }
 
-    private SimplePageMaster GetNextSimplePageMaster(PageSequenceMaster sequenceMaster,
-                                                     int currentPageNumber, bool thisIsFirstPage,
-                                                     bool isEmptyPage)
+    private SimplePageMaster GetNextSimplePageMaster(PageSequenceMaster sequenceMaster, int currentPageNumber, bool thisIsFirstPage, bool isEmptyPage)
     {
         if (isForcing)
         {
@@ -411,10 +398,9 @@ internal class PageSequence : FObj
                                          bool thisIsFirstPage,
                                          bool isEmptyPage)
     {
-        PageMaster pageMaster = null;
+        PageMaster? pageMaster;
 
-        PageSequenceMaster sequenceMaster =
-            this.layoutMasterSet.getPageSequenceMaster(pageSequenceName);
+        PageSequenceMaster sequenceMaster = layoutMasterSet.getPageSequenceMaster(pageSequenceName);
 
         if (sequenceMaster != null)
         {
@@ -426,8 +412,8 @@ internal class PageSequence : FObj
         }
         else
         {
-            SimplePageMaster simpleMaster = this.layoutMasterSet.getSimplePageMaster(pageSequenceName)
-                ?? throw new FonetException($"'master-reference' for 'fo:page-sequence' matches no 'simple-page-master' or 'page-sequence-master'");
+            SimplePageMaster simpleMaster = layoutMasterSet.getSimplePageMaster(pageSequenceName)
+                ?? throw new FonetException("'master-reference' for 'fo:page-sequence' matches no 'simple-page-master' or 'page-sequence-master'");
 
             currentPageMasterName = pageSequenceName;
 
@@ -593,7 +579,7 @@ internal class PageSequence : FObj
                 currentPage = MakePage(areaTree, firstAvailPageNumber, false, true);
                 string formattedPageNumber = pageNumberGenerator.makeFormattedPageNumber(_currentPageNumber);
                 currentPage.setFormattedNumber(formattedPageNumber);
-                currentPage.setPageSequence(this);
+                currentPage.PageSequence = this;
                 FormatStaticContent(areaTree);
 
                 FonetDriver.ActiveDriver.FireFonetInfo($"[forced-{firstAvailPageNumber}]");

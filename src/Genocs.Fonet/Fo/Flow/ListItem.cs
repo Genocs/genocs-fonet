@@ -4,18 +4,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class ListItem : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new ListItem(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new ListItem(parent, props));
 
     private int align;
     private int alignLast;
@@ -28,7 +18,7 @@ internal class ListItem : FObj
     public ListItem(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:list-item";
+        Name = "fo:list-item";
     }
 
     public override Status Layout(Area area)
@@ -42,15 +32,12 @@ internal class ListItem : FObj
             MarginProps mProps = _propertyManager.GetMarginProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            this.align = this._properties.GetProperty("text-align").GetEnum();
-            this.alignLast = this._properties.GetProperty("text-align-last").GetEnum();
-            this.lineHeight =
-                this._properties.GetProperty("line-height").GetLength().MValue();
-            this.spaceBefore =
-                this._properties.GetProperty("space-before.optimum").GetLength().MValue();
-            this.spaceAfter =
-                this._properties.GetProperty("space-after.optimum").GetLength().MValue();
-            this.id = this._properties.GetProperty("id").GetString();
+            this.align = this.Properties.GetProperty("text-align").GetEnum();
+            this.alignLast = this.Properties.GetProperty("text-align-last").GetEnum();
+            this.lineHeight = this.Properties.GetProperty("line-height").GetLength().MValue();
+            this.spaceBefore = this.Properties.GetProperty("space-before.optimum").GetLength().MValue();
+            this.spaceAfter = this.Properties.GetProperty("space-after.optimum").GetLength().MValue();
+            this.id = this.Properties.GetProperty("id").GetString();
 
             area.GetIDReferences().CreateID(id);
 
@@ -64,15 +51,17 @@ internal class ListItem : FObj
 
         if (spaceBefore != 0)
         {
-            area.addDisplaySpace(spaceBefore);
+            area.AddDisplaySpace(spaceBefore);
         }
 
-        this.blockArea =
-            new BlockArea(_propertyManager.GetFontState(area.getFontInfo()),
+        this.blockArea = new BlockArea(_propertyManager.GetFontState(area.GetFontInfo()),
                           area.getAllocationWidth(), area.spaceLeft(), 0, 0,
-                          0, align, alignLast, lineHeight);
+                          0, align, alignLast, lineHeight, area)
+        {
+            GeneratedBy = this
+        };
+
         this.blockArea.setTableCellXOffset(area.getTableCellXOffset());
-        this.blockArea.GeneratedBy = this;
         this._areasGenerated++;
         if (this._areasGenerated == 1)
         {
@@ -80,8 +69,7 @@ internal class ListItem : FObj
         }
         this.blockArea.addLineagePair(this, this._areasGenerated);
 
-        blockArea.setParent(area);
-        blockArea.setPage(area.getPage());
+        blockArea.Page = area.Page;
         blockArea.start();
 
         blockArea.setAbsoluteHeight(area.getAbsoluteHeight());
@@ -112,19 +100,19 @@ internal class ListItem : FObj
         if (status.IsIncomplete())
         {
             blockArea.end();
-            area.addChild(blockArea);
+            area.AddChild(blockArea);
             area.increaseHeight(blockArea.GetHeight());
             this._marker = 1;
             return status;
         }
 
         blockArea.end();
-        area.addChild(blockArea);
+        area.AddChild(blockArea);
         area.increaseHeight(blockArea.GetHeight());
 
         if (spaceAfter != 0)
         {
-            area.addDisplaySpace(spaceAfter);
+            area.AddDisplaySpace(spaceAfter);
         }
 
         if (area is BlockArea)

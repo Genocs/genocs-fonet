@@ -4,28 +4,19 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class MultiSwitch : ToBeImplementedElement
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new MultiSwitch(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new MultiSwitch(parent, props));
 
     protected MultiSwitch(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:multi-switch";
+        Name = "fo:multi-switch";
     }
 
     public override Status Layout(Area area)
     {
-        AccessibilityProps mAccProps = _propertyManager.GetAccessibilityProps();
+        // TODO: Implement the layout logic for the MultiSwitch element.
+        // AccessibilityProps mAccProps = _propertyManager.GetAccessibilityProps();
         return base.Layout(area);
     }
 }

@@ -4,27 +4,28 @@ namespace Genocs.Fonet.Pdf;
 
 public abstract class PdfObject
 {
-    private PdfObjectId objectId;
+    public PdfObjectId ObjectId { get; }
 
-    public PdfObject() { }
-
-    public PdfObject(PdfObjectId objectId)
+    protected PdfObject()
     {
-        this.objectId = objectId;
+    }
+
+    protected PdfObject(PdfObjectId objectId)
+    {
+        ObjectId = objectId;
     }
 
     protected internal abstract void Write(PdfWriter writer);
 
     protected internal void WriteIndirect(PdfWriter writer)
     {
-        Debug.Assert(writer != null);
         Debug.Assert(IsIndirect);
 
         // Write the object number and generation number 
         // followed by the keyword 'obj' and finally a newline.
-        writer.Write(objectId.ObjectNumber);
+        writer.Write(ObjectId.ObjectNumber);
         writer.WriteSpace();
-        writer.Write(objectId.GenerationNumber);
+        writer.Write(ObjectId.GenerationNumber);
         writer.WriteSpace();
         writer.WriteKeywordLine(Keyword.Obj);
 
@@ -44,11 +45,6 @@ public abstract class PdfObject
 
     public bool IsIndirect
     {
-        get { return objectId.ObjectNumber != 0; }
-    }
-
-    public PdfObjectId ObjectId
-    {
-        get { return objectId; }
+        get { return ObjectId.ObjectNumber != 0; }
     }
 }

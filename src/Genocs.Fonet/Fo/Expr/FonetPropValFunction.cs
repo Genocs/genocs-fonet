@@ -17,6 +17,6 @@ internal class FonetPropValFunction : FunctionBase
         {
             throw new PropertyException("Missing property name.");
         }
-        return pInfo.getPropertyList().GetProperty(propName);
+        return pInfo.PropertyList.GetProperty(propName);
     }
 }

@@ -3,10 +3,10 @@ using Genocs.Fonet.Pdf;
 namespace Genocs.Fonet.Pdf
 {
     /// <summary>
-    ///     Class representing a file trailer.
+    /// Class representing a file trailer.
     /// </summary>
     /// <remarks>
-    ///     File trailers are described in section 3.4.4 of the PDF specification.
+    /// File trailers are described in section 3.4.4 of the PDF specification.
     /// </remarks>
     public class PdfFileTrailer : PdfDictionary
     {

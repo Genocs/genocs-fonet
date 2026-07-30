@@ -22,19 +22,18 @@ internal class BackgroundColorMaker : GenericColor
     {
         if (m_defaultProp == null)
         {
-            m_defaultProp = Make(propertyList, "transparent", propertyList.getParentFObj());
+            m_defaultProp = Make(propertyList, "transparent", propertyList.GetParentFObj());
         }
         return m_defaultProp;
     }
 
-    protected override Property ConvertPropertyDatatype(
-        Property p, PropertyList propertyList, FObj fo)
+    protected override Property? ConvertPropertyDataType(Property p, PropertyList propertyList, FObj? fo)
     {
-        String nameval = p.GetNCname();
+        string? nameval = p.GetNCname();
         if (nameval != null)
         {
             return new ColorTypeProperty(new ColorType(nameval));
         }
-        return base.ConvertPropertyDatatype(p, propertyList, fo);
+        return base.ConvertPropertyDataType(p, propertyList, fo);
     }
 }

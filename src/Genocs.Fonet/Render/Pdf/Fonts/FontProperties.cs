@@ -1,8 +1,8 @@
 namespace Genocs.Fonet.Render.Pdf.Fonts
 {
     /// <summary>
-    ///     Collection of font properties such as face name and whether the 
-    ///     a font is bold and/or italic.
+    /// Collection of font properties such as face name and whether the 
+    /// a font is bold and/or italic.
     /// </summary>
     internal sealed class FontProperties
     {
@@ -11,13 +11,13 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         private bool italic;
 
         /// <summary>
-        ///     Class constructor.
+        /// Class constructor.
         /// </summary>
         /// <remarks>
-        ///     Regular    : bold=false, italic=false
-        ///     Bold       : bold=true,  italic=false
-        ///     Italic     : bold=false, italic=true
-        ///     BoldItalic : bold=true,  italic=true
+        /// Regular    : bold=false, italic=false
+        /// Bold       : bold=true,  italic=false
+        /// Italic     : bold=false, italic=true
+        /// BoldItalic : bold=true,  italic=true
         /// </remarks>
         /// <param name="faceName">Font face name, e.g. Arial.</param>
         /// <param name="bold">Bold flag.</param>

@@ -70,8 +70,8 @@ internal class GenericBorderStyle : EnumProperty.Maker
             listprop = (ListProperty)propertyList.GetExplicitProperty("border-style");
             if (listprop != null)
             {
-                IShorthandParser shparser = new BoxPropShorthandParser(listprop);
-                p = shparser.GetValueForProperty(PropName, this, propertyList);
+                IShortHandParser shparser = new BoxPropShorthandParser(listprop);
+                p = shparser.GetValueForProperty(PropertyName, this, propertyList);
             }
         }
 
@@ -139,7 +139,7 @@ internal class GenericBorderStyle : EnumProperty.Maker
     {
         if (_defaultProp == null)
         {
-            _defaultProp = Make(propertyList, "none", propertyList.getParentFObj());
+            _defaultProp = Make(propertyList, "none", propertyList.GetParentFObj());
         }
         return _defaultProp;
 

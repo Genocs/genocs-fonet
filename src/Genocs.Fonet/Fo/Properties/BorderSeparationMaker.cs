@@ -70,7 +70,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = MakeCompound(propertyList, propertyList.getParentFObj());
+                m_defaultProp = MakeCompound(propertyList, propertyList.GetParentFObj());
             }
             return m_defaultProp;
         }

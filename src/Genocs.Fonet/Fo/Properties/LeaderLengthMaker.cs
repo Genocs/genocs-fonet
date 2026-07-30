@@ -108,7 +108,7 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Make(PropertyList propertyList)
         {
-            return MakeCompound(propertyList, propertyList.getParentFObj());
+            return MakeCompound(propertyList, propertyList.GetParentFObj());
         }
 
 

@@ -19,7 +19,7 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Length = 0;
             sbExpr.Append("padding-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.START));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.START));
 
             if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
             {
@@ -32,11 +32,11 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Compute(PropertyList propertyList)
         {
-            FObj parentFO = propertyList.getParentFObj();
+            FObj parentFO = propertyList.GetParentFObj();
             StringBuilder sbExpr = new StringBuilder();
             Property p = null;
             sbExpr.Append("padding-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.START));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.START));
 
             p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 

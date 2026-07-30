@@ -22,7 +22,7 @@ internal class BorderAfterColorMaker : GenericColor
 
         sbExpr.Length = 0;
         sbExpr.Append("border-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.AFTER));
         sbExpr.Append("-color");
         if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
         {
@@ -35,11 +35,11 @@ internal class BorderAfterColorMaker : GenericColor
 
     public override Property Compute(PropertyList propertyList)
     {
-        FObj parentFO = propertyList.getParentFObj();
+        FObj parentFO = propertyList.GetParentFObj();
         StringBuilder sbExpr = new StringBuilder();
         Property p = null;
         sbExpr.Append("border-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.AFTER));
         sbExpr.Append("-color");
         p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 
@@ -57,7 +57,7 @@ internal class BorderAfterColorMaker : GenericColor
     {
         if (m_defaultProp == null)
         {
-            m_defaultProp = Make(propertyList, "black", propertyList.getParentFObj());
+            m_defaultProp = Make(propertyList, "black", propertyList.GetParentFObj());
         }
         return m_defaultProp;
     }

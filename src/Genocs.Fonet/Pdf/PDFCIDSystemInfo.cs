@@ -1,10 +1,8 @@
-using Genocs.Fonet.Pdf;
-
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     A dictionary containing entries that define the character collection
-///     of the CIDFont.
+/// A dictionary containing entries that define the character collection
+/// of the CIDFont.
 /// </summary>
 public class PdfCIDSystemInfo : PdfDictionary
 {
@@ -20,8 +18,7 @@ public class PdfCIDSystemInfo : PdfDictionary
         this[PdfName.Names.Supplement] = new PdfNumeric(DefaultSupplement);
     }
 
-    public PdfCIDSystemInfo(
-        string registry, string ordering, int supplement)
+    public PdfCIDSystemInfo(string registry, string ordering, int supplement)
         : base()
     {
         this[PdfName.Names.Registry] = new PdfString(registry);

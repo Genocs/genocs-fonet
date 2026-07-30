@@ -5,18 +5,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class SimplePageMaster : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new SimplePageMaster(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new SimplePageMaster(parent, props));
 
     private Hashtable _regions;
 
@@ -31,12 +21,12 @@ internal class SimplePageMaster : FObj
     protected SimplePageMaster(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:simple-page-master";
+        Name = "fo:simple-page-master";
 
-        if (parent.GetName().Equals("fo:layout-master-set"))
+        if (parent.Name.Equals("fo:layout-master-set"))
         {
             this.layoutMasterSet = (LayoutMasterSet)parent;
-            masterName = this._properties.GetProperty("master-name").GetString();
+            masterName = this.Properties.GetProperty("master-name").GetString();
             if (masterName == null)
             {
                 FonetDriver.ActiveDriver?.FireFonetWarning(
@@ -51,17 +41,15 @@ internal class SimplePageMaster : FObj
         {
             throw new FonetException("fo:simple-page-master must be child "
                 + "of fo:layout-master-set, not "
-                + parent.GetName());
+                + parent.Name);
         }
         _regions = new Hashtable();
     }
 
     protected internal override void End()
     {
-        int pageWidth =
-            this._properties.GetProperty("page-width").GetLength().MValue();
-        int pageHeight =
-            this._properties.GetProperty("page-height").GetLength().MValue();
+        int pageWidth = this.Properties.GetProperty("page-width").GetLength().MValue();
+        int pageHeight = this.Properties.GetProperty("page-height").GetLength().MValue();
         MarginProps mProps = _propertyManager.GetMarginProps();
 
         int contentRectangleXPosition = mProps.marginLeft;
@@ -83,9 +71,7 @@ internal class SimplePageMaster : FObj
         }
         else
         {
-            FonetDriver.ActiveDriver.FireFonetError(
-                "simple-page-master must have a region of class " +
-                    RegionBody.REGION_CLASS);
+            FonetDriver.ActiveDriver?.FireFonetError("simple-page-master must have a region of class " + RegionBody.REGION_CLASS);
         }
 
         if (getRegion(RegionBefore.REGION_CLASS) != null)

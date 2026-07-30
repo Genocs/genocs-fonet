@@ -23,7 +23,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = Make(propertyList, "medium", propertyList.getParentFObj());
+                m_defaultProp = Make(propertyList, "medium", propertyList.GetParentFObj());
             }
             return m_defaultProp;
 

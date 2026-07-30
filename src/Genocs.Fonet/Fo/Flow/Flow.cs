@@ -6,18 +6,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class Flow : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new Flow(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Flow(parent, props));
 
     private PageSequence pageSequence;
     private ArrayList markerSnapshot;
@@ -28,9 +18,9 @@ internal class Flow : FObj
     protected Flow(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = GetElementName();
+        Name = GetElementName();
 
-        if (parent.GetName().Equals("fo:page-sequence"))
+        if (parent.Name.Equals("fo:page-sequence"))
         {
             this.pageSequence = (PageSequence)parent;
         }
@@ -38,19 +28,19 @@ internal class Flow : FObj
         {
             throw new FonetException("flow must be child of "
                 + "page-sequence, not "
-                + parent.GetName());
+                + parent.Name);
         }
         SetFlowName(GetProperty("flow-name").GetString());
 
         if (pageSequence.IsFlowSet)
         {
-            if (this._name.Equals("fo:flow"))
+            if (Name.Equals("fo:flow"))
             {
                 throw new FonetException("Only a single fo:flow permitted per fo:page-sequence");
             }
             else
             {
-                throw new FonetException($"{_name} not allowed after fo:flow");
+                throw new FonetException($"{Name} not allowed after fo:flow");
             }
         }
         pageSequence.AddFlow(this);

@@ -10,55 +10,39 @@ internal class UnknownXMLObj : XMLObj
     {
         private readonly string _space;
         private readonly string _tag;
+        private readonly Attributes _attributes;
 
-        internal Maker(string space, string tag)
+        internal Maker(string space, string tag, Attributes attributes)
         {
             _space = space;
             _tag = tag;
+            _attributes = attributes;
         }
 
         public override FObj Make(FObj parent, PropertyList propertyList)
-            => new UnknownXMLObj(parent, propertyList, _space, _tag);
+            => new UnknownXMLObj(parent, propertyList, _space, _tag, _attributes);
     }
 
-    public static FObj.Maker GetMaker(string space, string tag)
-        => new Maker(space, tag);
+    public static FObj.Maker CreateMaker(string space, string tag, Attributes attributes)
+        => new Maker(space, tag, attributes);
 
-    protected UnknownXMLObj(FObj parent, PropertyList propertyList, string nspace, string tag)
-        : base(parent, propertyList, tag)
+    protected UnknownXMLObj(FObj parent, PropertyList propertyList, string nameSpace, string tag, Attributes attributes)
+        : base(parent, propertyList, tag, attributes)
     {
-        _namespace = nspace;
+        _namespace = nameSpace;
 
         if (!"".Equals(_namespace))
         {
-            _name = $"{_namespace}:{tag}";
+            Name = $"{_namespace}:{tag}";
         }
         else
         {
-            _name = $"(none):{tag}";
+            Name = $"(none):{tag}";
         }
     }
 
     public override string GetNameSpace()
         => _namespace;
-
-    protected internal override void AddChild(FONode child)
-    {
-        if (_doc == null)
-        {
-            CreateBasicDocument();
-        }
-        base.AddChild(child);
-    }
-
-    protected internal override void AddCharacters(char[] data, int start, int length)
-    {
-        if (_doc == null)
-        {
-            CreateBasicDocument();
-        }
-        base.AddCharacters(data, start, length);
-    }
 
     public override Status Layout(Area area)
         => new(Status.OK);

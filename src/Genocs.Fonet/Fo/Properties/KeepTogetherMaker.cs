@@ -1,31 +1,26 @@
-namespace Genocs.Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class KeepTogetherMaker : GenericKeep
 {
-    internal class KeepTogetherMaker : GenericKeep
+    private Property? _defaultProperty;
+
+    new public static PropertyMaker Maker(string propName)
     {
-        new public static PropertyMaker Maker(string propName)
-        {
-            return new KeepTogetherMaker(propName);
-        }
+        return new KeepTogetherMaker(propName);
+    }
 
-        protected KeepTogetherMaker(string name) : base(name) { }
+    protected KeepTogetherMaker(string name) 
+        : base(name)
+    {
+    }
 
 
-        public override bool IsInherited()
-        {
-            return false;
-        }
+    public override bool IsInherited()
+        => false;
 
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = Make(propertyList, "auto", propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-
-        }
-
+    public override Property Make(PropertyList propertyList)
+    {
+        _defaultProperty ??= Make(propertyList, "auto", propertyList.GetParentFObj());
+        return _defaultProperty;
     }
 }

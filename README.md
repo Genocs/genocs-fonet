@@ -16,9 +16,12 @@ For migration status, known issues, and the phased roadmap see the [docs/](./doc
 | Area | Status |
 |------|--------|
 | Build | ✅ Compiles on `net8.0`, `net9.0`, `net10.0` |
-| CI | ✅ GitHub Actions on Windows, Linux, macOS |
-| Tests | ✅ 5 integration tests with PDF structure validation |
-| Production use | ⚠️ Not recommended yet — font pipeline and FO coverage gaps remain |
+| CI | ✅ GitHub Actions (build, test, pack) |
+| Font pipeline | ✅ Glyph mapping, subsetting, metrics (Phase 1) |
+| Quality | ✅ Image spans, encoding, namespaces (Phase 2) |
+| FO completeness | 🔄 Tier 1 batch done; ~87 properties still stubbed (Phase 3) |
+| Tests | ✅ 22 tests with PDF structure validation on net8/9/10 |
+| Production use | ⚠️ Not recommended yet — FO coverage gaps; CJK needs validation |
 
 ## What the cross-platform solution is
 
@@ -63,23 +66,32 @@ dotnet build Fonet.slnx -c Release
 dotnet test Fonet.slnx -c Release
 ```
 
+## PDF Web API
+
+`src/Genocs.Fonet.WebApi` is a Genocs minimal API that builds PDFs via the same `XslFoPdfService` pipeline as the Host console sample. Templates, fonts, and assets are loaded from configurable paths (Docker volumes in compose).
+
+```powershell
+docker compose up --build
+# POST http://localhost:8080/api/pdf  (see src/Genocs.Fonet.WebApi/README.md)
+```
+
 ## Known limitations
 
 These are actively tracked in [docs/known-issues.md](./docs/known-issues.md) and [docs/migration-plan.md](./docs/migration-plan.md):
 
-1. **GDI compatibility shim** — `LibWrapper` still contains stubbed methods for glyph mapping and font table access. Private fonts work via file-based reads; system font embedding may still fail for some code paths.
-2. **~87 unimplemented FO properties** — log warnings and are ignored during layout.
-3. **13 unimplemented FO elements** — parse but produce no layout output.
-4. **System font discovery** — recursive filesystem scan with filename matching; can be slow or imprecise on Linux/macOS.
-5. **Image extraction** — non-JPEG path uses per-pixel `GetPixel()`; slow for large images.
+1. **~87 unimplemented FO properties** — log warnings and are ignored during layout.
+2. **11 unimplemented FO elements** — parse but produce no layout output.
+3. **Side-float layout** — `fo:float` renders in flow; `float`/`clear`/`z-index` parse but do not affect layout.
+4. **System font discovery** — recursive filesystem scan with filename matching; can be imprecise on Linux/macOS.
+5. **CJK / complex scripts** — not validated with fixture tests yet.
 6. **PDF encryption** — legacy RC4 only.
 
-## Concerns and next steps
+## Migration progress
 
-See the full assessment in [docs/assessment-overview.md](./docs/assessment-overview.md).
+**Phase 0 (stabilize)** — ✅ complete.
 
-**Phase 0 (stabilize)** — complete.
+**Phase 1 (font pipeline)** — ✅ complete. Glyph mapping, font table access, embedding/subsetting, and font descriptor metrics.
 
-**Phase 1 (font pipeline)** — complete. Glyph mapping, font table access, embedding/subsetting, and font descriptor metrics implemented.
+**Phase 2 (quality)** — ✅ complete. Image spans, PDF encoding, namespace consolidation, error reporting.
 
-**Phase 2 (quality)** — next: performance, encoding, namespace consolidation.
+**Phase 3 (FO completeness)** — 🔄 in progress. Tier 1 properties and table captions done; side-float layout deferred.

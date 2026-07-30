@@ -5,13 +5,13 @@ namespace Genocs.Fonet.Pdf
     public class PdfTrueTypeFont : PdfFont
     {
         /// <param name="objectId">
-        ///     A unique object number.
+        /// A unique object number.
         /// </param>
         /// <param name="fontName">
-        ///     The name by which the font is reference in the Font subdictionary 
+        /// The name by which the font is reference in the Font subdictionary 
         /// </param>
         /// <param name="baseFont">
-        ///     The PostScript name of the font.
+        /// The PostScript name of the font.
         /// </param>
         public PdfTrueTypeFont(PdfObjectId objectId, string fontName, string baseFont)
             : base(fontName, objectId)
@@ -23,7 +23,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets a value representing the character encoding.
+        /// Sets a value representing the character encoding.
         /// </summary>
         public PdfName Encoding
         {
@@ -31,7 +31,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets the font descriptor.
+        /// Sets the font descriptor.
         /// </summary>
         public PdfFontDescriptor Descriptor
         {
@@ -39,10 +39,10 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets the first character code defined in the font's widths array
+        /// Sets the first character code defined in the font's widths array
         /// </summary>
         /// <value>
-        ///     The default value is 0.
+        /// The default value is 0.
         /// </value>
         public PdfNumeric FirstChar
         {
@@ -50,10 +50,10 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets the last character code defined in the font's widths array
+        /// Sets the last character code defined in the font's widths array
         /// </summary>
         /// <value>
-        ///     The default value is 255.
+        /// The default value is 255.
         /// </value>
         public PdfNumeric LastChar
         {
@@ -61,7 +61,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets the array of character widths.
+        /// Sets the array of character widths.
         /// </summary>
         public PdfArray Widths
         {

@@ -12,14 +12,14 @@ internal class StringTokenizer : IEnumerator
     private bool retDelims;
 
     /// <summary>
-    ///     maxDelimChar stores the value of the delimiter character with 
-    ///     the highest value. It is used to optimize the detection of 
-    ///     delimiter _characters.
+    /// maxDelimChar stores the value of the delimiter character with 
+    /// the highest value. It is used to optimize the detection of 
+    /// delimiter _characters.
     /// </summary>
     private char maxDelimChar;
 
     /// <summary>
-    ///     Set maxDelimChar to the highest char in the delimiter set.
+    /// Set maxDelimChar to the highest char in the delimiter set.
     /// </summary>
     private void SetMaxDelimChar()
     {
@@ -42,14 +42,14 @@ internal class StringTokenizer : IEnumerator
     }
 
     /// <summary>
-    ///     Constructs a string tokenizer for the specified string. All 
-    ///     _characters in the <i>delim</i> argument are the delimiters 
-    ///     for separating tokens.<br/>
-    ///     If the <i>returnDelims</i> flag is <i>true</i>, then 
-    ///     the delimiter _characters are also returned as tokens. Each delimiter 
-    ///     is returned as a string of length one. If the flag is 
-    ///     <i>false</i>, the delimiter _characters are skipped and only 
-    ///     serve as separators between tokens. 
+    /// Constructs a string tokenizer for the specified string. All 
+    /// _characters in the <i>delim</i> argument are the delimiters 
+    /// for separating tokens.<br/>
+    /// If the <i>returnDelims</i> flag is <i>true</i>, then 
+    /// the delimiter _characters are also returned as tokens. Each delimiter 
+    /// is returned as a string of length one. If the flag is 
+    /// <i>false</i>, the delimiter _characters are skipped and only 
+    /// serve as separators between tokens. 
     /// </summary>
     /// <param name="str"></param>
     /// <param name="delim"></param>
@@ -66,10 +66,10 @@ internal class StringTokenizer : IEnumerator
     }
 
     /// <summary>
-    ///     Constructs a string tokenizer for the specified string. The 
-    ///     _characters in the <code>delim</code> argument are the delimiters 
-    ///     for separating tokens. Delimiter _characters themselves will not 
-    ///     be treated as tokens.
+    /// Constructs a string tokenizer for the specified string. The 
+    /// _characters in the <code>delim</code> argument are the delimiters 
+    /// for separating tokens. Delimiter _characters themselves will not 
+    /// be treated as tokens.
     /// </summary>
     /// <param name="str">a string to be parsed.</param>
     /// <param name="delim">the delimiters.</param>
@@ -78,11 +78,11 @@ internal class StringTokenizer : IEnumerator
     }
 
     /// <summary>
-    ///     Constructs a string tokenizer for the specified string. The 
-    ///     tokenizer uses the default delimiter set, which is the space 
-    ///     character, the tab character, the newline character, the 
-    ///     carriage-return character, and the form-feed character. 
-    ///     Delimiter _characters themselves will not be treated as tokens.
+    /// Constructs a string tokenizer for the specified string. The 
+    /// tokenizer uses the default delimiter set, which is the space 
+    /// character, the tab character, the newline character, the 
+    /// carriage-return character, and the form-feed character. 
+    /// Delimiter _characters themselves will not be treated as tokens.
     /// </summary>
     /// <param name="str">a string to be parsed</param>
     public StringTokenizer(string str) : this(str, " \t\n\r\f", false)
@@ -90,10 +90,10 @@ internal class StringTokenizer : IEnumerator
     }
 
     /// <summary>
-    ///     Skips delimiters starting from the specified position. If 
-    ///     retDelims is false, returns the index of the first non-delimiter 
-    ///     character at or after startPos. If retDelims is true, startPos 
-    ///     is returned.
+    /// Skips delimiters starting from the specified position. If 
+    /// retDelims is false, returns the index of the first non-delimiter 
+    /// character at or after startPos. If retDelims is true, startPos 
+    /// is returned.
     /// </summary>
     /// <param name="startPos"></param>
     /// <returns></returns>
@@ -118,9 +118,9 @@ internal class StringTokenizer : IEnumerator
     }
 
     /// <summary>
-    ///     Skips ahead from startPos and returns the index of the next 
-    ///     delimiter character encountered, or maxPosition if no such 
-    ///     delimiter is found.
+    /// Skips ahead from startPos and returns the index of the next 
+    /// delimiter character encountered, or maxPosition if no such 
+    /// delimiter is found.
     /// </summary>
     /// <param name="startPos"></param>
     /// <returns></returns>
@@ -148,7 +148,7 @@ internal class StringTokenizer : IEnumerator
     }
 
     /// <summary>
-    ///     Returns the next token from this string tokenizer.
+    /// Returns the next token from this string tokenizer.
     /// </summary>
     /// <returns>the next token from this string tokenizer.</returns>
     public virtual string NextToken()
@@ -173,9 +173,9 @@ internal class StringTokenizer : IEnumerator
     }
 
     /// <summary>
-    ///     Returns the same value as the <code>hasMoreTokens</code> method. 
-    ///     It exists so that this class can implement the 
-    ///     <i>Enumeration</i> interface. 
+    /// Returns the same value as the <code>hasMoreTokens</code> method. 
+    /// It exists so that this class can implement the 
+    /// <i>Enumeration</i> interface. 
     /// </summary>
     /// <returns>
     /// <i>true</i> if there are more tokens; <i>false</i> 

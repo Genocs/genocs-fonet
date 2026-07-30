@@ -22,7 +22,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = Make(propertyList, "use-normal-stylesheet", propertyList.getParentFObj());
+                m_defaultProp = Make(propertyList, "use-normal-stylesheet", propertyList.GetParentFObj());
             }
             return m_defaultProp;
         }

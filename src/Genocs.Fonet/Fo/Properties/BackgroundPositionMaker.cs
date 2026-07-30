@@ -23,7 +23,7 @@ internal class BackgroundPositionMaker : ToBeImplementedProperty.Maker
     {
         if (m_defaultProp == null)
         {
-            m_defaultProp = Make(propertyList, "0%", propertyList.getParentFObj());
+            m_defaultProp = Make(propertyList, "0%", propertyList.GetParentFObj());
         }
         return m_defaultProp;
 

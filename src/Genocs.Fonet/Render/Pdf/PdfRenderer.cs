@@ -1,3 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using System.Xml;
 using Genocs.Fonet.DataTypes;
 using Genocs.Fonet.Fo.Properties;
 using Genocs.Fonet.Image;
@@ -6,8 +11,6 @@ using Genocs.Fonet.Layout.Inline;
 using Genocs.Fonet.Pdf;
 using Genocs.Fonet.Pdf.Gdi;
 using Genocs.Fonet.Render.Pdf.Fonts;
-using System.Collections;
-using System.Text;
 
 namespace Genocs.Fonet.Render.Pdf;
 
@@ -95,7 +98,7 @@ internal sealed class PdfRenderer
     private StringBuilder _wordAreaPDF = new StringBuilder();
 
     /// <summary>
-    ///     User specified rendering options.
+    /// User specified rendering options.
     /// </summary>
     private PdfRendererOptions? _options;
 
@@ -189,6 +192,8 @@ internal sealed class PdfRenderer
     /// </summary>
     private IDReferences? idReferences;
 
+    private readonly Dictionary<string, PdfName> _svgFillOpacityStates = new();
+
     /// <summary>
     /// Create the PDF renderer.
     /// </summary>
@@ -198,13 +203,13 @@ internal sealed class PdfRenderer
     }
 
     /// <summary>
-    ///     Assigns renderer options to this PdfRenderer
+    /// Assigns renderer options to this PdfRenderer
     /// </summary>
     /// <remarks>
-    ///     This property will only accept an instance of the PdfRendererOptions class
+    /// This property will only accept an instance of the PdfRendererOptions class
     /// </remarks>
     /// <exception cref="ArgumentException">
-    ///     If <i>value</i> is not an instance of PdfRendererOptions
+    /// If <i>value</i> is not an instance of PdfRendererOptions
     /// </exception>
     public PdfRendererOptions Options
     {
@@ -264,11 +269,10 @@ internal sealed class PdfRenderer
 
     public void RenderSpanArea(SpanArea area)
     {
-        foreach (Box b in area.getChildren())
+        foreach (Box b in area.Children)
         {
             b.Render(this); // column areas
         }
-
     }
 
     public void RenderBodyAreaContainer(BodyAreaContainer area)
@@ -302,7 +306,7 @@ internal sealed class PdfRenderer
         RenderAreaContainer(area.getFootnoteReferenceArea());
 
         // main reference area
-        foreach (Box b in area.getMainReferenceArea().getChildren())
+        foreach (Box b in area.getMainReferenceArea().Children)
         {
             b.Render(this); // span areas
         }
@@ -316,7 +320,6 @@ internal sealed class PdfRenderer
         {
             this.currentYPosition -= area.GetHeight();
         }
-
     }
 
     public void RenderAreaContainer(AreaContainer area)
@@ -327,13 +330,13 @@ internal sealed class PdfRenderer
         if (area.getPosition() == Position.ABSOLUTE)
         {
             // XPosition and YPosition give the content rectangle position
-            this.currentYPosition = area.GetYPosition();
-            this.currentAreaContainerXPosition = area.getXPosition();
+            this.currentYPosition = area.YPosition;
+            this.currentAreaContainerXPosition = area.XPosition;
         }
         else if (area.getPosition() == Position.RELATIVE)
         {
-            this.currentYPosition -= area.GetYPosition();
-            this.currentAreaContainerXPosition += area.getXPosition();
+            this.currentYPosition -= area.YPosition;
+            this.currentAreaContainerXPosition += area.XPosition;
         }
         else if (area.getPosition() == Position.STATIC)
         {
@@ -344,10 +347,7 @@ internal sealed class PdfRenderer
         this.currentXPosition = this.currentAreaContainerXPosition;
         DoFrame(area);
 
-        foreach (Box b in area.getChildren())
-        {
-            b.Render(this);
-        }
+        Area.RenderChildrenInZOrder(area.Children, this);
 
         // Restore previous origin
         this.currentYPosition = saveY;
@@ -365,10 +365,7 @@ internal sealed class PdfRenderer
         this.currentYPosition -= (area.getPaddingTop()
             + area.getBorderTopWidth());
         DoFrame(area);
-        foreach (Box b in area.getChildren())
-        {
-            b.Render(this);
-        }
+        Area.RenderChildrenInZOrder(area.Children, this);
         this.currentYPosition -= (area.getPaddingBottom()
             + area.getBorderBottomWidth());
     }
@@ -385,7 +382,7 @@ internal sealed class PdfRenderer
 
         int bl = this.currentYPosition;
 
-        foreach (Box b in area.getChildren())
+        foreach (Box b in area.Children)
         {
             if (b is InlineArea)
             {
@@ -482,8 +479,7 @@ internal sealed class PdfRenderer
     * @param stroke the stroke color/gradient
     */
 
-    private void AddRect(int x, int y, int w, int h, PdfColor stroke,
-                         PdfColor fill)
+    private void AddRect(int x, int y, int w, int h, PdfColor stroke, PdfColor fill)
     {
         CloseText();
         _currentStream.Write("ET\nq\n" + fill.getColorSpaceOut(true)
@@ -502,8 +498,7 @@ internal sealed class PdfRenderer
     * @param fill the fill color/gradient
     */
 
-    private void AddFilledRect(int x, int y, int w, int h,
-                               PdfColor fill)
+    private void AddFilledRect(int x, int y, int w, int h, PdfColor fill)
     {
         CloseText();
         _currentStream.Write("ET\nq\n" + fill.getColorSpaceOut(true)
@@ -605,11 +600,1196 @@ internal sealed class PdfRenderer
                 break;
         }
 
-        area.getObject().Render(this);
+        Area? foreignObject = area.getObject();
+        if (foreignObject != null)
+        {
+            foreignObject.Render(this);
+        }
+        else
+        {
+            XmlDocument? svgDoc = area.getSvgDocument();
+            if (svgDoc != null)
+            {
+                RenderInlineSvg(area, svgDoc);
+            }
+        }
+
         _currentStream.Write("Q\n");
         _currentStream.Write("BT\n");
         this.currentXPosition += area.getEffectiveWidth();
         // this.currentYPosition -= area.getEffectiveHeight();
+    }
+
+    private void RenderInlineSvg(ForeignObjectArea area, XmlDocument svgDoc)
+    {
+        XmlElement? root = svgDoc.DocumentElement;
+        if (root == null || !root.LocalName.Equals("svg", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        float targetWidthPt = area.getEffectiveWidth() / 1000f;
+        float targetHeightPt = area.getEffectiveHeight() / 1000f;
+        if (targetWidthPt <= 0f || targetHeightPt <= 0f)
+        {
+            return;
+        }
+
+        if (!TryGetSvgViewport(root, out float viewportWidth, out float viewportHeight)
+            || viewportWidth <= 0f
+            || viewportHeight <= 0f)
+        {
+            viewportWidth = targetWidthPt;
+            viewportHeight = targetHeightPt;
+        }
+
+        float offsetX = currentXPosition / 1000f;
+        float offsetY = (currentYPosition - area.getEffectiveHeight()) / 1000f;
+        float scaleX = targetWidthPt / viewportWidth;
+        float scaleY = targetHeightPt / viewportHeight;
+
+        _currentStream.Write("q\n");
+        _currentStream.Write("1 0 0 1 " + PdfNumber.DoubleOut(offsetX) + " " + PdfNumber.DoubleOut(offsetY) + " cm\n");
+        _currentStream.Write(PdfNumber.DoubleOut(scaleX) + " 0 0 " + PdfNumber.DoubleOut(scaleY) + " 0 0 cm\n");
+
+        SvgStyle baseStyle = SvgStyle.Default;
+        foreach (XmlNode childNode in root.ChildNodes)
+        {
+            if (childNode is XmlElement childElement)
+            {
+                RenderSvgElement(childElement, viewportHeight, baseStyle);
+            }
+        }
+
+        _currentStream.Write("Q\n");
+    }
+
+    private void RenderSvgElement(XmlElement element, float viewportHeight, SvgStyle inheritedStyle)
+    {
+        SvgStyle style = MergeSvgStyle(inheritedStyle, element);
+
+        string localName = element.LocalName.ToLowerInvariant();
+        switch (localName)
+        {
+            case "g":
+                foreach (XmlNode child in element.ChildNodes)
+                {
+                    if (child is XmlElement childElement)
+                    {
+                        RenderSvgElement(childElement, viewportHeight, style);
+                    }
+                }
+                break;
+            case "rect":
+                RenderSvgRect(element, viewportHeight, style);
+                break;
+            case "circle":
+                RenderSvgCircle(element, viewportHeight, style);
+                break;
+            case "line":
+                RenderSvgLine(element, viewportHeight, style);
+                break;
+            case "path":
+                RenderSvgPath(element, viewportHeight, style);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void RenderSvgRect(XmlElement element, float viewportHeight, SvgStyle style)
+    {
+        if (!TryGetFloatAttribute(element, "x", out float x)) x = 0f;
+        if (!TryGetFloatAttribute(element, "y", out float y)) y = 0f;
+        if (!TryGetFloatAttribute(element, "width", out float width) || width <= 0f) return;
+        if (!TryGetFloatAttribute(element, "height", out float height) || height <= 0f) return;
+
+        float pdfY = viewportHeight - y - height;
+
+        EmitSvgPaint(style, (stream, hasFill, hasStroke) =>
+        {
+            stream.Write(PdfNumber.DoubleOut(x) + " "
+                + PdfNumber.DoubleOut(pdfY) + " "
+                + PdfNumber.DoubleOut(width) + " "
+                + PdfNumber.DoubleOut(height) + " re ");
+            stream.Write(GetPaintOperator(hasFill, hasStroke) + "\n");
+        });
+    }
+
+    private void RenderSvgCircle(XmlElement element, float viewportHeight, SvgStyle style)
+    {
+        if (!TryGetFloatAttribute(element, "cx", out float cx)) return;
+        if (!TryGetFloatAttribute(element, "cy", out float cy)) return;
+        if (!TryGetFloatAttribute(element, "r", out float r) || r <= 0f) return;
+
+        float centerY = viewportHeight - cy;
+        const float k = 0.552284749831f;
+        float c = r * k;
+
+        EmitSvgPaint(style, (stream, hasFill, hasStroke) =>
+        {
+            stream.Write(PdfNumber.DoubleOut(cx + r) + " " + PdfNumber.DoubleOut(centerY) + " m\n");
+            stream.Write(PdfNumber.DoubleOut(cx + r) + " " + PdfNumber.DoubleOut(centerY + c) + " "
+                + PdfNumber.DoubleOut(cx + c) + " " + PdfNumber.DoubleOut(centerY + r) + " "
+                + PdfNumber.DoubleOut(cx) + " " + PdfNumber.DoubleOut(centerY + r) + " c\n");
+            stream.Write(PdfNumber.DoubleOut(cx - c) + " " + PdfNumber.DoubleOut(centerY + r) + " "
+                + PdfNumber.DoubleOut(cx - r) + " " + PdfNumber.DoubleOut(centerY + c) + " "
+                + PdfNumber.DoubleOut(cx - r) + " " + PdfNumber.DoubleOut(centerY) + " c\n");
+            stream.Write(PdfNumber.DoubleOut(cx - r) + " " + PdfNumber.DoubleOut(centerY - c) + " "
+                + PdfNumber.DoubleOut(cx - c) + " " + PdfNumber.DoubleOut(centerY - r) + " "
+                + PdfNumber.DoubleOut(cx) + " " + PdfNumber.DoubleOut(centerY - r) + " c\n");
+            stream.Write(PdfNumber.DoubleOut(cx + c) + " " + PdfNumber.DoubleOut(centerY - r) + " "
+                + PdfNumber.DoubleOut(cx + r) + " " + PdfNumber.DoubleOut(centerY - c) + " "
+                + PdfNumber.DoubleOut(cx + r) + " " + PdfNumber.DoubleOut(centerY) + " c\n");
+            stream.Write(GetPaintOperator(hasFill, hasStroke) + "\n");
+        });
+    }
+
+    private void RenderSvgLine(XmlElement element, float viewportHeight, SvgStyle style)
+    {
+        if (!TryGetFloatAttribute(element, "x1", out float x1)) return;
+        if (!TryGetFloatAttribute(element, "y1", out float y1)) return;
+        if (!TryGetFloatAttribute(element, "x2", out float x2)) return;
+        if (!TryGetFloatAttribute(element, "y2", out float y2)) return;
+
+        float py1 = viewportHeight - y1;
+        float py2 = viewportHeight - y2;
+
+        EmitSvgPaint(style with { Fill = null }, (stream, hasFill, hasStroke) =>
+        {
+            stream.Write(PdfNumber.DoubleOut(x1) + " " + PdfNumber.DoubleOut(py1) + " m\n");
+            stream.Write(PdfNumber.DoubleOut(x2) + " " + PdfNumber.DoubleOut(py2) + " l\n");
+            stream.Write("S\n");
+        });
+    }
+
+    private void RenderSvgPath(XmlElement element, float viewportHeight, SvgStyle style)
+    {
+        string d = element.GetAttribute("d");
+        if (string.IsNullOrWhiteSpace(d))
+        {
+            return;
+        }
+
+        bool evenOdd = IsEvenOddFill(element);
+
+        EmitSvgPaint(style, (stream, hasFill, hasStroke) =>
+        {
+            if (!TryWriteSvgPathData(stream, d, viewportHeight))
+            {
+                return;
+            }
+
+            stream.Write(GetPaintOperator(hasFill, hasStroke, evenOdd) + "\n");
+        });
+    }
+
+    private void EmitSvgPaint(SvgStyle style, Action<PdfContentStream, bool, bool> emitPath)
+    {
+        bool hasFill = style.Fill != null && style.FillOpacity > 0f;
+        bool hasStroke = style.Stroke != null;
+
+        if (!hasFill && !hasStroke)
+        {
+            return;
+        }
+
+        _currentStream.Write("q\n");
+        if (hasFill)
+        {
+            PdfColor fill = style.Fill!;
+            _currentStream.Write(fill.getColorSpaceOut(true));
+
+            if (style.FillOpacity < 1f)
+            {
+                PdfName alphaStateName = GetOrCreateSvgFillOpacityState(style.FillOpacity);
+                _currentStream.Write("/" + alphaStateName.Name + " gs\n");
+            }
+        }
+
+        if (hasStroke)
+        {
+            PdfColor stroke = style.Stroke!;
+            _currentStream.Write(stroke.getColorSpaceOut(false));
+            _currentStream.Write(PdfNumber.DoubleOut(style.StrokeWidth <= 0f ? 1f : style.StrokeWidth) + " w\n");
+        }
+
+        emitPath(_currentStream, hasFill, hasStroke);
+        _currentStream.Write("Q\n");
+    }
+
+    private static SvgStyle MergeSvgStyle(SvgStyle inherited, XmlElement element)
+    {
+        SvgStyle style = inherited;
+
+        string fillAttr = element.GetAttribute("fill");
+        if (!string.IsNullOrWhiteSpace(fillAttr))
+        {
+            style = style with { Fill = ParseSvgColor(fillAttr) };
+        }
+
+        string strokeAttr = element.GetAttribute("stroke");
+        if (!string.IsNullOrWhiteSpace(strokeAttr))
+        {
+            style = style with { Stroke = ParseSvgColor(strokeAttr) };
+        }
+
+        string strokeWidthAttr = element.GetAttribute("stroke-width");
+        if (TryParseSvgNumber(strokeWidthAttr, out float strokeWidth))
+        {
+            style = style with { StrokeWidth = strokeWidth };
+        }
+
+        string fillOpacityAttr = element.GetAttribute("fill-opacity");
+        if (TryParseSvgOpacity(fillOpacityAttr, out float fillOpacity))
+        {
+            style = style with { FillOpacity = fillOpacity };
+        }
+
+        string styleAttr = element.GetAttribute("style");
+        if (!string.IsNullOrWhiteSpace(styleAttr))
+        {
+            foreach (string declaration in styleAttr.Split(';', StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] pair = declaration.Split(':', 2, StringSplitOptions.TrimEntries);
+                if (pair.Length != 2)
+                {
+                    continue;
+                }
+
+                switch (pair[0])
+                {
+                    case "fill":
+                        style = style with { Fill = ParseSvgColor(pair[1]) };
+                        break;
+                    case "stroke":
+                        style = style with { Stroke = ParseSvgColor(pair[1]) };
+                        break;
+                    case "stroke-width":
+                        if (TryParseSvgNumber(pair[1], out float styledWidth))
+                        {
+                            style = style with { StrokeWidth = styledWidth };
+                        }
+                        break;
+                    case "fill-opacity":
+                        if (TryParseSvgOpacity(pair[1], out float styledOpacity))
+                        {
+                            style = style with { FillOpacity = styledOpacity };
+                        }
+                        break;
+                }
+            }
+        }
+
+        return style;
+    }
+
+    private static string GetPaintOperator(bool hasFill, bool hasStroke, bool evenOdd = false)
+    {
+        if (hasFill && hasStroke)
+        {
+            return evenOdd ? "B*" : "B";
+        }
+
+        if (hasFill)
+        {
+            return evenOdd ? "f*" : "f";
+        }
+
+        return "S";
+    }
+
+    private static bool IsEvenOddFill(XmlElement element)
+    {
+        string fillRule = element.GetAttribute("fill-rule");
+        if (fillRule.Equals("evenodd", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        string style = element.GetAttribute("style");
+        if (string.IsNullOrWhiteSpace(style))
+        {
+            return false;
+        }
+
+        foreach (string declaration in style.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] pair = declaration.Split(':', 2, StringSplitOptions.TrimEntries);
+            if (pair.Length != 2)
+            {
+                continue;
+            }
+
+            if (pair[0].Equals("fill-rule", StringComparison.OrdinalIgnoreCase)
+                && pair[1].Equals("evenodd", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryWriteSvgPathData(PdfContentStream stream, string d, float viewportHeight)
+    {
+        int index = 0;
+        char command = '\0';
+        char previousCommand = '\0';
+
+        float currentX = 0f;
+        float currentY = 0f;
+        float subpathStartX = 0f;
+        float subpathStartY = 0f;
+
+        bool hasCurrentPoint = false;
+        bool hasLastCubicControl = false;
+        bool hasLastQuadControl = false;
+        float lastCubicControlX = 0f;
+        float lastCubicControlY = 0f;
+        float lastQuadControlX = 0f;
+        float lastQuadControlY = 0f;
+
+        bool wroteAnySegment = false;
+
+        while (true)
+        {
+            SkipSvgSeparators(d, ref index);
+            if (index >= d.Length)
+            {
+                break;
+            }
+
+            if (IsSvgPathCommandLetter(d[index]))
+            {
+                command = d[index++];
+            }
+            else if (command == '\0')
+            {
+                return false;
+            }
+
+            switch (command)
+            {
+                case 'M':
+                case 'm':
+                    {
+                        bool relative = command == 'm';
+                        if (!TryReadSvgNumber(d, ref index, out float x)
+                            || !TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            return wroteAnySegment;
+                        }
+
+                        if (relative && hasCurrentPoint)
+                        {
+                            x += currentX;
+                            y += currentY;
+                        }
+
+                        WritePdfMoveTo(stream, x, y, viewportHeight);
+                        wroteAnySegment = true;
+
+                        currentX = x;
+                        currentY = y;
+                        subpathStartX = x;
+                        subpathStartY = y;
+                        hasCurrentPoint = true;
+                        hasLastCubicControl = false;
+                        hasLastQuadControl = false;
+
+                        while (TryReadSvgNumber(d, ref index, out float x2)
+                            && TryReadSvgNumber(d, ref index, out float y2))
+                        {
+                            if (relative)
+                            {
+                                x2 += currentX;
+                                y2 += currentY;
+                            }
+
+                            WritePdfLineTo(stream, x2, y2, viewportHeight);
+                            wroteAnySegment = true;
+                            currentX = x2;
+                            currentY = y2;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'L':
+                case 'l':
+                    {
+                        bool relative = command == 'l';
+                        while (TryReadSvgNumber(d, ref index, out float x)
+                            && TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            if (relative)
+                            {
+                                x += currentX;
+                                y += currentY;
+                            }
+
+                            WritePdfLineTo(stream, x, y, viewportHeight);
+                            wroteAnySegment = true;
+                            currentX = x;
+                            currentY = y;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = false;
+                            hasLastQuadControl = false;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'H':
+                case 'h':
+                    {
+                        bool relative = command == 'h';
+                        while (TryReadSvgNumber(d, ref index, out float x))
+                        {
+                            if (relative)
+                            {
+                                x += currentX;
+                            }
+
+                            WritePdfLineTo(stream, x, currentY, viewportHeight);
+                            wroteAnySegment = true;
+                            currentX = x;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = false;
+                            hasLastQuadControl = false;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'V':
+                case 'v':
+                    {
+                        bool relative = command == 'v';
+                        while (TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            if (relative)
+                            {
+                                y += currentY;
+                            }
+
+                            WritePdfLineTo(stream, currentX, y, viewportHeight);
+                            wroteAnySegment = true;
+                            currentY = y;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = false;
+                            hasLastQuadControl = false;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'C':
+                case 'c':
+                    {
+                        bool relative = command == 'c';
+                        while (TryReadSvgNumber(d, ref index, out float x1)
+                            && TryReadSvgNumber(d, ref index, out float y1)
+                            && TryReadSvgNumber(d, ref index, out float x2)
+                            && TryReadSvgNumber(d, ref index, out float y2)
+                            && TryReadSvgNumber(d, ref index, out float x)
+                            && TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            if (relative)
+                            {
+                                x1 += currentX;
+                                y1 += currentY;
+                                x2 += currentX;
+                                y2 += currentY;
+                                x += currentX;
+                                y += currentY;
+                            }
+
+                            WritePdfCubicTo(stream, x1, y1, x2, y2, x, y, viewportHeight);
+                            wroteAnySegment = true;
+                            currentX = x;
+                            currentY = y;
+                            lastCubicControlX = x2;
+                            lastCubicControlY = y2;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = true;
+                            hasLastQuadControl = false;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'S':
+                case 's':
+                    {
+                        bool relative = command == 's';
+                        while (TryReadSvgNumber(d, ref index, out float x2)
+                            && TryReadSvgNumber(d, ref index, out float y2)
+                            && TryReadSvgNumber(d, ref index, out float x)
+                            && TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            float x1;
+                            float y1;
+                            if (IsCubicCommand(previousCommand) && hasLastCubicControl)
+                            {
+                                x1 = 2f * currentX - lastCubicControlX;
+                                y1 = 2f * currentY - lastCubicControlY;
+                            }
+                            else
+                            {
+                                x1 = currentX;
+                                y1 = currentY;
+                            }
+
+                            if (relative)
+                            {
+                                x2 += currentX;
+                                y2 += currentY;
+                                x += currentX;
+                                y += currentY;
+                            }
+
+                            WritePdfCubicTo(stream, x1, y1, x2, y2, x, y, viewportHeight);
+                            wroteAnySegment = true;
+                            currentX = x;
+                            currentY = y;
+                            lastCubicControlX = x2;
+                            lastCubicControlY = y2;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = true;
+                            hasLastQuadControl = false;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'Q':
+                case 'q':
+                    {
+                        bool relative = command == 'q';
+                        while (TryReadSvgNumber(d, ref index, out float qx)
+                            && TryReadSvgNumber(d, ref index, out float qy)
+                            && TryReadSvgNumber(d, ref index, out float x)
+                            && TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            if (relative)
+                            {
+                                qx += currentX;
+                                qy += currentY;
+                                x += currentX;
+                                y += currentY;
+                            }
+
+                            QuadraticToCubic(currentX, currentY, qx, qy, x, y,
+                                out float c1x, out float c1y, out float c2x, out float c2y);
+                            WritePdfCubicTo(stream, c1x, c1y, c2x, c2y, x, y, viewportHeight);
+
+                            wroteAnySegment = true;
+                            currentX = x;
+                            currentY = y;
+                            lastQuadControlX = qx;
+                            lastQuadControlY = qy;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = false;
+                            hasLastQuadControl = true;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'T':
+                case 't':
+                    {
+                        bool relative = command == 't';
+                        while (TryReadSvgNumber(d, ref index, out float x)
+                            && TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            if (relative)
+                            {
+                                x += currentX;
+                                y += currentY;
+                            }
+
+                            float qx;
+                            float qy;
+                            if (IsQuadraticCommand(previousCommand) && hasLastQuadControl)
+                            {
+                                qx = 2f * currentX - lastQuadControlX;
+                                qy = 2f * currentY - lastQuadControlY;
+                            }
+                            else
+                            {
+                                qx = currentX;
+                                qy = currentY;
+                            }
+
+                            QuadraticToCubic(currentX, currentY, qx, qy, x, y,
+                                out float c1x, out float c1y, out float c2x, out float c2y);
+                            WritePdfCubicTo(stream, c1x, c1y, c2x, c2y, x, y, viewportHeight);
+
+                            wroteAnySegment = true;
+                            currentX = x;
+                            currentY = y;
+                            lastQuadControlX = qx;
+                            lastQuadControlY = qy;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = false;
+                            hasLastQuadControl = true;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'A':
+                case 'a':
+                    {
+                        bool relative = command == 'a';
+                        while (TryReadSvgNumber(d, ref index, out float rx)
+                            && TryReadSvgNumber(d, ref index, out float ry)
+                            && TryReadSvgNumber(d, ref index, out float angle)
+                            && TryReadSvgNumber(d, ref index, out float largeArc)
+                            && TryReadSvgNumber(d, ref index, out float sweep)
+                            && TryReadSvgNumber(d, ref index, out float x)
+                            && TryReadSvgNumber(d, ref index, out float y))
+                        {
+                            if (relative)
+                            {
+                                x += currentX;
+                                y += currentY;
+                            }
+
+                            bool wroteArc = WriteSvgArcAsCubics(
+                                stream,
+                                currentX,
+                                currentY,
+                                rx,
+                                ry,
+                                angle,
+                                Math.Abs(largeArc) > 0.5f,
+                                Math.Abs(sweep) > 0.5f,
+                                x,
+                                y,
+                                viewportHeight);
+
+                            if (wroteArc)
+                            {
+                                wroteAnySegment = true;
+                            }
+
+                            currentX = x;
+                            currentY = y;
+                            hasCurrentPoint = true;
+                            hasLastCubicControl = false;
+                            hasLastQuadControl = false;
+                        }
+
+                        previousCommand = command;
+                        continue;
+                    }
+
+                case 'Z':
+                case 'z':
+                    stream.Write("h\n");
+                    wroteAnySegment = true;
+                    currentX = subpathStartX;
+                    currentY = subpathStartY;
+                    hasCurrentPoint = true;
+                    hasLastCubicControl = false;
+                    hasLastQuadControl = false;
+                    previousCommand = command;
+                    continue;
+
+                default:
+                    return wroteAnySegment;
+            }
+        }
+
+        return wroteAnySegment;
+    }
+
+    private static bool IsSvgPathCommandLetter(char c)
+    {
+        return c switch
+        {
+            'M' or 'm' or 'L' or 'l' or 'H' or 'h' or 'V' or 'v' or 'C' or 'c' or 'S' or 's' or 'Q' or 'q' or 'T' or 't' or 'A' or 'a' or 'Z' or 'z' => true,
+            _ => false
+        };
+    }
+
+    private static void SkipSvgSeparators(string data, ref int index)
+    {
+        while (index < data.Length)
+        {
+            char ch = data[index];
+            if (char.IsWhiteSpace(ch) || ch == ',')
+            {
+                index++;
+                continue;
+            }
+
+            break;
+        }
+    }
+
+    private static bool TryReadSvgNumber(string data, ref int index, out float value)
+    {
+        value = 0f;
+        SkipSvgSeparators(data, ref index);
+        if (index >= data.Length)
+        {
+            return false;
+        }
+
+        int start = index;
+
+        if (data[index] == '+' || data[index] == '-')
+        {
+            index++;
+        }
+
+        bool hasDigits = false;
+        while (index < data.Length && char.IsDigit(data[index]))
+        {
+            hasDigits = true;
+            index++;
+        }
+
+        if (index < data.Length && data[index] == '.')
+        {
+            index++;
+            while (index < data.Length && char.IsDigit(data[index]))
+            {
+                hasDigits = true;
+                index++;
+            }
+        }
+
+        if (!hasDigits)
+        {
+            index = start;
+            return false;
+        }
+
+        if (index < data.Length && (data[index] == 'e' || data[index] == 'E'))
+        {
+            int exponentStart = index;
+            index++;
+            if (index < data.Length && (data[index] == '+' || data[index] == '-'))
+            {
+                index++;
+            }
+
+            bool hasExponentDigits = false;
+            while (index < data.Length && char.IsDigit(data[index]))
+            {
+                hasExponentDigits = true;
+                index++;
+            }
+
+            if (!hasExponentDigits)
+            {
+                index = exponentStart;
+            }
+        }
+
+        string token = data[start..index];
+        return float.TryParse(token, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+    }
+
+    private static void WritePdfMoveTo(PdfContentStream stream, float x, float y, float viewportHeight)
+    {
+        stream.Write(PdfNumber.DoubleOut(x) + " " + PdfNumber.DoubleOut(viewportHeight - y) + " m\n");
+    }
+
+    private static void WritePdfLineTo(PdfContentStream stream, float x, float y, float viewportHeight)
+    {
+        stream.Write(PdfNumber.DoubleOut(x) + " " + PdfNumber.DoubleOut(viewportHeight - y) + " l\n");
+    }
+
+    private static void WritePdfCubicTo(PdfContentStream stream,
+        float x1,
+        float y1,
+        float x2,
+        float y2,
+        float x,
+        float y,
+        float viewportHeight)
+    {
+        stream.Write(PdfNumber.DoubleOut(x1) + " " + PdfNumber.DoubleOut(viewportHeight - y1) + " "
+            + PdfNumber.DoubleOut(x2) + " " + PdfNumber.DoubleOut(viewportHeight - y2) + " "
+            + PdfNumber.DoubleOut(x) + " " + PdfNumber.DoubleOut(viewportHeight - y) + " c\n");
+    }
+
+    private static void QuadraticToCubic(float x0,
+        float y0,
+        float qx,
+        float qy,
+        float x,
+        float y,
+        out float c1x,
+        out float c1y,
+        out float c2x,
+        out float c2y)
+    {
+        c1x = x0 + (2f / 3f) * (qx - x0);
+        c1y = y0 + (2f / 3f) * (qy - y0);
+        c2x = x + (2f / 3f) * (qx - x);
+        c2y = y + (2f / 3f) * (qy - y);
+    }
+
+    private static bool WriteSvgArcAsCubics(PdfContentStream stream,
+        float x1,
+        float y1,
+        float rx,
+        float ry,
+        float xAxisRotationDegrees,
+        bool largeArc,
+        bool sweep,
+        float x2,
+        float y2,
+        float viewportHeight)
+    {
+        if (Math.Abs(x2 - x1) < 1e-6f && Math.Abs(y2 - y1) < 1e-6f)
+        {
+            return false;
+        }
+
+        rx = Math.Abs(rx);
+        ry = Math.Abs(ry);
+        if (rx < 1e-6f || ry < 1e-6f)
+        {
+            WritePdfLineTo(stream, x2, y2, viewportHeight);
+            return true;
+        }
+
+        double phi = xAxisRotationDegrees * Math.PI / 180.0;
+        double cosPhi = Math.Cos(phi);
+        double sinPhi = Math.Sin(phi);
+
+        double dx2 = (x1 - x2) / 2.0;
+        double dy2 = (y1 - y2) / 2.0;
+
+        double x1Prime = cosPhi * dx2 + sinPhi * dy2;
+        double y1Prime = -sinPhi * dx2 + cosPhi * dy2;
+
+        double rx2 = rx * rx;
+        double ry2 = ry * ry;
+        double x1Prime2 = x1Prime * x1Prime;
+        double y1Prime2 = y1Prime * y1Prime;
+
+        double lambda = x1Prime2 / rx2 + y1Prime2 / ry2;
+        if (lambda > 1.0)
+        {
+            double scale = Math.Sqrt(lambda);
+            rx *= (float)scale;
+            ry *= (float)scale;
+            rx2 = rx * rx;
+            ry2 = ry * ry;
+        }
+
+        double numerator = rx2 * ry2 - rx2 * y1Prime2 - ry2 * x1Prime2;
+        double denominator = rx2 * y1Prime2 + ry2 * x1Prime2;
+        if (Math.Abs(denominator) < 1e-12)
+        {
+            WritePdfLineTo(stream, x2, y2, viewportHeight);
+            return true;
+        }
+
+        double factor = Math.Sqrt(Math.Max(0.0, numerator / denominator));
+        if (largeArc == sweep)
+        {
+            factor = -factor;
+        }
+
+        double cxPrime = factor * (rx * y1Prime / ry);
+        double cyPrime = factor * (-ry * x1Prime / rx);
+
+        double cx = cosPhi * cxPrime - sinPhi * cyPrime + (x1 + x2) / 2.0;
+        double cy = sinPhi * cxPrime + cosPhi * cyPrime + (y1 + y2) / 2.0;
+
+        double ux = (x1Prime - cxPrime) / rx;
+        double uy = (y1Prime - cyPrime) / ry;
+        double vx = (-x1Prime - cxPrime) / rx;
+        double vy = (-y1Prime - cyPrime) / ry;
+
+        double startAngle = Math.Atan2(uy, ux);
+        double sweepAngle = Math.Atan2(ux * vy - uy * vx, ux * vx + uy * vy);
+        if (!sweep && sweepAngle > 0)
+        {
+            sweepAngle -= 2.0 * Math.PI;
+        }
+        else if (sweep && sweepAngle < 0)
+        {
+            sweepAngle += 2.0 * Math.PI;
+        }
+
+        int segments = Math.Max(1, (int)Math.Ceiling(Math.Abs(sweepAngle) / (Math.PI / 2.0)));
+        double delta = sweepAngle / segments;
+
+        for (int i = 0; i < segments; i++)
+        {
+            double a0 = startAngle + i * delta;
+            double a1 = a0 + delta;
+            ArcSegmentToCubic(
+                cx,
+                cy,
+                rx,
+                ry,
+                cosPhi,
+                sinPhi,
+                a0,
+                a1,
+                out float c1x,
+                out float c1y,
+                out float c2x,
+                out float c2y,
+                out float ex,
+                out float ey);
+
+            WritePdfCubicTo(stream, c1x, c1y, c2x, c2y, ex, ey, viewportHeight);
+        }
+
+        return true;
+    }
+
+    private static void ArcSegmentToCubic(double cx,
+        double cy,
+        double rx,
+        double ry,
+        double cosPhi,
+        double sinPhi,
+        double a0,
+        double a1,
+        out float c1x,
+        out float c1y,
+        out float c2x,
+        out float c2y,
+        out float ex,
+        out float ey)
+    {
+        double t = (4.0 / 3.0) * Math.Tan((a1 - a0) / 4.0);
+
+        double cosA0 = Math.Cos(a0);
+        double sinA0 = Math.Sin(a0);
+        double cosA1 = Math.Cos(a1);
+        double sinA1 = Math.Sin(a1);
+
+        double p1x = cosA0 - t * sinA0;
+        double p1y = sinA0 + t * cosA0;
+        double p2x = cosA1 + t * sinA1;
+        double p2y = sinA1 - t * cosA1;
+
+        MapArcPoint(cx, cy, rx, ry, cosPhi, sinPhi, p1x, p1y, out c1x, out c1y);
+        MapArcPoint(cx, cy, rx, ry, cosPhi, sinPhi, p2x, p2y, out c2x, out c2y);
+        MapArcPoint(cx, cy, rx, ry, cosPhi, sinPhi, cosA1, sinA1, out ex, out ey);
+    }
+
+    private static void MapArcPoint(double cx,
+        double cy,
+        double rx,
+        double ry,
+        double cosPhi,
+        double sinPhi,
+        double ux,
+        double uy,
+        out float x,
+        out float y)
+    {
+        double ellipseX = rx * ux;
+        double ellipseY = ry * uy;
+
+        x = (float)(cx + cosPhi * ellipseX - sinPhi * ellipseY);
+        y = (float)(cy + sinPhi * ellipseX + cosPhi * ellipseY);
+    }
+
+    private static bool IsCubicCommand(char command)
+        => command is 'C' or 'c' or 'S' or 's';
+
+    private static bool IsQuadraticCommand(char command)
+        => command is 'Q' or 'q' or 'T' or 't';
+
+    private static bool TryGetSvgViewport(XmlElement root, out float width, out float height)
+    {
+        width = 0f;
+        height = 0f;
+
+        bool hasWidth = TryParseSvgNumber(root.GetAttribute("width"), out width);
+        bool hasHeight = TryParseSvgNumber(root.GetAttribute("height"), out height);
+        if (hasWidth && hasHeight && width > 0f && height > 0f)
+        {
+            return true;
+        }
+
+        string viewBox = root.GetAttribute("viewBox");
+        if (string.IsNullOrWhiteSpace(viewBox))
+        {
+            return false;
+        }
+
+        string[] values = viewBox.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+        if (values.Length != 4)
+        {
+            return false;
+        }
+
+        if (!float.TryParse(values[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float vbWidth)
+            || !float.TryParse(values[3], NumberStyles.Float, CultureInfo.InvariantCulture, out float vbHeight)
+            || vbWidth <= 0f
+            || vbHeight <= 0f)
+        {
+            return false;
+        }
+
+        if (!hasWidth)
+        {
+            width = vbWidth;
+        }
+
+        if (!hasHeight)
+        {
+            height = vbHeight;
+        }
+
+        return width > 0f && height > 0f;
+    }
+
+    private static bool TryGetFloatAttribute(XmlElement element, string attributeName, out float value)
+        => TryParseSvgNumber(element.GetAttribute(attributeName), out value);
+
+    private static bool TryParseSvgNumber(string value, out float result)
+    {
+        result = 0f;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        string trimmed = value.Trim();
+        int index = 0;
+        while (index < trimmed.Length && (char.IsDigit(trimmed[index]) || trimmed[index] == '.' || trimmed[index] == '-' || trimmed[index] == '+'))
+        {
+            index++;
+        }
+
+        if (index == 0)
+        {
+            return false;
+        }
+
+        string number = trimmed[..index];
+        if (!float.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out float parsed))
+        {
+            return false;
+        }
+
+        result = parsed;
+        return true;
+    }
+
+    private static PdfColor? ParseSvgColor(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        string normalized = value.Trim();
+        if (normalized.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        if (!normalized.StartsWith("#", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        string hex = normalized[1..];
+        if (hex.Length == 3)
+        {
+            hex = string.Concat(hex[0], hex[0], hex[1], hex[1], hex[2], hex[2]);
+        }
+
+        if (hex.Length != 6)
+        {
+            return null;
+        }
+
+        if (!int.TryParse(hex[..2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int r)
+            || !int.TryParse(hex.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int g)
+            || !int.TryParse(hex.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int b))
+        {
+            return null;
+        }
+
+        return new PdfColor(r, g, b);
+    }
+
+    private PdfName GetOrCreateSvgFillOpacityState(float fillOpacity)
+    {
+        float alpha = Math.Clamp(fillOpacity, 0f, 1f);
+        string cacheKey = alpha.ToString("0.###", CultureInfo.InvariantCulture);
+        if (_svgFillOpacityStates.TryGetValue(cacheKey, out PdfName? existing))
+        {
+            return existing;
+        }
+
+        if (_pdfDoc == null || _pdfResources == null)
+        {
+            throw new InvalidOperationException("PDF document resources are not initialized.");
+        }
+
+        PdfName stateName = new("GSFO" + _svgFillOpacityStates.Count);
+        PdfDictionary extGState = new(_pdfDoc.Doc.NextObjectId());
+        extGState[PdfName.Names.Type] = new PdfName("ExtGState");
+        extGState[new PdfName("ca")] = new PdfNumeric((decimal)alpha);
+        extGState[new PdfName("CA")] = new PdfNumeric(1m);
+
+        _pdfDoc.AddObject(extGState);
+        _pdfResources.AddExtGState(stateName, extGState.GetReference());
+        _svgFillOpacityStates[cacheKey] = stateName;
+
+        return stateName;
+    }
+
+    private static bool TryParseSvgOpacity(string value, out float result)
+    {
+        result = 1f;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        string trimmed = value.Trim();
+        bool percent = trimmed.EndsWith("%", StringComparison.Ordinal);
+        string numericPart = percent ? trimmed[..^1] : trimmed;
+
+        if (!TryParseSvgNumber(numericPart, out float parsed))
+        {
+            return false;
+        }
+
+        if (percent)
+        {
+            parsed /= 100f;
+        }
+
+        result = Math.Clamp(parsed, 0f, 1f);
+        return true;
+    }
+
+    private readonly record struct SvgStyle(PdfColor? Fill, PdfColor? Stroke, float StrokeWidth, float FillOpacity)
+    {
+        public static SvgStyle Default => new(new PdfColor(0, 0, 0), null, 1f, 1f);
     }
 
     /**
@@ -739,7 +1919,7 @@ internal sealed class PdfRenderer
             if (area.getPageNumberID() != null)
             {
                 // This text is a page number, so resolve it
-                s = idReferences.getPageNumber(area.getPageNumberID());
+                s = idReferences.SetPageNumber(area.getPageNumberID());
                 if (s == null)
                 {
                     s = String.Empty;
@@ -957,7 +2137,7 @@ internal sealed class PdfRenderer
     * defines a string containing dashArray and dashPhase for the rule style
     */
 
-    private string SetRuleStylePattern(int style)
+    private static string SetRuleStylePattern(int style)
     {
         string rs;
         rs = style switch
@@ -1000,23 +2180,19 @@ internal sealed class PdfRenderer
         // If style is solid, use filled rectangles
         if (top != 0)
         {
-            AddFilledRect(rx, ry, w, top,
-                          new PdfColor(bp.GetBorderColor(BorderAndPadding.TOP)));
+            AddFilledRect(rx, ry, w, top, new PdfColor(bp.GetBorderColor(BorderAndPadding.TOP)));
         }
         if (left != 0)
         {
-            AddFilledRect(rx - left, ry - h - bottom, left, h + top + bottom,
-                          new PdfColor(bp.GetBorderColor(BorderAndPadding.LEFT)));
+            AddFilledRect(rx - left, ry - h - bottom, left, h + top + bottom, new PdfColor(bp.GetBorderColor(BorderAndPadding.LEFT)));
         }
         if (right != 0)
         {
-            AddFilledRect(rx + w, ry - h - bottom, right, h + top + bottom,
-                          new PdfColor(bp.GetBorderColor(BorderAndPadding.RIGHT)));
+            AddFilledRect(rx + w, ry - h - bottom, right, h + top + bottom, new PdfColor(bp.GetBorderColor(BorderAndPadding.RIGHT)));
         }
         if (bottom != 0)
         {
-            AddFilledRect(rx, ry - h - bottom, w, bottom,
-                          new PdfColor(bp.GetBorderColor(BorderAndPadding.BOTTOM)));
+            AddFilledRect(rx, ry - h - bottom, w, bottom, new PdfColor(bp.GetBorderColor(BorderAndPadding.BOTTOM)));
         }
     }
 
@@ -1140,10 +2316,10 @@ internal sealed class PdfRenderer
     }
 
     /// <summary>
-    ///     Renders an image, rendered at the image's intrinsic size.
-    ///     This by default calls drawImageScaled() with the image's
-    ///     intrinsic width and height, but implementations may
-    ///     override this method if it can provide a more efficient solution.
+    /// Renders an image, rendered at the image's intrinsic size.
+    /// This by default calls drawImageScaled() with the image's
+    /// intrinsic width and height, but implementations may
+    /// override this method if it can provide a more efficient solution.
     /// </summary>
     /// <param name="x">The x position of left edge in _millipoints.</param>
     /// <param name="y">The y position of top edge in _millipoints.</param>
@@ -1156,9 +2332,9 @@ internal sealed class PdfRenderer
     }
 
     /// <summary>
-    ///     Renders an image, scaling it to the given width and height.
-    ///     If the scaled width and height is the same intrinsic size 
-    ///     of the image, the image is not scaled
+    /// Renders an image, scaling it to the given width and height.
+    /// If the scaled width and height is the same intrinsic size 
+    /// of the image, the image is not scaled
     /// </summary>
     /// <param name="x">The x position of left edge in _millipoints.</param>
     /// <param name="y">The y position of top edge in _millipoints.</param>
@@ -1178,7 +2354,7 @@ internal sealed class PdfRenderer
     }
 
     /// <summary>
-    ///     Renders an image, clipping it as specified.
+    /// Renders an image, clipping it as specified.
     /// </summary>
     /// <param name="x">The x position of left edge in _millipoints.</param>
     /// <param name="y">The y position of top edge in _millipoints.</param>

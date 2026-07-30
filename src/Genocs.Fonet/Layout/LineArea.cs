@@ -44,7 +44,7 @@ namespace Genocs.Fonet.Layout
         public LineArea(FontState? fontState, int lineHeight, int halfLeading,
                         int allocationWidth, int startIndent, int endIndent,
                         LineArea prevLineArea)
-            : base(fontState)
+            : base(fontState, null)
         {
             this.currentFontState = fontState;
             this.lineHeight = lineHeight;
@@ -203,7 +203,7 @@ namespace Genocs.Fonet.Layout
                                     isp.setUnderlined(textState.getUnderlined());
                                     isp.setOverlined(textState.getOverlined());
                                     isp.setLineThrough(textState.getLineThrough());
-                                    addChild(isp);
+                                    AddChild(isp);
                                     finalWidth += spaceWidth;
                                     spaceWidth = 0;
                                 }
@@ -222,7 +222,7 @@ namespace Genocs.Fonet.Layout
                                 isp.setUnderlined(textState.getUnderlined());
                                 isp.setOverlined(textState.getOverlined());
                                 isp.setLineThrough(textState.getLineThrough());
-                                addChild(isp);
+                                AddChild(isp);
                                 finalWidth += spaceWidth;
                                 spaceWidth = 0;
                             }
@@ -247,7 +247,7 @@ namespace Genocs.Fonet.Layout
                             {
                                 isp.setLineThrough(textState.getLineThrough());
                             }
-                            addChild(isp);
+                            AddChild(isp);
                             finalWidth += spaceWidth;
                             spaceWidth = 0;
                         }
@@ -267,7 +267,7 @@ namespace Genocs.Fonet.Layout
                                     ls.addRect(lr, this, (InlineArea)box);
                                 }
                             }
-                            addChild(box);
+                            AddChild(box);
                         }
 
                         finalWidth += pendingWidth;
@@ -318,7 +318,7 @@ namespace Genocs.Fonet.Layout
                             else if (c == '\n')
                             {
                                 InlineSpace isp = new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth));
-                                addChild(isp);
+                                AddChild(isp);
                                 return i + 1;
                             }
                             else if (c == '\t')
@@ -382,7 +382,7 @@ namespace Genocs.Fonet.Layout
                             {
                                 isp.setLineThrough(textState.getLineThrough());
                             }
-                            addChild(isp);
+                            AddChild(isp);
                             finalWidth += spaceWidth;
                             spaceWidth = 0;
 
@@ -401,7 +401,7 @@ namespace Genocs.Fonet.Layout
                                         ls.addRect(lr, this, (InlineArea)box);
                                     }
                                 }
-                                addChild(box);
+                                AddChild(box);
                             }
 
                             finalWidth += pendingWidth;
@@ -603,14 +603,14 @@ namespace Genocs.Fonet.Layout
         {
             if (spaceWidth > 0)
             {
-                addChild(new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth)));
+                AddChild(new InlineSpace(AdjustSpaceForWordSpacing(spaceWidth)));
                 finalWidth += spaceWidth;
                 spaceWidth = 0;
             }
 
             foreach (Box box in pendingAreas)
             {
-                addChild(box);
+                AddChild(box);
             }
 
             finalWidth += pendingWidth;
@@ -640,7 +640,7 @@ namespace Genocs.Fonet.Layout
                     break;
                 case TextAlign.JUSTIFY:
                     int spaceCount = 0;
-                    foreach (Box b in _children)
+                    foreach (Box b in Children)
                     {
                         if (b is InlineSpace)
                         {
@@ -660,7 +660,7 @@ namespace Genocs.Fonet.Layout
                         padding = 0;
                     }
                     spaceCount = 0;
-                    foreach (Box b in _children)
+                    foreach (Box b in Children)
                     {
                         if (b is InlineSpace)
                         {
@@ -685,7 +685,7 @@ namespace Genocs.Fonet.Layout
         {
             int superHeight = -this.placementOffset;
             int maxHeight = this.allocationHeight;
-            foreach (Box b in _children)
+            foreach (Box b in Children)
             {
                 if (b is InlineArea)
                 {
@@ -766,7 +766,7 @@ namespace Genocs.Fonet.Layout
 
         public bool isEmpty()
         {
-            return !(pendingAreas.Count > 0 || _children.Count > 0);
+            return !(pendingAreas.Count > 0 || Children.Count > 0);
         }
 
         public ArrayList getPendingAreas()
@@ -881,7 +881,7 @@ namespace Genocs.Fonet.Layout
         public void addInlineArea(InlineArea box, LinkSet ls)
         {
             addPending();
-            addChild(box);
+            AddChild(box);
             if (ls != null)
             {
                 IntRectangle lr = new IntRectangle(finalWidth, 0, box.getContentWidth(), box.getContentHeight());
@@ -893,7 +893,7 @@ namespace Genocs.Fonet.Layout
 
         public void addInlineSpace(InlineSpace isp, int spaceWidth)
         {
-            addChild(isp);
+            AddChild(isp);
             finalWidth += spaceWidth;
         }
 
@@ -953,7 +953,7 @@ namespace Genocs.Fonet.Layout
 
             if (isAnySpace(startChar))
             {
-                this.addChild(new InlineSpace(startCharWidth));
+                this.AddChild(new InlineSpace(startCharWidth));
             }
             else
             {
@@ -961,13 +961,13 @@ namespace Genocs.Fonet.Layout
                                    this.blue,
                                    startChar.ToString(), 1);
                 hia.setYOffset(placementOffset);
-                this.addChild(hia);
+                this.AddChild(hia);
             }
             int wordWidth = this.getWordWidth(word);
             hia = new WordArea(currentFontState, this.red, this.green, this.blue,
                                word, word.Length);
             hia.setYOffset(placementOffset);
-            this.addChild(hia);
+            this.AddChild(hia);
 
             finalWidth += startCharWidth + wordWidth;
         }
@@ -1167,7 +1167,7 @@ namespace Genocs.Fonet.Layout
                         }
                         else
                         {
-                            addChild(ispace);
+                            AddChild(ispace);
                         }
                     }
                 }
@@ -1193,7 +1193,7 @@ namespace Genocs.Fonet.Layout
                     }
                     else
                     {
-                        addChild(ia);
+                        AddChild(ia);
                     }
                     if (ls != null)
                     {

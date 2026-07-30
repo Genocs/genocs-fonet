@@ -1,36 +1,34 @@
 using Genocs.Fonet.DataTypes;
 
-namespace Genocs.Fonet.Fo
+namespace Genocs.Fonet.Fo;
+
+internal class CondLengthProperty : Property
 {
-    internal class CondLengthProperty : Property
+    internal class Maker(string name)
+        : PropertyMaker(name)
     {
-        internal class Maker : PropertyMaker
-        {
-            public Maker(string name) : base(name) { }
 
-        }
+    }
 
-        private CondLength condLength = null;
+    private readonly CondLength? _condLength;
 
-        public CondLengthProperty(CondLength condLength)
-        {
-            this.condLength = condLength;
-        }
+    public CondLengthProperty(CondLength condLength)
+    {
+        _condLength = condLength;
+    }
 
-        public override CondLength GetCondLength()
-        {
-            return this.condLength;
-        }
+    public override CondLength? GetCondLength()
+    {
+        return _condLength;
+    }
 
-        public override Length GetLength()
-        {
-            return this.condLength.GetLength().GetLength();
-        }
+    public override Length? GetLength()
+    {
+        return _condLength?.GetLength()?.GetLength();
+    }
 
-        public override object GetObject()
-        {
-            return this.condLength;
-        }
-
+    public override object? GetObject()
+    {
+        return _condLength;
     }
 }

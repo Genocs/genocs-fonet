@@ -1,23 +1,26 @@
 namespace Genocs.Fonet.Fo;
 
-internal class EnumProperty : Property
+internal class EnumProperty(int explicitValue) : Property
 {
     internal class Maker : PropertyMaker
     {
-        protected Maker(string propName) : base(propName) { }
-
-        public override Property CheckEnumValues(string value)
+        protected Maker(string propName)
+            : base(propName)
         {
-            FonetDriver.ActiveDriver.FireFonetError($"Unknown enumerated value for property '{PropName}': {value}");
+        }
+
+        public override Property? CheckEnumValues(string value)
+        {
+            FonetDriver.ActiveDriver?.FireFonetError($"Unknown enumerated value for property '{PropertyName}': {value}");
             return null;
         }
 
-        protected Property findConstant(string value)
+        protected Property? FindConstant(string value)
         {
             return null;
         }
 
-        public override Property ConvertProperty(Property p, PropertyList propertyList, FObj fo)
+        public override Property? ConvertProperty(Property p, PropertyList propertyList, FObj fo)
         {
             if (p is EnumProperty)
             {
@@ -30,20 +33,11 @@ internal class EnumProperty : Property
         }
     }
 
-    private int value;
-
-    public EnumProperty(int explicitValue)
-    {
-        this.value = explicitValue;
-    }
+    private readonly int _value = explicitValue;
 
     public override int GetEnum()
-    {
-        return this.value;
-    }
+        => _value;
 
     public override object GetObject()
-    {
-        return this.value;
-    }
+        => _value;
 }

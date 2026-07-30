@@ -10,6 +10,8 @@ namespace Genocs.Fonet.Pdf
 
         private PdfDictionary xObjects = new PdfDictionary();
 
+        private PdfDictionary extGStates = new PdfDictionary();
+
         static PdfResources()
         {
             DefaultProcedureSets = new PdfArray();
@@ -36,6 +38,11 @@ namespace Genocs.Fonet.Pdf
             xObjects.Add(xObject.Name, xObject.GetReference());
         }
 
+        public void AddExtGState(PdfName name, PdfObject extGState)
+        {
+            extGStates.Add(name, extGState);
+        }
+
         protected internal override void Write(PdfWriter writer)
         {
             if (fonts.Count > 0)
@@ -45,6 +52,10 @@ namespace Genocs.Fonet.Pdf
             if (xObjects.Count > 0)
             {
                 this[PdfName.Names.XObject] = xObjects;
+            }
+            if (extGStates.Count > 0)
+            {
+                this[new PdfName("ExtGState")] = extGStates;
             }
             base.Write(writer);
         }

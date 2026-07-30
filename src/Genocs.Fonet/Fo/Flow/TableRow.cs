@@ -7,18 +7,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class TableRow : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new TableRow(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new TableRow(parent, props));
 
     private bool setup = false;
 
@@ -138,14 +128,12 @@ internal class TableRow : FObj
     public TableRow(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        if (!(parent is AbstractTableBody))
+        if (parent is not AbstractTableBody)
         {
-            throw new FonetException("A table row must be child of fo:table-body,"
-                + " fo:table-header or fo:table-footer, not "
-                + parent.GetName());
+            throw new FonetException($"A table row must be child of fo:table-body, fo:table-header or fo:table-footer, not {parent.Name}");
         }
 
-        this._name = "fo:table-row";
+        Name = "fo:table-row";
     }
 
     public void SetColumns(ArrayList columns)
@@ -176,26 +164,28 @@ internal class TableRow : FObj
         BackgroundProps bProps = _propertyManager.GetBackgroundProps();
         RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-        this.breakAfter = this._properties.GetProperty("break-after").GetEnum();
+        this.breakAfter = this.Properties.GetProperty("break-after")?.GetEnum() ?? Constants.AUTO;
         this.keepTogether = getKeepValue("keep-together.within-column");
         this.keepWithNext = getKeepValue("keep-with-next.within-column");
         this.keepWithPrevious =
             getKeepValue("keep-with-previous.within-column");
 
-        this.id = this._properties.GetProperty("id").GetString();
-        this.minHeight = this._properties.GetProperty("height").GetLength().MValue();
+        this.id = this.Properties.GetProperty("id").GetString();
+        this.minHeight = this.Properties.GetProperty("height").GetLength().MValue();
         setup = true;
     }
 
     private KeepValue getKeepValue(string sPropName)
     {
-        Property p = this._properties.GetProperty(sPropName);
-        Number n = p.GetNumber();
-        if (n != null)
+        Property? property = Properties.GetProperty(sPropName);
+        Number? number = property?.GetNumber();
+
+        if (number != null)
         {
-            return new KeepValue(KeepValue.KEEP_WITH_VALUE, n.IntValue());
+            return new KeepValue(KeepValue.KEEP_WITH_VALUE, number.IntValue());
         }
-        switch (p.GetEnum())
+
+        switch (property?.GetEnum())
         {
             case Constants.ALWAYS:
                 return new KeepValue(KeepValue.KEEP_WITH_ALWAYS, 0);
@@ -240,13 +230,12 @@ internal class TableRow : FObj
 
         int spaceLeft = area.spaceLeft();
 
-        this.areaContainer =
-            new AreaContainer(_propertyManager.GetFontState(area.getFontInfo()), 0, 0,
+        this.areaContainer = new AreaContainer(_propertyManager.GetFontState(area.GetFontInfo()), 0, 0,
                               area.getContentWidth(), spaceLeft,
-                              Position.RELATIVE);
+                              Position.RELATIVE, area);
+
         areaContainer.foCreator = this;
-        areaContainer.setPage(area.getPage());
-        areaContainer.setParent(area);
+        areaContainer.Page = area.Page;
 
         areaContainer.setBackground(_propertyManager.GetBackgroundProps());
         areaContainer.start();
@@ -290,7 +279,7 @@ internal class TableRow : FObj
             Status status;
             if ((status = cell.Layout(areaContainer)).IsIncomplete())
             {
-                if ((keepTogether.GetKeepType() == KeepValue.KEEP_WITH_ALWAYS)
+                if ((keepTogether.KeepType == KeepValue.KEEP_WITH_ALWAYS)
                     || (status.GetCode() == Status.AREA_FULL_NONE)
                     || rowSpan > 1)
                 {
@@ -330,12 +319,12 @@ internal class TableRow : FObj
 
         rowSpanMgr.FinishRow(largestCellHeight);
 
-        area.addChild(areaContainer);
+        area.AddChild(areaContainer);
         areaContainer.SetHeight(largestCellHeight);
         areaAdded = true;
         areaContainer.end();
 
-        area.addDisplaySpace(largestCellHeight
+        area.AddDisplaySpace(largestCellHeight
             + areaContainer.getPaddingTop()
             + areaContainer.getBorderTopWidth()
             + areaContainer.getPaddingBottom()
@@ -374,7 +363,8 @@ internal class TableRow : FObj
                 this._marker = MarkerBreakAfter;
                 return new Status(Status.FORCE_COLUMN_BREAK);
             }
-            if (keepWithNext.GetKeepType() != KeepValue.KEEP_WITH_AUTO)
+
+            if (keepWithNext.KeepType != KeepValue.KEEP_WITH_AUTO)
             {
                 return new Status(Status.KEEP_WITH_NEXT);
             }

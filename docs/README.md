@@ -15,18 +15,23 @@ This folder tracks the assessment, concerns, and migration plan for porting the 
 | [Feature Completeness](./feature-completeness.md) | XSL-FO property and element implementation matrix |
 | [Risks & Concerns](./risks-and-concerns.md) | Technical debt, operational risks, and open decisions |
 | [Phase 1 Summary](./phase-1-summary.md) | Font pipeline implementation details (completed) |
+| [Phase 2 Summary](./phase-2-summary.md) | Quality & performance improvements (completed) |
+| [Phase 3 Summary](./phase-3-summary.md) | FO feature completeness — Tier 1 batch (in progress) |
 
-## Quick Status (June 2026)
+## Quick Status (August 2026)
 
 | Area | Status |
 |------|--------|
-| Build | Compiles on `net8.0` / `net9.0` / `net10.0` (nullable warnings remain) |
+| Build | Compiles on `net8.0` / `net9.0` / `net10.0` |
 | `System.Drawing` / GDI P/Invoke | Removed |
 | SkiaSharp integration | Fonts (cmap, table access) and images |
-| GDI compatibility layer | Thin shim — real implementations behind `LibWrapper` |
-| Test suite | 9 integration tests on net8/9/10 (incl. font pipeline) |
-| CI / automation | GitHub Actions (Windows, Linux, macOS) |
-| Production readiness | **Not ready** — FO coverage gaps; CJK needs validation |
+| GDI compatibility layer | Thin shim — font ops via `FontManager` / `FontTableAccess` |
+| Font pipeline (Phase 1) | ✅ Complete — glyph mapping, subsetting, metrics |
+| Quality & performance (Phase 2) | ✅ Complete — image spans, encoding, namespaces |
+| FO completeness (Phase 3) | 🔄 Tier 1 initial batch done; side-float layout deferred |
+| Test suite | 22 tests on net8/9/10 with PDF structure validation |
+| CI / automation | GitHub Actions (build, test, pack, NuGet publish workflows) |
+| Production readiness | **Not ready** — ~87 FO properties still stubbed; CJK needs validation |
 
 ## How to Use These Docs
 
@@ -37,6 +42,6 @@ This folder tracks the assessment, concerns, and migration plan for porting the 
 
 ## Related Resources
 
-- Root [README.md](../README.md) — build instructions and cross-platform notes (partially stale)
+- Root [README.md](../README.md) — build instructions and cross-platform notes
 - Test templates: `src/tests/Genocs.Fonet.Tests/templates/`
 - Entry point: `src/Genocs.Fonet/FonetDriver.cs`

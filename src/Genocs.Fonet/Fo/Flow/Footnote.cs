@@ -1,28 +1,16 @@
 using Genocs.Fonet.Layout;
-using System.Collections;
 
 namespace Genocs.Fonet.Fo.Flow;
 
-
 internal class Footnote : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new Footnote(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Footnote(parent, props));
 
     public Footnote(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:footnote";
+        Name = "fo:footnote";
     }
 
     public override Status Layout(Area area)
@@ -55,16 +43,17 @@ internal class Footnote : FObj
                 }
                 else
                 {
-                    Page page = area.getPage();
+                    Page? page = area.Page;
                     LayoutFootnote(page, (FootnoteBody)fbody, area);
                 }
             }
         }
+
         if (fbody == null)
         {
-            FonetDriver.ActiveDriver.FireFonetWarning(
-                "No footnote-body in footnote");
+            FonetDriver.ActiveDriver?.FireFonetWarning("No footnote-body in footnote");
         }
+
         if (area is BlockArea) { }
         return new Status(Status.OK);
     }
@@ -96,16 +85,13 @@ internal class Footnote : FObj
             }
             else
             {
-                if (area != null)
-                {
-                    area.setMaxHeight(area.getMaxHeight()
-                        - footArea.GetHeight() + oldHeight);
-                }
+                area?.setMaxHeight(area.getMaxHeight() - footArea.GetHeight() + oldHeight);
+
                 if (bac.getFootnoteState() == 0)
                 {
                     Area ar = bac.getMainReferenceArea();
                     DecreaseMaxHeight(ar, footArea.GetHeight() - oldHeight);
-                    footArea.setYPosition(basePos + footArea.GetHeight());
+                    footArea.YPosition = basePos + footArea.GetHeight();
                 }
             }
         }
@@ -119,12 +105,11 @@ internal class Footnote : FObj
     protected static void DecreaseMaxHeight(Area ar, int change)
     {
         ar.setMaxHeight(ar.getMaxHeight() - change);
-        ArrayList childs = ar.getChildren();
-        foreach (object obj in childs)
+
+        foreach (object obj in ar.Children)
         {
-            if (obj is Area)
+            if (obj is Area childArea)
             {
-                Area childArea = (Area)obj;
                 DecreaseMaxHeight(childArea, change);
             }
         }

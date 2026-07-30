@@ -2,47 +2,43 @@ using Genocs.Fonet.Fo;
 
 namespace Genocs.Fonet.DataTypes;
 
-internal class Keep : ICompoundDatatype
+internal class Keep : ICompoundDataType
 {
-    private Property withinLine;
+    private Property? WithinLine { get; set; }
 
-    private Property withinColumn;
+    private Property? WithinColumn { get; set; }
 
-    private Property withinPage;
+    private Property? WithinPage { get; set; }
 
-    public Keep()
+    public void SetComponent(string componentName, Property componentValue, bool isDefault)
     {
-    }
-
-    public void SetComponent(string sCmpnName, Property cmpnValue, bool bIsDefault)
-    {
-        if (sCmpnName.Equals("within-line"))
+        if (componentName.Equals("within-line"))
         {
-            setWithinLine(cmpnValue, bIsDefault);
+            WithinLine = componentValue;
         }
-        else if (sCmpnName.Equals("within-column"))
+        else if (componentName.Equals("within-column"))
         {
-            setWithinColumn(cmpnValue, bIsDefault);
+            WithinColumn = componentValue;
         }
-        else if (sCmpnName.Equals("within-page"))
+        else if (componentName.Equals("within-page"))
         {
-            setWithinPage(cmpnValue, bIsDefault);
+            WithinPage = componentValue;
         }
     }
 
-    public Property? GetComponent(string sCmpnName)
+    public Property? GetComponent(string componentName)
     {
-        if (sCmpnName.Equals("within-line"))
+        if (componentName.Equals("within-line"))
         {
-            return getWithinLine();
+            return WithinLine;
         }
-        else if (sCmpnName.Equals("within-column"))
+        else if (componentName.Equals("within-column"))
         {
-            return getWithinColumn();
+            return WithinColumn;
         }
-        else if (sCmpnName.Equals("within-page"))
+        else if (componentName.Equals("within-page"))
         {
-            return getWithinPage();
+            return WithinPage;
         }
         else
         {
@@ -50,39 +46,6 @@ internal class Keep : ICompoundDatatype
         }
     }
 
-    public void setWithinLine(Property withinLine, bool bIsDefault)
-    {
-        this.withinLine = withinLine;
-    }
-
-    protected void setWithinColumn(Property withinColumn,
-                                   bool bIsDefault)
-    {
-        this.withinColumn = withinColumn;
-    }
-
-    public void setWithinPage(Property withinPage, bool bIsDefault)
-    {
-        this.withinPage = withinPage;
-    }
-
-    public Property getWithinLine()
-    {
-        return this.withinLine;
-    }
-
-    public Property getWithinColumn()
-    {
-        return this.withinColumn;
-    }
-
-    public Property getWithinPage()
-    {
-        return this.withinPage;
-    }
-
     public override string ToString()
-    {
-        return "Keep";
-    }
+        => "Keep";
 }

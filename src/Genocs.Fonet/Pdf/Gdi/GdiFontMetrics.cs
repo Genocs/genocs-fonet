@@ -6,7 +6,7 @@ using System.Text;
 namespace Genocs.Fonet.Pdf.Gdi;
 
 /// <summary>
-///     Class that obtains OutlineTextMetrics for a TrueType font
+/// Class that obtains OutlineTextMetrics for a TrueType font
 /// </summary>
 /// <example>
 /// </example>
@@ -35,32 +35,31 @@ public class GdiFontMetrics
     {
         if (dc.Handle == IntPtr.Zero)
         {
-            throw new ArgumentNullException("dc", "Handle to device context cannot be null");
+            throw new ArgumentNullException(nameof(dc), "Handle to device context cannot be null");
         }
+
         if (dc.GetCurrentObject(GdiDcObject.Font) == IntPtr.Zero)
         {
-            throw new ArgumentException("dc", "No font selected into supplied device context");
+            throw new ArgumentException("No font selected into supplied device context", nameof(dc));
         }
+
         this.dc = dc;
         this.currentFont = currentFont;
 
         // FontFileReader requires the font facename because the font may exist in 
         // a TrueType collection.
-        StringBuilder builder = new StringBuilder(255);
+        StringBuilder builder = new(255);
         LibWrapper.GetTextFace(dc.Handle, builder.Capacity, builder);
         faceName = builder.Length == 0 ? currentFont.FaceName : builder.ToString();
 
         ranges = new GdiUnicodeRanges(dc);
         reader = new FontFileReader(new MemoryStream(GetFontData()), faceName);
         converter = new PdfUnitConverter(EmSquare);
-
-        // After we have cached the font data, we can safely delete the resource
-        //currentFont.Dispose();
     }
 
     /// <summary>
-    ///     Retrieves the typeface name of the font that is selected into the 
-    ///     device context supplied to the GdiFontMetrics constructor. 
+    /// Gets the typeface name of the font that is selected into the 
+    /// device context supplied to the GdiFontMetrics constructor. 
     /// </summary>
     public string FaceName
     {
@@ -68,43 +67,44 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Specifies the number of logical units defining the x- or y-dimension 
-    ///     of the em square for this font.  The common value for EmSquare is 2048.
+    /// Gets the number of logical units defining the x- or y-dimension
+    /// of the em square for this font.  The common value for EmSquare is 2048.
     /// </summary>
     /// <remarks>
-    ///     The number of units in the x- and y-directions are always the same 
-    ///     for an em square.) 
+    /// The number of units in the x- and y-directions are always the same
+    /// for an em square.) 
     /// </remarks>
     public int EmSquare
     {
         get
         {
             EnsureHeadTable();
-            return (int)head.unitsPermEm;
+            return head.unitsPermEm;
         }
     }
 
     /// <summary>
-    ///     Gets the main italic angle of the font expressed in tenths of 
-    ///     a degree counterclockwise from the vertical.
+    /// Gets the main italic angle of the font expressed in tenths of
+    /// a degree counterclockwise from the vertical.
     /// </summary>
     /// <remarks>
-    ///     Regular (roman) fonts have a value of zero. Italic fonts typically 
-    ///     have a negative italic angle (that is, they lean to the right). 
+    /// Regular (roman) fonts have a value of zero. Italic fonts typically
+    /// have a negative italic angle (that is, they lean to the right).
     /// </remarks>
     public int ItalicAngle
     {
         get
         {
             EnsurePostTable();
+
             // TODO: Is the italic angle always a whole number?
             return converter.ToPdfUnits((int)post.ItalicAngle);
         }
     }
 
     /// <summary>
-    ///     Specifies the maximum distance _characters in this font extend 
-    ///     above the base line. This is the typographic ascent for the font. 
+    /// Gets the maximum distance _characters in this font extend
+    /// above the base line. This is the typographic ascent for the font.
     /// </summary>
     public int Ascent
     {
@@ -116,8 +116,8 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Specifies the maximum distance _characters in this font extend 
-    ///     below the base line. This is the typographic descent for the font. 
+    /// Gets the maximum distance _characters in this font extend
+    /// below the base line. This is the typographic descent for the font.
     /// </summary>
     public int Descent
     {
@@ -129,8 +129,8 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets the distance between the baseline and the approximate 
-    ///     height of uppercase letters.
+    /// Gets the distance between the baseline and the approximate 
+    /// height of uppercase letters.
     /// </summary>
     public int CapHeight
     {
@@ -142,8 +142,8 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets the distance between the baseline and the approximate 
-    ///     height of non-ascending lowercase letters.
+    /// Gets the distance between the baseline and the approximate 
+    /// height of non-ascending lowercase letters.
     /// </summary>
     public int XHeight
     {
@@ -155,8 +155,8 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     TODO: The thickness, measured horizontally, of the dominant vertical 
-    ///     stems of the glyphs in the font.
+    /// TODO: The thickness, measured horizontally, of the dominant vertical 
+    /// stems of the glyphs in the font.
     /// </summary>
     public int StemV
     {
@@ -178,7 +178,7 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets the value of the first character defined in the font
+    /// Gets the value of the first character defined in the font
     /// </summary>
     public ushort FirstChar
     {
@@ -190,7 +190,7 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets the value of the last character defined in the font
+    /// Gets the value of the last character defined in the font
     /// </summary>
     public ushort LastChar
     {
@@ -202,7 +202,7 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets the average width of glyphs in a font.
+    /// Gets the average width of glyphs in a font.
     /// </summary>
     public int AverageWidth
     {
@@ -214,7 +214,7 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets the maximum width of glyphs in a font.
+    /// Gets the maximum width of glyphs in a font.
     /// </summary>
     public int MaxWidth
     {
@@ -232,8 +232,8 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets a value indicating whether the font can be legally embedded 
-    ///     within a document.
+    /// Gets a value indicating whether the font can be legally embedded 
+    /// within a document.
     /// </summary>
     public bool IsEmbeddable
     {
@@ -245,7 +245,7 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets a value indicating whether the font can be legally subsetted.
+    /// Gets a value indicating whether the font can be legally subsetted.
     /// </summary>
     public bool IsSubsettable
     {
@@ -257,30 +257,30 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets the font's bounding box.
+    /// Gets the font's bounding box.
     /// </summary>
     /// <remarks>
-    ///     This is the smallest rectangle enclosing the shape that would 
-    ///     result if all the glyphs of the font were placed with their 
-    ///     origins cooincident and then filled.
+    /// This is the smallest rectangle enclosing the shape that would 
+    /// result if all the glyphs of the font were placed with their 
+    /// origins coincident and then filled.
     /// </remarks>
     public int[] BoundingBox
     {
         get
         {
             EnsureHeadTable();
-            return new int[] {
+            return [
                 converter.ToPdfUnits(head.xMin),
                 converter.ToPdfUnits(head.yMin),
                 converter.ToPdfUnits(head.xMax),
                 converter.ToPdfUnits(head.yMax)
-            };
+            ];
         }
     }
 
     /// <summary>
-    ///     Gets a collection of flags defining various characteristics of 
-    ///     a font (e.g. serif or sans-serif, symbolic, etc).
+    /// Gets a collection of flags defining various characteristics of 
+    /// a font (e.g. serif or sans-serif, symbolic, etc).
     /// </summary>
     public int Flags
     {
@@ -317,9 +317,9 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets font metric data for a TrueType font or TrueType collection.
+    /// Gets font metric data for a TrueType font or TrueType collection.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Font metric data for a TrueType font or TrueType collection.</returns>
     public byte[] GetFontData()
     {
         if (data == null)
@@ -339,8 +339,7 @@ public class GdiFontMetrics
             }
             catch (Exception e)
             {
-                throw new Exception(
-                    String.Format("Failed to load data for font {0}", FaceName), e);
+                throw new Exception($"Failed to load data for font {FaceName}", e);
             }
         }
 
@@ -349,18 +348,13 @@ public class GdiFontMetrics
 
     private byte[] ReadFontFromCollection()
     {
-        GdiFontCreator creator = new GdiFontCreator(dc);
+        GdiFontCreator creator = new(dc);
         return creator.Build();
     }
 
     private byte[] ReadFont()
     {
-        var typeface = dc.CurrentTypeface ?? currentFont.Typeface;
-        if (typeface == null)
-        {
-            throw new InvalidOperationException("No font selected into device context");
-        }
-
+        var typeface = (dc.CurrentTypeface ?? currentFont.Typeface) ?? throw new InvalidOperationException("No font selected into device context");
         byte[] fontData = FontManager.Instance.GetFontData(typeface);
         if (fontData.Length > 0)
         {
@@ -371,9 +365,9 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets a collection of kerning pairs.
+    /// Gets a collection of kerning pairs.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A collection of kerning pairs.</returns>
     public GdiKerningPairs KerningPairs
     {
         get
@@ -391,10 +385,10 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Gets a collection of kerning pairs for _characters defined in 
-    ///     the WinAnsiEncoding scheme only.
+    /// Gets a collection of kerning pairs for characters defined in 
+    /// the WinAnsiEncoding scheme only.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A collection of kerning pairs for characters defined in the WinAnsiEncoding scheme only.</returns>
     public GdiKerningPairs AnsiKerningPairs
     {
         get
@@ -440,8 +434,8 @@ public class GdiFontMetrics
                         }
                     }
                 });
-                return new GdiKerningPairs(newPairs, converter);
 
+                return new GdiKerningPairs(newPairs, converter);
             }
             else
             {
@@ -451,14 +445,14 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Retrieves the widths, in PDF units, of consecutive glyphs.
+    /// Gets the widths, in PDF units, of consecutive glyphs.
     /// </summary>
     /// <returns>
-    ///     An array of integers whose size is equal to the number of glyphs 
-    ///     specified in the 'maxp' table.
-    ///     The width at location 0 is the width of glyph with index 0, 
-    ///     The width at location 1 is the width of glyph with index 1, 
-    ///     etc...
+    /// An array of integers whose size is equal to the number of glyphs 
+    /// specified in the 'maxp' table.
+    /// The width at location 0 is the width of glyph with index 0, 
+    /// The width at location 1 is the width of glyph with index 1, 
+    /// etc...
     /// </returns>
     public int[] GetWidths()
     {
@@ -476,15 +470,15 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Returns the width, in PDF units, of consecutive glyphs for the 
-    ///     WinAnsiEncoding only.
+    /// Returns the width, in PDF units, of consecutive glyphs for the 
+    /// WinAnsiEncoding only.
     /// </summary>
     /// <returns>An array consisting of 256 elements.</returns>
     public int[] GetAnsiWidths()
     {
         EnsureHmtxTable();
 
-        // WinAnsiEncoding consists of 256 _characters
+        // WinAnsiEncoding consists of 256 characters
         int[] widths = new int[256];
 
         // The glyph at position 0 always represents the .notdef glyph
@@ -509,55 +503,28 @@ public class GdiFontMetrics
     }
 
     /// <summary>
-    ///     Translates the supplied character to a glyph index using the 
-    ///     currently selected font.
+    /// Translates the supplied character to a glyph index using the 
+    /// currently selected font.
     /// </summary>
     /// <param name="c">A unicode character.</param>
     /// <returns></returns>
     public ushort MapCharacter(char c)
-    {
-        return ranges.MapCharacter(c);
-    }
+        => ranges.MapCharacter(c);
 
     private void EnsureHmtxTable()
-    {
-        if (hmtx == null)
-        {
-            hmtx = (HorizontalMetricsTable)GetTable(TableNames.Hmtx);
-        }
-    }
+        => hmtx ??= (HorizontalMetricsTable)GetTable(TableNames.Hmtx);
 
     private void EnsureHheaTable()
-    {
-        if (hhea == null)
-        {
-            hhea = (HorizontalHeaderTable)GetTable(TableNames.Hhea);
-        }
-    }
+        => hhea ??= (HorizontalHeaderTable)GetTable(TableNames.Hhea);
 
     private void EnsurePostTable()
-    {
-        if (post == null)
-        {
-            post = (PostTable)GetTable(TableNames.Post);
-        }
-    }
+        => post ??= (PostTable)GetTable(TableNames.Post);
 
     private void EnsureHeadTable()
-    {
-        if (head == null)
-        {
-            head = (HeaderTable)GetTable(TableNames.Head);
-        }
-    }
+        => head ??= (HeaderTable)GetTable(TableNames.Head);
 
     private void EnsureOS2Table()
-    {
-        if (os2 == null)
-        {
-            os2 = (OS2Table)GetTable(TableNames.Os2);
-        }
-    }
+        => os2 ??= (OS2Table)GetTable(TableNames.Os2);
 
     private FontTable GetTable(string name)
     {
@@ -567,8 +534,7 @@ public class GdiFontMetrics
         }
         catch
         {
-            throw new Exception(String.Format(
-                "Unable to retrieve table {0} from font {1}", name, FaceName));
+            throw new Exception($"Unable to retrieve table {name} from font {FaceName}");
         }
     }
 }

@@ -5,14 +5,14 @@ using System.Collections;
 namespace Genocs.Fonet.Fo;
 
 /// <summary>
-/// Represents a property in the formatting object model. 
-/// This abstract class serves as a base for various property types, 
+/// Represents a property in the formatting object model.
+/// This abstract class serves as a base for various property types,
 /// providing methods to retrieve specific property values such as length, color, space, and more.
 /// Each derived class can override these methods to provide the appropriate behavior for its specific property type.
 /// </summary>
 internal abstract class Property
 {
-    public string SpecifiedValue { get; set; }
+    public string? SpecifiedValue { get; set; }
     public virtual Length? GetLength() => null;
     public virtual ColorType? GetColorType() => null;
     public virtual CondLength? GetCondLength() => null;

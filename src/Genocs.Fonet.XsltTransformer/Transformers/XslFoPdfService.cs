@@ -6,8 +6,23 @@
 /// </summary>
 public class XslFoPdfService : IPdfWriterService
 {
+    /// <summary>
+    /// Generates a PDF stream from the specified document, template, and resources using XSL-FO transformation.
+    /// </summary>
+    /// <param name="document">The printable document.</param>
+    /// <param name="templateName">The name of the XSLT template file.</param>
+    /// <param name="resourcesName">The name of the localized resources file.</param>
+    /// <param name="fontsDirectory">The directory containing font files.</param>
+    /// <param name="countryId">The country identifier for localization.</param>
+    /// <returns>A stream containing the generated PDF.</returns>
     public Stream Print(IPrintableDocument document, string templateName, string? resourcesName, string? fontsDirectory, string? countryId = null)
     {
+        ArgumentNullException.ThrowIfNull(document);
+        if (string.IsNullOrWhiteSpace(templateName))
+        {
+            throw new ArgumentNullException(nameof(templateName));
+        }
+
         string debug = document.ToXml();
 
         var xsltStyleSheet = ResourceManager.GetXsltFileContent(templateName, countryId);

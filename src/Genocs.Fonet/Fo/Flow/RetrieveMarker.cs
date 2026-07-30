@@ -7,6 +7,9 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class RetrieveMarker : FObjMixed
 {
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new RetrieveMarker(parent, props));
+
     private string _retrieveClassName;
 
     private int _retrievePosition;
@@ -15,27 +18,16 @@ internal class RetrieveMarker : FObjMixed
 
     private Marker? _bestMarker;
 
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new RetrieveMarker(parent, propertyList);
-        }
-    }
 
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
 
     public RetrieveMarker(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "fo:retrieve-marker";
+        Name = "fo:retrieve-marker";
 
-        _retrieveClassName = _properties.GetProperty("retrieve-class-name").GetString();
-        _retrievePosition = _properties.GetProperty("retrieve-position").GetEnum();
-        _retrieveBoundary = _properties.GetProperty("retrieve-boundary").GetEnum();
+        _retrieveClassName = Properties.GetProperty("retrieve-class-name").GetString();
+        _retrievePosition = Properties.GetProperty("retrieve-position").GetEnum();
+        _retrieveBoundary = Properties.GetProperty("retrieve-boundary").GetEnum();
     }
 
     public override Status Layout(Area area)
@@ -43,7 +35,7 @@ internal class RetrieveMarker : FObjMixed
         if (_marker == MarkerStart)
         {
             _marker = 0;
-            Page containingPage = area.getPage();
+            Page? containingPage = area.Page;
             _bestMarker = SearchPage(containingPage);
 
             if (_bestMarker != null)
@@ -56,7 +48,7 @@ internal class RetrieveMarker : FObjMixed
             if (_retrieveBoundary == RetrieveBoundary.PAGE_SEQUENCE)
             {
                 PageSequence pageSequence = areaTree.GetCurrentPageSequence();
-                if (pageSequence == containingPage.getPageSequence())
+                if (pageSequence == containingPage.PageSequence)
                 {
                     return LayoutBestMarker(areaTree.GetCurrentPageSequenceMarkers(), area);
                 }

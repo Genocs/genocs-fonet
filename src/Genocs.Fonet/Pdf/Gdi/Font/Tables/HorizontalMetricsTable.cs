@@ -3,25 +3,25 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Class that represents the Horizontal Metrics ('hmtx') table.
+/// Class that represents the Horizontal Metrics ('hmtx') table.
 /// </summary>
 /// <remarks>
-///     http://www.microsoft.com/typography/otspec/hmtx.htm
+/// http://www.microsoft.com/typography/otspec/hmtx.htm
 /// </remarks>
 internal class HorizontalMetricsTable : FontTable
 {
     public IList? _metrics;
 
     /// <summary>
-    ///     Initialises a new instance of the 
-    ///     <see cref="HorizontalMetricsTable"/> class.
+    /// Initialises a new instance of the 
+    /// <see cref="HorizontalMetricsTable"/> class.
     /// </summary>
     /// <param name="entry"></param>
     public HorizontalMetricsTable(DirectoryEntry entry)
         : base(TableNames.Hmtx, entry) { }
 
     /// <summary>
-    ///     Initialises a new instance of the HorizontalMetricsTable class.
+    /// Initialises a new instance of the HorizontalMetricsTable class.
     /// </summary>
     /// <param name="entry"></param>
     /// <param name="numMetrics"></param>
@@ -32,8 +32,8 @@ internal class HorizontalMetricsTable : FontTable
     }
 
     /// <summary>
-    ///     Returns the number of horizontal metrics stored in the 
-    ///     hmtx table.
+    /// Returns the number of horizontal metrics stored in the 
+    /// hmtx table.
     /// </summary>
     public int Count
     {
@@ -41,7 +41,7 @@ internal class HorizontalMetricsTable : FontTable
     }
 
     /// <summary>
-    ///     Gets the <see cref="HorizontalMetric"/> located at <i>index</i>.
+    /// Gets the <see cref="HorizontalMetric"/> located at <i>index</i>.
     /// </summary>
     public HorizontalMetric this[int index]
     {
@@ -50,8 +50,8 @@ internal class HorizontalMetricsTable : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "hmtx" table from the supplied stream 
-    ///     at the current position.
+    /// Reads the contents of the "hmtx" table from the supplied stream 
+    /// at the current position.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)
@@ -97,6 +97,5 @@ internal class HorizontalMetricsTable : FontTable
             stream.WriteUShort(metric.AdvanceWidth);
             stream.WriteShort(metric.LeftSideBearing);
         }
-
     }
 }

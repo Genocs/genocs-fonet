@@ -12,38 +12,34 @@ internal abstract class Region : FObj
     protected Region(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = GetElementName();
+        Name = GetElementName();
 
-        if (null == this._properties.GetProperty(PROP_REGION_NAME))
+        if (null == this.Properties.GetProperty(PROP_REGION_NAME))
         {
             setRegionName(GetDefaultRegionName());
         }
-        else if (this._properties.GetProperty(PROP_REGION_NAME).GetString().Equals(""))
+        else if (this.Properties.GetProperty(PROP_REGION_NAME).GetString().Equals(""))
         {
             setRegionName(GetDefaultRegionName());
         }
         else
         {
-            setRegionName(this._properties.GetProperty(PROP_REGION_NAME).GetString());
+            setRegionName(this.Properties.GetProperty(PROP_REGION_NAME).GetString());
             if (isReserved(getRegionName())
                 && !getRegionName().Equals(GetDefaultRegionName()))
             {
-                throw new FonetException(PROP_REGION_NAME + " '" + _regionName
-                    + "' for " + this._name
-                    + " not permitted.");
+                throw new FonetException($"{PROP_REGION_NAME} '{_regionName}' for {Name} not permitted.");
             }
         }
 
-        if (parent.GetName().Equals("fo:simple-page-master"))
+        if (parent.Name.Equals("fo:simple-page-master"))
         {
             _layoutMaster = (SimplePageMaster)parent;
             getPageMaster().addRegion(this);
         }
         else
         {
-            throw new FonetException(GetElementName() + " must be child "
-                + "of simple-page-master, not "
-                + parent.GetName());
+            throw new FonetException($"{GetElementName()} must be child of simple-page-master, not {parent.Name}");
         }
     }
 

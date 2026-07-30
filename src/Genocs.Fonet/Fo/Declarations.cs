@@ -1,26 +1,13 @@
-using Genocs.Fonet.Fo;
+namespace Genocs.Fonet.Fo;
 
-namespace Genocs.Fonet.Fo
+internal class Declarations : ToBeImplementedElement
 {
-    internal class Declarations : ToBeImplementedElement
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Declarations(parent, props));
+
+    protected Declarations(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
     {
-        new internal class Maker : FObj.Maker
-        {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new Declarations(parent, propertyList);
-            }
-        }
-
-        new public static FObj.Maker GetMaker()
-        {
-            return new Declarations.Maker();
-        }
-
-        protected Declarations(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            this._name = "fo:declarations";
-        }
+        Name = "fo:declarations";
     }
 }

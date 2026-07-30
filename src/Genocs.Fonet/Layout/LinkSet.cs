@@ -59,8 +59,8 @@ namespace Genocs.Fonet.Layout
             BlockArea ba = (BlockArea)area;
             foreach (LinkedRectangle r in rects)
             {
-                r.setX(r.getX() + ac.getXPosition() + area.getTableCellXOffset());
-                r.setY(ac.GetYPosition() - height + (maxY - r.getY()) - ba.getHalfLeading());
+                r.setX(r.getX() + ac.XPosition + area.getTableCellXOffset());
+                r.setY(ac.YPosition - height + (maxY - r.getY()) - ba.getHalfLeading());
             }
         }
 

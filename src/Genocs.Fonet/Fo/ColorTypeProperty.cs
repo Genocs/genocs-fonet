@@ -21,7 +21,7 @@ internal class ColorTypeProperty(ColorType colorType) : Property
                 return new ColorTypeProperty(val);
             }
 
-            return ConvertPropertyDatatype(p, propertyList, fo);
+            return ConvertPropertyDataType(p, propertyList, fo);
         }
 
     }

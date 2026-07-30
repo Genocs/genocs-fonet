@@ -1,7 +1,6 @@
-using Genocs.Fonet.Pdf.Gdi;
-using SkiaSharp;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using SkiaSharp;
 
 namespace Genocs.Fonet.Pdf.Gdi;
 
@@ -119,7 +118,7 @@ internal sealed class FontManager
     /// <summary>
     /// Loads a font typeface by family name and style.
     /// </summary>
-    public SKTypeface LoadTypeface(string familyName, bool bold = false, bool italic = false)
+    public SKTypeface? LoadTypeface(string familyName, bool bold = false, bool italic = false)
     {
         var weight = bold ? 700 : 400;
         var slant = italic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright;
@@ -134,7 +133,7 @@ internal sealed class FontManager
         var typeface = MatchPrivateTypeface(familyName, bold, italic)
             ?? fontManager.MatchFamily(familyName, fontStyle)
             ?? fontManager.MatchFamily(familyName);
-        
+
         if (typeface != null)
         {
             typefaces[cacheKey] = typeface;
@@ -154,7 +153,7 @@ internal sealed class FontManager
     /// <summary>
     /// Loads a font from a file path.
     /// </summary>
-    public SKTypeface LoadTypefaceFromFile(string filePath)
+    public SKTypeface? LoadTypefaceFromFile(string filePath)
     {
         if (!File.Exists(filePath))
         {
@@ -184,7 +183,7 @@ internal sealed class FontManager
     }
 
     /// <summary>
-    ///     Registers a private font file so it can be resolved by family name.
+    /// Registers a private font file so it can be resolved by family name.
     /// </summary>
     public void RegisterTypefaceFromFile(string filePath)
     {
@@ -222,7 +221,7 @@ internal sealed class FontManager
     /// <summary>
     /// Extracts font data (TrueType/OpenType tables) from a typeface.
     /// </summary>
-    public byte[] GetFontData(SKTypeface typeface)
+    public byte[] GetFontData(SKTypeface? typeface)
     {
         ArgumentNullException.ThrowIfNull(typeface);
 
@@ -231,12 +230,12 @@ internal sealed class FontManager
             return fontData;
         }
 
-        return Array.Empty<byte>();
+        return [];
     }
 
     /// <summary>
-    ///     Reads raw font bytes from a registered file path or system font directory.
-    ///     Avoids SKTypeface.OpenStream(), which can crash on some platform/font combinations.
+    /// Reads raw font bytes from a registered file path or system font directory.
+    /// Avoids SKTypeface.OpenStream(), which can crash on some platform/font combinations.
     /// </summary>
     private bool TryReadFontFile(SKTypeface typeface, out byte[] fontData)
     {
@@ -271,33 +270,8 @@ internal sealed class FontManager
             return fontData.Length > 0;
         }
 
-        fontData = Array.Empty<byte>();
+        fontData = [];
         return false;
-    }
-
-    /// <summary>
-    ///     Gets glyph indices for a string of characters.
-    /// </summary>
-    public ushort[] GetGlyphIndices(string text, SKTypeface typeface)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return Array.Empty<ushort>();
-        }
-
-        var cmap = GetCmapReader(typeface);
-        if (cmap != null)
-        {
-            var indices = new ushort[text.Length];
-            for (int i = 0; i < text.Length; i++)
-            {
-                indices[i] = cmap.MapCharacter(text[i]);
-            }
-
-            return indices;
-        }
-
-        return GetGlyphIndicesFromSkia(text, typeface);
     }
 
     public ushort GetGlyphIndex(SKTypeface typeface, int codePoint)
@@ -314,7 +288,7 @@ internal sealed class FontManager
         return glyphs[0];
     }
 
-    public CmapReader? GetCmapReader(SKTypeface typeface)
+    public CmapReader? GetCmapReader(SKTypeface? typeface)
     {
         ArgumentNullException.ThrowIfNull(typeface);
 
@@ -339,14 +313,6 @@ internal sealed class FontManager
         return data.Length == 0 ? null : CmapReader.FromFontData(data);
     }
 
-    private ushort[] GetGlyphIndicesFromSkia(string text, SKTypeface typeface)
-    {
-        using var font = new SKFont(typeface);
-        var indices = new ushort[text.Length];
-        font.GetGlyphs(text, indices);
-        return indices;
-    }
-
     private bool TryGetTypefacePath(SKTypeface typeface, out string filePath)
     {
         if (typefaceFilePaths.TryGetValue(typeface, out filePath!))
@@ -368,7 +334,7 @@ internal sealed class FontManager
 
 
     /// <summary>
-    ///     Locates a system font file by family name (cross-platform).
+    /// Locates a system font file by family name (cross-platform).
     /// </summary>
     private string? LocateSystemFont(string familyName)
     {
@@ -438,28 +404,11 @@ internal sealed class FontManager
     }
 
     /// <summary>
-    ///     Normalizes a font family name for file matching.
+    /// Normalizes a font family name for file matching.
     /// </summary>
     private string NormalizeFamilyName(string familyName)
     {
         return familyName?.ToLowerInvariant().Replace(" ", "") ?? string.Empty;
-    }
-
-    /// <summary>
-    ///     Clears the typeface cache.
-    /// </summary>
-    public void ClearCache()
-    {
-        foreach (var typeface in typefaces.Values)
-        {
-            typeface?.Dispose();
-        }
-        typefaces.Clear();
-        typefaceFilePaths.Clear();
-        privateTypefaces.Clear();
-        systemFontPathCache.Clear();
-        cmapCache.Clear();
-        InvalidateFontFamilyCache();
     }
 
     private IEnumerable<SKTypeface> GetPrivateTypefaces(string familyName)
@@ -475,7 +424,7 @@ internal sealed class FontManager
         return Array.Empty<SKTypeface>();
     }
 
-    private SKTypeface MatchPrivateTypeface(string familyName, bool bold, bool italic)
+    private SKTypeface? MatchPrivateTypeface(string familyName, bool bold, bool italic)
     {
         var matches = GetPrivateTypefaces(familyName).ToArray();
         if (matches.Length == 0)

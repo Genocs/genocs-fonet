@@ -3,7 +3,7 @@ using SkiaSharp;
 namespace Genocs.Fonet.Pdf.Gdi;
 
 /// <summary>
-///     Parses TrueType cmap tables for glyph mapping and Unicode coverage.
+/// Gets the CmapReader parses TrueType cmap tables for glyph mapping and Unicode coverage.
 /// </summary>
 internal sealed class CmapReader
 {
@@ -86,7 +86,7 @@ internal sealed class CmapReader
         _ => platformId == 3 ? 40 : 10
     };
 
-    private static CmapReader ParseFormat0(byte[] cmapTable, int offset)
+    private static CmapReader? ParseFormat0(byte[] cmapTable, int offset)
     {
         if (offset + 262 > cmapTable.Length)
         {
@@ -146,25 +146,25 @@ internal sealed class CmapReader
             ushort charCode = (ushort)codePoint;
             for (int i = 0; i < segments.Count; i++)
             {
-                var segment = segments[i];
-                if (charCode < segment.Start || charCode > segment.End)
+                var (End, Start, Delta, RangeOffset) = segments[i];
+                if (charCode < Start || charCode > End)
                 {
                     continue;
                 }
 
-                if (segment.RangeOffset == 0)
+                if (RangeOffset == 0)
                 {
-                    return (ushort)((charCode + segment.Delta) & 0xFFFF);
+                    return (ushort)((charCode + Delta) & 0xFFFF);
                 }
 
-                int glyphIndexAddress = segment.RangeOffset + (charCode - segment.Start) * 2 + (idRangeOffset + i * 2);
+                int glyphIndexAddress = RangeOffset + (charCode - Start) * 2 + (idRangeOffset + i * 2);
                 if (glyphIndexAddress + 2 > cmapTable.Length)
                 {
                     return 0;
                 }
 
                 ushort glyphIndex = ReadUInt16BE(cmapTable, glyphIndexAddress);
-                return glyphIndex == 0 ? (ushort)0 : (ushort)((glyphIndex + segment.Delta) & 0xFFFF);
+                return glyphIndex == 0 ? (ushort)0 : (ushort)((glyphIndex + Delta) & 0xFFFF);
             }
 
             return 0;
@@ -223,14 +223,15 @@ internal sealed class CmapReader
         return new CmapReader(Map, coverage);
     }
 
-    private static ushort ReadUInt16BE(byte[] data, int offset) =>
-        (ushort)((data[offset] << 8) | data[offset + 1]);
+    private static ushort ReadUInt16BE(byte[] data, int offset)
+        => (ushort)((data[offset] << 8) | data[offset + 1]);
 
-    private static short ReadInt16BE(byte[] data, int offset) =>
-        (short)ReadUInt16BE(data, offset);
+    private static short ReadInt16BE(byte[] data, int offset)
+        => (short)ReadUInt16BE(data, offset);
 
-    private static int ReadInt32BE(byte[] data, int offset) =>
-        (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
+    private static int ReadInt32BE(byte[] data, int offset)
+        => (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
 
-    private static uint ReadUInt32BE(byte[] data, int offset) => (uint)ReadInt32BE(data, offset);
+    private static uint ReadUInt32BE(byte[] data, int offset)
+        => (uint)ReadInt32BE(data, offset);
 }

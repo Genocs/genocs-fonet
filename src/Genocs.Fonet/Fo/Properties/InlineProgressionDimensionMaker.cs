@@ -129,7 +129,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = MakeCompound(propertyList, propertyList.getParentFObj());
+                m_defaultProp = MakeCompound(propertyList, propertyList.GetParentFObj());
             }
             return m_defaultProp;
         }
@@ -208,7 +208,7 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Length = 0;
 
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.INLINEPROGDIM));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.INLINEPROGDIM));
 
             if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
             {
@@ -217,7 +217,7 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Length = 0;
             sbExpr.Append("min-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.INLINEPROGDIM));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.INLINEPROGDIM));
 
             if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
             {
@@ -226,7 +226,7 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Length = 0;
             sbExpr.Append("max-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.INLINEPROGDIM));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.INLINEPROGDIM));
 
             if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
             {
@@ -239,11 +239,11 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Compute(PropertyList propertyList)
         {
-            FObj parentFO = propertyList.getParentFObj();
+            FObj parentFO = propertyList.GetParentFObj();
             StringBuilder sbExpr = new StringBuilder();
             Property p = null;
 
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.INLINEPROGDIM));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.INLINEPROGDIM));
 
             p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 
@@ -261,7 +261,7 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Length = 0;
             sbExpr.Append("min-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.INLINEPROGDIM));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.INLINEPROGDIM));
 
             subprop = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 
@@ -272,7 +272,7 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Length = 0;
             sbExpr.Append("max-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.INLINEPROGDIM));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.INLINEPROGDIM));
 
             subprop = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 

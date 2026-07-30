@@ -6,18 +6,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class PageNumber : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new PageNumber(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new PageNumber(parent, props));
 
     private float red;
     private float green;
@@ -29,7 +19,7 @@ internal class PageNumber : FObj
     public PageNumber(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "fo:page-number";
+        Name = "fo:page-number";
     }
 
     public override Status Layout(Area area)
@@ -49,23 +39,23 @@ internal class PageNumber : FObj
             MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            ColorType c = _properties.GetProperty("color").GetColorType();
+            ColorType c = Properties.GetProperty("color").GetColorType();
             red = c.Red;
             green = c.Green;
             blue = c.Blue;
 
-            wrapOption = _properties.GetProperty("wrap-option").GetEnum();
-            whiteSpaceCollapse =_properties.GetProperty("white-space-collapse").GetEnum();
+            wrapOption = Properties.GetProperty("wrap-option").GetEnum();
+            whiteSpaceCollapse = Properties.GetProperty("white-space-collapse").GetEnum();
             ts = new TextState();
             _marker = 0;
 
-            string id = _properties.GetProperty("id").GetString();
+            string id = Properties.GetProperty("id").GetString();
             area.GetIDReferences().InitializeID(id, area);
         }
 
-        string p = area.getPage().getFormattedNumber();
+        string? p = area.Page?.getFormattedNumber();
         _marker = FOText.addText((BlockArea)area,
-                                     _propertyManager.GetFontState(area.getFontInfo()),
+                                     _propertyManager.GetFontState(area.GetFontInfo()),
                                      red, green, blue, wrapOption, null,
                                      whiteSpaceCollapse, p.ToCharArray(), 0,
                                      p.Length, ts, VerticalAlign.BASELINE);

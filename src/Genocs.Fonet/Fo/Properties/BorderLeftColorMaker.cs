@@ -21,11 +21,11 @@ internal class BorderLeftColorMaker : GenericColor
 
     public override Property Compute(PropertyList propertyList)
     {
-        FObj parentFO = propertyList.getParentFObj();
+        FObj parentFO = propertyList.GetParentFObj();
         StringBuilder sbExpr = new StringBuilder();
         Property p = null;
         sbExpr.Append("border-");
-        sbExpr.Append(propertyList.wmAbsToRel(PropertyList.LEFT));
+        sbExpr.Append(propertyList.AbsoluteToRelative(PropertyList.LEFT));
         sbExpr.Append("-color");
         p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 
@@ -48,8 +48,8 @@ internal class BorderLeftColorMaker : GenericColor
             if (listprop != null)
             {
                 // Get a parser for the shorthand to set the individual properties
-                IShorthandParser shparser = new GenericShorthandParser(listprop);
-                p = shparser.GetValueForProperty(PropName, this, propertyList);
+                IShortHandParser shparser = new GenericShorthandParser(listprop);
+                p = shparser.GetValueForProperty(PropertyName, this, propertyList);
             }
         }
 
@@ -59,8 +59,8 @@ internal class BorderLeftColorMaker : GenericColor
             if (listprop != null)
             {
                 // Get a parser for the shorthand to set the individual properties
-                IShorthandParser shparser = new BoxPropShorthandParser(listprop);
-                p = shparser.GetValueForProperty(PropName, this, propertyList);
+                IShortHandParser shparser = new BoxPropShorthandParser(listprop);
+                p = shparser.GetValueForProperty(PropertyName, this, propertyList);
             }
         }
 
@@ -70,8 +70,8 @@ internal class BorderLeftColorMaker : GenericColor
             if (listprop != null)
             {
                 // Get a parser for the shorthand to set the individual properties
-                IShorthandParser shparser = new GenericShorthandParser(listprop);
-                p = shparser.GetValueForProperty(PropName, this, propertyList);
+                IShortHandParser shparser = new GenericShorthandParser(listprop);
+                p = shparser.GetValueForProperty(PropertyName, this, propertyList);
             }
         }
 
@@ -82,7 +82,7 @@ internal class BorderLeftColorMaker : GenericColor
 
     public override Property Make(PropertyList propertyList)
     {
-        m_defaultProp ??= Make(propertyList, "black", propertyList.getParentFObj());
+        m_defaultProp ??= Make(propertyList, "black", propertyList.GetParentFObj());
         return m_defaultProp;
 
     }

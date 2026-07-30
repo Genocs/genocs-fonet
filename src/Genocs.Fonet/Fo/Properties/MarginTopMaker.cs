@@ -8,8 +8,8 @@ internal class MarginTopMaker : GenericMargin
 
     public override Property Compute(PropertyList propertyList)
     {
-        FObj parentFO = propertyList.getParentFObj();
-        Property? p = propertyList.GetExplicitOrShorthandProperty(PropName);
+        FObj parentFO = propertyList.GetParentFObj();
+        Property? p = propertyList.GetExplicitOrShorthandProperty(PropertyName);
         return p != null ? ConvertProperty(p, propertyList, parentFO) : null;
     }
 
@@ -17,7 +17,7 @@ internal class MarginTopMaker : GenericMargin
 
     public override Property Make(PropertyList propertyList)
     {
-        m_defaultProp ??= Make(propertyList, "0pt", propertyList.getParentFObj());
+        m_defaultProp ??= Make(propertyList, "0pt", propertyList.GetParentFObj());
         return m_defaultProp;
     }
 }

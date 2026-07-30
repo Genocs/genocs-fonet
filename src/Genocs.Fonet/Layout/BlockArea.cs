@@ -20,10 +20,12 @@ namespace Genocs.Fonet.Layout
         protected HyphenationProps hyphProps;
         protected ArrayList pendingFootnotes = null;
 
-        public BlockArea(FontState fontState, int allocationWidth, int maxHeight,
-                         int startIndent, int endIndent, int textIndent,
-                         int align, int alignLastLine, int lineHeight)
-            : base(fontState, allocationWidth, maxHeight)
+        public BlockArea(FontState fontState, int allocationWidth, 
+            int maxHeight, int startIndent, 
+            int endIndent, int textIndent, 
+            int align, int alignLastLine, 
+            int lineHeight, Area? parent)
+            : base(fontState, allocationWidth, maxHeight, parent)
         {
             this.startIndent = startIndent;
             this.endIndent = endIndent;
@@ -50,17 +52,17 @@ namespace Genocs.Fonet.Layout
             if (!la.isEmpty())
             {
                 la.verticalAlign();
-                this.addDisplaySpace(this.halfLeading);
+                this.AddDisplaySpace(this.halfLeading);
                 int size = la.GetHeight();
-                this.addChild(la);
+                this.AddChild(la);
                 this.increaseHeight(size);
-                this.addDisplaySpace(this.halfLeading);
+                this.AddDisplaySpace(this.halfLeading);
             }
             if (pendingFootnotes != null)
             {
                 foreach (FootnoteBody fb in pendingFootnotes)
                 {
-                    Page page = getPage();
+                    Page? page = Page;
                     if (!Footnote.LayoutFootnote(page, fb, this))
                     {
                         page.addPendingFootnote(fb);
@@ -88,9 +90,10 @@ namespace Genocs.Fonet.Layout
                 this.currentLineArea.align(this.align);
                 this.addLineArea(this.currentLineArea);
             }
+            GetEffectiveIndents(out int effectiveStartIndent, out int effectiveEndIndent);
             this.currentLineArea = new LineArea(FontState, lineHeight,
                                                 halfLeading, allocationWidth,
-                                                startIndent, endIndent,
+                                                effectiveStartIndent, effectiveEndIndent,
                                                 currentLineArea);
             this.currentLineArea.changeHyphenation(hyphProps);
             if (currentHeight + lineHeight > maxHeight)
@@ -121,10 +124,27 @@ namespace Genocs.Fonet.Layout
 
         public override void start()
         {
+            GetEffectiveIndents(out int effectiveStartIndent, out int effectiveEndIndent);
             currentLineArea = new LineArea(FontState, lineHeight, halfLeading,
                                            allocationWidth,
-                                           startIndent + textIndent, endIndent,
+                                           effectiveStartIndent + textIndent, effectiveEndIndent,
                                            null);
+        }
+
+        private void GetEffectiveIndents(out int effectiveStartIndent, out int effectiveEndIndent)
+        {
+            effectiveStartIndent = startIndent;
+            effectiveEndIndent = endIndent;
+
+            ColumnArea? column = ColumnArea.FindColumnArea(this);
+            if (column == null)
+            {
+                return;
+            }
+
+            column.GetFloatIndents(currentHeight, lineHeight, out int extraStart, out int extraEnd);
+            effectiveStartIndent += extraStart;
+            effectiveEndIndent += extraEnd;
         }
 
         public int getEndIndent()

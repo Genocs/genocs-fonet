@@ -24,7 +24,7 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Length = 0;
             sbExpr.Append("margin-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.END));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.END));
 
             if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
             {
@@ -37,11 +37,11 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Compute(PropertyList propertyList)
         {
-            FObj parentFO = propertyList.getParentFObj();
+            FObj parentFO = propertyList.GetParentFObj();
             StringBuilder sbExpr = new StringBuilder();
             Property p = null;
             sbExpr.Append("margin-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.END));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.END));
 
             if (propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString()) == null)
             {
@@ -51,23 +51,23 @@ namespace Genocs.Fonet.Fo.Properties
 
             sbExpr.Append("_fop-property-value(");
             sbExpr.Append("margin-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.END));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.END));
 
             sbExpr.Append(")");
             sbExpr.Append("+");
             sbExpr.Append("_fop-property-value(");
             sbExpr.Append("padding-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.END));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.END));
 
             sbExpr.Append(")");
             sbExpr.Append("+");
             sbExpr.Append("_fop-property-value(");
             sbExpr.Append("border-");
-            sbExpr.Append(propertyList.wmRelToAbs(PropertyList.END));
+            sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.END));
             sbExpr.Append("-width");
             sbExpr.Append(")");
 
-            p = Make(propertyList, sbExpr.ToString(), propertyList.getParentFObj());
+            p = Make(propertyList, sbExpr.ToString(), propertyList.GetParentFObj());
 
             if (p != null)
             {
@@ -83,7 +83,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = Make(propertyList, "0pt", propertyList.getParentFObj());
+                m_defaultProp = Make(propertyList, "0pt", propertyList.GetParentFObj());
             }
             return m_defaultProp;
 

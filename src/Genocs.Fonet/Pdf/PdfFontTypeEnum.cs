@@ -1,7 +1,7 @@
 namespace Genocs.Fonet.Pdf
 {
     /// <summary>
-    ///     An enumeration listing all the fonts types available in Pdf.
+    /// An enumeration listing all the fonts types available in Pdf.
     /// </summary>
     public enum PdfFontTypeEnum
     {
@@ -14,7 +14,7 @@ namespace Genocs.Fonet.Pdf
     }
 
     /// <summary>
-    ///     An enumeration listing all the font subtypes
+    /// An enumeration listing all the font subtypes
     /// </summary>
     public enum PdfFontSubTypeEnum
     {

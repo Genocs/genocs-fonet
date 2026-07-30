@@ -4,18 +4,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class Root : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new Root(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Root(parent, props));
 
     public LayoutMasterSet? LayoutMasterSet { get; set; }
 
@@ -26,7 +16,7 @@ internal class Root : FObj
     protected internal Root(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:root";
+        Name = "fo:root";
         pageSequences = new ArrayList();
         if (parent != null)
         {

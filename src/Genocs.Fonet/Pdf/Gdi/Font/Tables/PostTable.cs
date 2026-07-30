@@ -1,77 +1,77 @@
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Class that represents the PostScript ('post') table
+/// Class that represents the PostScript ('post') table
 /// </summary>
 /// <remarks>
-///     http://www.microsoft.com/typography/otspec/post.htm
+/// http://www.microsoft.com/typography/otspec/post.htm
 /// </remarks>
 internal class PostTable : FontTable
 {
     /// <summary>
-    ///     0x00010000 for version 1.0 
-    ///     0x00020000 for version 2.0 
-    ///     0x00025000 for version 2.5 (deprecated) 
-    ///     0x00030000 for version 3.0 
+    /// 0x00010000 for version 1.0
+    /// 0x00020000 for version 2.0
+    /// 0x00025000 for version 2.5 (deprecated)
+    /// 0x00030000 for version 3.0
     /// </summary>
     private int version;
 
     /// <summary>
-    ///     Italic angle in counter-clockwise degrees from the vertical. 
-    ///     Zero for upright text, negative for text that leans to the 
-    ///     right (forward). 
+    /// Italic angle in counter-clockwise degrees from the vertical. 
+    /// Zero for upright text, negative for text that leans to the 
+    /// right (forward). 
     /// </summary>
     private float italicAngle;
 
     /// <summary>
-    ///     This is the suggested distance of the top of the underline from 
-    ///     the baseline (negative values indicate below baseline). 
+    /// This is the suggested distance of the top of the underline from 
+    /// the baseline (negative values indicate below baseline).
     /// </summary>
     private short underlinePosition;
 
     /// <summary>
-    ///     Suggested values for the underline thickness. 
+    /// Suggested values for the underline thickness. 
     /// </summary>
     private short underlineThickness;
 
     /// <summary>
-    ///     Set to 0 if the font is proportionally spaced, non-zero if the 
-    ///     font is not proportionally spaced (i.e. monospaced). 
+    /// Set to 0 if the font is proportionally spaced, non-zero if the 
+    /// font is not proportionally spaced (i.e. monospaced). 
     /// </summary>
     private uint fixedPitch;
 
     /// <summary>
-    ///     Minimum memory usage when an OpenType font is downloaded. 
+    /// Minimum memory usage when an OpenType font is downloaded. 
     /// </summary>
     private uint minMemType42;
 
     /// <summary>
-    ///     Maximum memory usage when an OpenType font is downloaded. 
+    /// Maximum memory usage when an OpenType font is downloaded. 
     /// </summary>
     private uint maxMemType42;
 
     /// <summary>
-    ///     Minimum memory usage when an OpenType font is downloaded 
-    ///     as a Type 1 font. 
+    /// Minimum memory usage when an OpenType font is downloaded 
+    /// as a Type 1 font. 
     /// </summary>
     private uint minMemType1;
 
     /// <summary>
-    ///     Maximum memory usage when an OpenType font is downloaded 
-    ///     as a Type 1 font. 
+    /// Maximum memory usage when an OpenType font is downloaded 
+    /// as a Type 1 font. 
     /// </summary>
     private uint maxMemType1;
     private byte[]? rawTableBytes;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     /// <param name="entry"></param>
     public PostTable(DirectoryEntry entry) : base(TableNames.Post, entry) { }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether this font is 
-    ///     proportionally spaced (fixed pitch) or not.
+    /// Gets a boolean value that indicates whether this font is 
+    /// proportionally spaced (fixed pitch) or not.
     /// </summary>
     public bool IsFixedPitch
     {
@@ -84,8 +84,8 @@ internal class PostTable : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "post" table from the supplied stream 
-    ///     at the current position.
+    /// Reads the contents of the "post" table from the supplied stream 
+    /// at the current position.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)

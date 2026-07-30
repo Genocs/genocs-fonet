@@ -3,136 +3,131 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     This represents a single Outline object in a PDF, including the root Outlines
-///     object. Outlines provide the bookmark bar, usually rendered to the right of
-///     a PDF document in user agents such as Acrobat Reader
+/// This represents a single Outline object in a PDF, including the root Outlines
+/// object. Outlines provide the bookmark bar, usually rendered to the right of
+/// a PDF document in user agents such as Acrobat Reader
 /// </summary>
 public class PdfOutline : PdfObject
 {
     /// <summary>
-    ///     List of sub-entries (outline objects)
+    /// List of sub-entries (outline objects)
     /// </summary>
-    private ArrayList subentries;
+    private ArrayList _subentries;
 
     /// <summary>
-    ///     Parent outline object. Root Outlines parent is null
+    /// Parent outline object. Root Outlines parent is null
     /// </summary>
-    private PdfOutline parent;
+    private PdfOutline? Parent;
 
-    private PdfOutline prev;
-    private PdfOutline next;
+    private PdfOutline? Previous;
+    private PdfOutline? Next;
 
-    private PdfOutline first;
-    private PdfOutline last;
+    private PdfOutline? First;
+    private PdfOutline? Last;
 
     private int count;
 
     /// <summary>
-    ///     Title to display for the bookmark entry
+    /// Title to display for the bookmark entry
     /// </summary>
-    private string title;
+    private string? _title;
 
-    private PdfObjectReference actionRef;
+    private PdfObjectReference? _actionRef;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     /// <param name="objectId">The object id number</param>
     /// <param name="title">The title of the outline entry (can only be null for root Outlines obj)</param>
     /// <param name="action">The page which this outline refers to.</param>
-    public PdfOutline(PdfObjectId objectId, string title, PdfObjectReference action)
+    public PdfOutline(PdfObjectId objectId, string? title, PdfObjectReference? action)
         : base(objectId)
     {
-        this.subentries = new ArrayList();
-        this.count = 0;
-        this.parent = null;
-        this.prev = null;
-        this.next = null;
-        this.first = null;
-        this.last = null;
-        this.title = title;
-        this.actionRef = action;
+        _subentries = [];
+        count = 0;
+        Parent = null;
+        Previous = null;
+        Next = null;
+        First = null;
+        Last = null;
+        _title = title;
+        _actionRef = action;
     }
 
     public void SetTitle(string title)
-    {
-        this.title = title;
-    }
+        => _title = title;
 
     /// <summary>
-    ///     Add a sub element to this outline
+    /// Add a sub element to this outline
     /// </summary>
     /// <param name="outline"></param>
     public void AddOutline(PdfOutline outline)
     {
-        if (subentries.Count > 0)
+        if (_subentries.Count > 0)
         {
-            outline.prev = (PdfOutline)subentries[subentries.Count - 1];
-            outline.prev.next = outline;
+            outline.Previous = (PdfOutline)_subentries[_subentries.Count - 1];
+            outline.Previous.Next = outline;
         }
         else
         {
-            first = outline;
+            First = outline;
         }
 
-        subentries.Add(outline);
-        outline.parent = this;
+        _subentries.Add(outline);
+        outline.Parent = this;
 
         IncrementCount(); // note: count is not just the immediate children
 
-        last = outline;
+        Last = outline;
     }
 
     private void IncrementCount()
     {
         // count is a total of our immediate subentries and all descendent subentries
         count++;
-        if (parent != null)
-        {
-            parent.IncrementCount();
-        }
+        Parent?.IncrementCount();
     }
 
     protected internal override void Write(PdfWriter writer)
     {
-        PdfDictionary dict = new PdfDictionary();
+        PdfDictionary dict = [];
 
-        if (parent == null)
+        if (Parent == null)
         {
             // root Outlines object
-            if (first != null && last != null)
+            if (First != null && Last != null)
             {
-                dict.Add(PdfName.Names.First, first.GetReference());
-                dict.Add(PdfName.Names.Last, last.GetReference());
+                dict.Add(PdfName.Names.First, First.GetReference());
+                dict.Add(PdfName.Names.Last, Last.GetReference());
             }
 
         }
         else
         {
-            dict.Add(PdfName.Names.Title, new PdfString(title));
-            dict.Add(PdfName.Names.Parent, parent.GetReference());
+            dict.Add(PdfName.Names.Title, new PdfString(_title));
+            dict.Add(PdfName.Names.Parent, Parent.GetReference());
 
-            if (first != null && last != null)
+            if (First != null && Last != null)
             {
-                dict.Add(PdfName.Names.First, first.GetReference());
-                dict.Add(PdfName.Names.Last, last.GetReference());
+                dict.Add(PdfName.Names.First, First.GetReference());
+                dict.Add(PdfName.Names.Last, Last.GetReference());
             }
-            if (prev != null)
+            if (Previous != null)
             {
-                dict.Add(PdfName.Names.Prev, prev.GetReference());
+                dict.Add(PdfName.Names.Prev, Previous.GetReference());
             }
-            if (next != null)
+            if (Next != null)
             {
-                dict.Add(PdfName.Names.Next, next.GetReference());
+                dict.Add(PdfName.Names.Next, Next.GetReference());
             }
             if (count > 0)
             {
                 dict.Add(PdfName.Names.Count, new PdfNumeric(count));
             }
 
-            if (actionRef != null)
+            if (_actionRef != null)
             {
-                dict.Add(PdfName.Names.A, actionRef);
+                dict.Add(PdfName.Names.A, _actionRef);
             }
         }
 

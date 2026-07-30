@@ -3,21 +3,21 @@ using Genocs.Fonet.Fo.Properties;
 
 namespace Genocs.Fonet.DataTypes;
 
-internal class CondLength : ICompoundDatatype
+internal class CondLength : ICompoundDataType
 {
     private Property? _length;
 
     private Property? _conditionality;
 
-    public void SetComponent(string sCmpnName, Property cmpnValue, bool bIsDefault)
+    public void SetComponent(string componentName, Property componentValue, bool isDefault)
     {
-        if (sCmpnName.Equals("length"))
+        if (componentName.Equals("length"))
         {
-            _length = cmpnValue;
+            _length = componentValue;
         }
-        else if (sCmpnName.Equals("conditionality"))
+        else if (componentName.Equals("conditionality"))
         {
-            _conditionality = cmpnValue;
+            _conditionality = componentValue;
         }
     }
 
@@ -47,5 +47,5 @@ internal class CondLength : ICompoundDatatype
         => _conditionality?.GetEnum() == Constants.DISCARD;
 
     public int MValue()
-        => _length?.GetLength().MValue() ?? 0;
+        => _length?.GetLength()?.MValue() ?? 0;
 }

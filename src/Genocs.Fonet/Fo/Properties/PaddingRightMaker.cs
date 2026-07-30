@@ -15,11 +15,11 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Compute(PropertyList propertyList)
         {
-            FObj parentFO = propertyList.getParentFObj();
+            FObj parentFO = propertyList.GetParentFObj();
             StringBuilder sbExpr = new StringBuilder();
             Property p = null;
             sbExpr.Append("padding-");
-            sbExpr.Append(propertyList.wmAbsToRel(PropertyList.RIGHT));
+            sbExpr.Append(propertyList.AbsoluteToRelative(PropertyList.RIGHT));
 
             p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 

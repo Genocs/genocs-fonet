@@ -17,7 +17,7 @@ namespace Genocs.Fonet.Render.Pdf;
 ///    supported (i.e. Latin)</li>
 ///    <li>The PDF document will not Render correctly if the linked 
 ///    font is not installed.</li>
-///  </ol>///     </p>
+///  </ol>/// </p>
 ///  <p>The <see cref="FontType.Embed"/> option will copy the contents of 
 ///  the entire font program into the PDF document.  This will guarantee 
 ///  correct rendering of the document on any system, however certain 

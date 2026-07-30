@@ -1,27 +1,13 @@
-using Genocs.Fonet.Fo;
+namespace Genocs.Fonet.Fo.Flow;
 
-namespace Genocs.Fonet.Fo.Flow
+internal class TableBody : AbstractTableBody
 {
-    internal class TableBody : AbstractTableBody
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new TableBody(parent, props));
+
+    public TableBody(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
     {
-        new internal class Maker : FObj.Maker
-        {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new TableBody(parent, propertyList);
-            }
-        }
-
-        new public static FObj.Maker GetMaker()
-        {
-            return new Maker();
-        }
-
-        public TableBody(FObj parent, PropertyList propertyList)
-            : base(parent, propertyList)
-        {
-            this._name = "fo:table-body";
-        }
-
+        Name = "fo:table-body";
     }
 }

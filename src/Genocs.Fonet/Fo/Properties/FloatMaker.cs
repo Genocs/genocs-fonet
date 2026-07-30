@@ -36,7 +36,7 @@ internal class FloatMaker : EnumProperty.Maker
 
     public override Property Make(PropertyList propertyList)
     {
-        m_defaultProp ??= Make(propertyList, "none", propertyList.getParentFObj());
+        m_defaultProp ??= Make(propertyList, "none", propertyList.GetParentFObj());
         return m_defaultProp;
     }
 }

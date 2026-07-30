@@ -2,32 +2,17 @@ using Genocs.Fonet.Fo.Expr;
 
 namespace Genocs.Fonet.DataTypes;
 
-internal class TableColLength : Length
+internal class TableColLength(double tableUnits) : Length
 {
-    private double _columns;
-
-    public TableColLength(double tcolUnits)
-    {
-        _columns = tcolUnits;
-    }
-
     public override double GetTableUnits()
-    {
-        return _columns;
-    }
+        =>  tableUnits;
 
-    public override void ResolveTableUnit(double mpointsPerUnit)
-    {
-        SetComputedValue((int)(_columns * mpointsPerUnit));
-    }
+    public override void ResolveTableUnit(double milliPointsPerUnit)
+        => SetComputedValue((int)(tableUnits * milliPointsPerUnit));
 
     public override string ToString()
-    {
-        return $"{_columns} table-column-units";
-    }
+        => $"{tableUnits} table-column-units";
 
     public override Numeric AsNumeric()
-    {
-        return new Numeric(this);
-    }
+        => new(this);
 }

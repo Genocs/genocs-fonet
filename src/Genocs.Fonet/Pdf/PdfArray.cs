@@ -4,7 +4,7 @@ namespace Genocs.Fonet.Pdf;
 
 public class PdfArray : PdfObject, IEnumerable
 {
-    private ArrayList elements = new ArrayList();
+    private readonly ArrayList _elements = [];
 
     public PdfArray()
     {
@@ -15,54 +15,38 @@ public class PdfArray : PdfObject, IEnumerable
     }
 
     public int Add(PdfObject value)
-    {
-        return elements.Add(value);
-    }
+        =>_elements.Add(value);
 
     public void Clear()
-    {
-        elements.Clear();
-    }
+        => _elements.Clear();
 
     public bool Contains(PdfObject value)
-    {
-        return elements.Contains(value);
-    }
+        => _elements.Contains(value);
 
     public int IndexOf(PdfObject value)
-    {
-        return elements.IndexOf(value);
-    }
+        => _elements.IndexOf(value);
 
     public void Insert(int index, PdfObject value)
-    {
-        elements.Insert(index, value);
-    }
+        => _elements.Insert(index, value);
 
     public void Remove(PdfObject value)
-    {
-        elements.Remove(value);
-    }
+        => _elements.Remove(value);
 
     public void RemoveAt(int index)
-    {
-        elements.RemoveAt(index);
-    }
+        => _elements.RemoveAt(index);
 
     public IEnumerator GetEnumerator()
-    {
-        return elements.GetEnumerator();
-    }
+        => _elements.GetEnumerator();
 
     public PdfObject this[int index]
     {
         get
         {
-            return (PdfObject)elements[index];
+            return (PdfObject)_elements[index];
         }
         set
         {
-            elements[index] = value;
+            _elements[index] = value;
         }
     }
 
@@ -70,7 +54,7 @@ public class PdfArray : PdfObject, IEnumerable
     {
         get
         {
-            return elements.Count;
+            return _elements.Count;
         }
     }
 
@@ -86,7 +70,7 @@ public class PdfArray : PdfObject, IEnumerable
     {
         writer.WriteKeyword(Keyword.ArrayBegin);
         bool isFirst = true;
-        foreach (PdfObject obj in elements)
+        foreach (PdfObject obj in _elements)
         {
             if (!isFirst)
             {

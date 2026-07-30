@@ -2,14 +2,10 @@ namespace Genocs.Fonet.Fo.Properties
 {
     internal class LeaderPatternMaker : EnumProperty.Maker
     {
-        protected static readonly EnumProperty s_propSPACE = new EnumProperty(Constants.SPACE);
-
-        protected static readonly EnumProperty s_propRULE = new EnumProperty(Constants.RULE);
-
-        protected static readonly EnumProperty s_propDOTS = new EnumProperty(Constants.DOTS);
-
-        protected static readonly EnumProperty s_propUSECONTENT = new EnumProperty(Constants.USECONTENT);
-
+        protected static readonly EnumProperty s_propSPACE = new(Constants.SPACE);
+        protected static readonly EnumProperty s_propRULE = new(Constants.RULE);
+        protected static readonly EnumProperty s_propDOTS = new(Constants.DOTS);
+        protected static readonly EnumProperty s_propUSECONTENT = new(Constants.USECONTENT);
 
         new public static PropertyMaker Maker(string propName)
         {
@@ -55,7 +51,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = Make(propertyList, "space", propertyList.getParentFObj());
+                m_defaultProp = Make(propertyList, "space", propertyList.GetParentFObj());
             }
             return m_defaultProp;
 

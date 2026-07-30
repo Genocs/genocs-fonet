@@ -5,6 +5,9 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class BlockContainer : FObj
 {
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new BlockContainer(parent, props));
+
     private int position;
     private int top;
     private int bottom;
@@ -15,24 +18,13 @@ internal class BlockContainer : FObj
     private int span;
     private AreaContainer areaContainer;
 
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new BlockContainer(parent, propertyList);
-        }
-    }
 
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
 
     protected BlockContainer(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:block-container";
-        this.span = this._properties.GetProperty("span").GetEnum();
+        Name = "fo:block-container";
+        this.span = this.Properties.GetProperty("span").GetEnum();
     }
 
     public override Status Layout(Area area)
@@ -45,16 +37,16 @@ internal class BlockContainer : FObj
             MarginProps mProps = _propertyManager.GetMarginProps();
 
             this._marker = 0;
-            this.position = this._properties.GetProperty("position").GetEnum();
-            this.top = this._properties.GetProperty("top").GetLength().MValue();
-            this.bottom = this._properties.GetProperty("bottom").GetLength().MValue();
-            this.left = this._properties.GetProperty("left").GetLength().MValue();
-            this.right = this._properties.GetProperty("right").GetLength().MValue();
-            this.width = this._properties.GetProperty("width").GetLength().MValue();
-            this.height = this._properties.GetProperty("height").GetLength().MValue();
-            span = this._properties.GetProperty("span").GetEnum();
+            this.position = ResolvePosition();
+            this.top = this.Properties.GetProperty("top").GetLength().MValue();
+            this.bottom = this.Properties.GetProperty("bottom").GetLength().MValue();
+            this.left = this.Properties.GetProperty("left").GetLength().MValue();
+            this.right = this.Properties.GetProperty("right").GetLength().MValue();
+            this.width = this.Properties.GetProperty("width").GetLength().MValue();
+            this.height = this.Properties.GetProperty("height").GetLength().MValue();
+            span = this.Properties.GetProperty("span").GetEnum();
 
-            string id = this._properties.GetProperty("id").GetString();
+            string id = this.Properties.GetProperty("id").GetString();
             area.GetIDReferences().InitializeID(id, area);
         }
 
@@ -66,12 +58,16 @@ internal class BlockContainer : FObj
         }
 
         this.areaContainer =
-            new AreaContainer(_propertyManager.GetFontState(container.getFontInfo()),
-                              container.getXPosition() + left,
-                              container.GetYPosition() - top, width, height,
-                              position);
+            new AreaContainer(_propertyManager.GetFontState(container.GetFontInfo()),
+                              container.XPosition + left,
+                              container.YPosition - top, width, height,
+                              position,
+                              null)
+            {
+                ZIndex = _propertyManager.GetZIndex(),
+            };
 
-        areaContainer.setPage(area.getPage());
+        areaContainer.Page = area.Page;
         areaContainer.setBackground(_propertyManager.GetBackgroundProps());
         areaContainer.setBorderAndPadding(_propertyManager.GetBorderAndPadding());
         areaContainer.start();
@@ -91,7 +87,7 @@ internal class BlockContainer : FObj
         {
             areaContainer.SetHeight(height);
         }
-        area.addChild(areaContainer);
+        area.AddChild(areaContainer);
 
         return new Status(Status.OK);
     }
@@ -116,5 +112,21 @@ internal class BlockContainer : FObj
     public int GetSpan()
     {
         return this.span;
+    }
+
+    private int ResolvePosition()
+    {
+        int absolutePosition = this.Properties.GetProperty("absolute-position").GetEnum();
+        if (absolutePosition == AbsolutePosition.ABSOLUTE)
+        {
+            return Position.ABSOLUTE;
+        }
+
+        if (absolutePosition == AbsolutePosition.FIXED)
+        {
+            return Position.FIXED;
+        }
+
+        return this.Properties.GetProperty("position").GetEnum();
     }
 }

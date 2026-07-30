@@ -1,85 +1,50 @@
-using System.IO;
 using Genocs.Fonet.Pdf.Security;
 
-namespace Genocs.Fonet.Pdf
+namespace Genocs.Fonet.Pdf;
+
+/// <summary>
+/// A class that enables a well structured PDF document to be generated.
+/// </summary>
+/// <remarks>
+/// Responsible for allocating object identifiers.
+/// </remarks>
+public class PdfDocument
 {
-    /// <summary>
-    ///     A class that enables a well structured PDF document to be generated.
-    /// </summary>
-    /// <remarks>
-    ///     Responsible for allocating object identifiers.
-    /// </remarks>
-    public class PdfDocument
+    private uint nextObjectNumber = 1;
+
+    public PdfDocument(Stream stream) : this(new PdfWriter(stream)) { }
+    public PdfDocument(PdfWriter writer)
     {
-        private PdfWriter writer;
+        Writer = writer;
+        Catalog = new PdfCatalog(NextObjectId());
+        Pages = new PdfPageTree(NextObjectId());
+        Catalog.Pages = Pages;
+    }
 
-        private PdfVersion version = PdfVersion.V14;
+    public PdfVersion Version { get; set; } = PdfVersion.V14;
+    public FileIdentifier FileIdentifier { get; } = new FileIdentifier();
+    public PdfCatalog Catalog { get; }
+    public PdfPageTree Pages { get; }
+    public PdfWriter Writer { get; }
 
-        private FileIdentifier fileId = new FileIdentifier();
+    public SecurityOptions SecurityOptions
+    {
+        set { Writer.SecurityManager = new SecurityManager(value, FileIdentifier); }
+    }
 
-        private PdfCatalog catalog;
+    public PdfObjectId NextObjectId()
+    {
+        return new PdfObjectId(nextObjectNumber++, 0);
+    }
 
-        private PdfPageTree pages;
+    public uint ObjectCount
+    {
+        get { return nextObjectNumber - 1; }
+    }
 
-        private uint nextObjectNumber = 1;
-
-        public PdfDocument(Stream stream) : this(new PdfWriter(stream)) { }
-
-        public PdfDocument(PdfWriter writer)
-        {
-            this.writer = writer;
-            this.catalog = new PdfCatalog(NextObjectId());
-            this.pages = new PdfPageTree(NextObjectId());
-            this.catalog.Pages = pages;
-        }
-
-        public PdfVersion Version
-        {
-            get { return version; }
-            set { this.version = value; }
-        }
-
-        public FileIdentifier FileIdentifier
-        {
-            get { return fileId; }
-            set { fileId = value; }
-        }
-
-        public SecurityOptions SecurityOptions
-        {
-            set { writer.SecurityManager = new SecurityManager(value, fileId); }
-        }
-
-        public PdfCatalog Catalog
-        {
-            get { return catalog; }
-        }
-
-        public PdfPageTree Pages
-        {
-            get { return pages; }
-        }
-
-        public PdfObjectId NextObjectId()
-        {
-            return new PdfObjectId(nextObjectNumber++, 0);
-        }
-
-        public uint ObjectCount
-        {
-            get { return nextObjectNumber - 1; }
-        }
-
-        public PdfWriter Writer
-        {
-            get { return this.writer; }
-        }
-
-        public void WriteHeader()
-        {
-            writer.WriteHeader(version);
-            writer.WriteBinaryComment();
-        }
-
+    public void WriteHeader()
+    {
+        Writer.WriteHeader(Version);
+        Writer.WriteBinaryComment();
     }
 }

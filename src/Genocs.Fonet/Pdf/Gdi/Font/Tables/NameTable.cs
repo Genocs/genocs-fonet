@@ -3,10 +3,10 @@ using System.Text;
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Class that represents the Naming ('name') table
+/// Class that represents the Naming ('name') table
 /// </summary>
 /// <remarks>
-///     http://www.microsoft.com/typography/otspec/name.htm
+/// http://www.microsoft.com/typography/otspec/name.htm
 /// </remarks>
 internal class NameTable : FontTable
 {
@@ -32,7 +32,7 @@ internal class NameTable : FontTable
     private string fullName = String.Empty;
 
     /// <summary>
-    ///     Offset to start of string storage (from start of table).
+    /// Offset to start of string storage (from start of table).
     /// </summary>
     private ushort storageOffset;
     private byte[]? rawTableBytes;
@@ -41,7 +41,7 @@ internal class NameTable : FontTable
         : base(TableNames.Name, entry) { }
 
     /// <summary>
-    ///     Get the font family name.
+    /// Get the font family name.
     /// </summary>
     public string FamilyName
     {
@@ -49,8 +49,8 @@ internal class NameTable : FontTable
     }
 
     /// <summary>
-    ///     Gets the font full name composed of the family name and the 
-    ///     subfamily name.
+    /// Gets the font full name composed of the family name and the 
+    /// subfamily name.
     /// </summary>
     public string FullName
     {
@@ -58,8 +58,8 @@ internal class NameTable : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "name" table from the supplied stream 
-    ///     at the current position.
+    /// Reads the contents of the "name" table from the supplied stream 
+    /// at the current position.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)
@@ -113,13 +113,13 @@ internal class NameTable : FontTable
     }
 
     /// <summary>
-    ///     Reads a string from the storage area beginning at <i>offset</i>
-    ///     consisting of <i>length</i> bytes.  The returned string will be 
-    ///     converted using the Unicode encoding.
+    /// Reads a string from the storage area beginning at <i>offset</i>
+    /// consisting of <i>length</i> bytes.  The returned string will be 
+    /// converted using the Unicode encoding.
     /// </summary>
     /// <param name="stream">Big-endian font stream.</param>
     /// <param name="stringOffset">
-    ///     The offset in bytes from the beginning of the string storage area.
+    /// The offset in bytes from the beginning of the string storage area.
     ///  </param>
     /// <param name="length">The length of the string in bytes.</param>
     /// <returns></returns>
@@ -141,7 +141,7 @@ internal class NameTable : FontTable
     }
 
     /// <summary>
-    ///     Not supported.
+    /// Not supported.
     /// </summary>
     /// <param name="writer"></param>
     protected internal override void Write(FontFileWriter writer)

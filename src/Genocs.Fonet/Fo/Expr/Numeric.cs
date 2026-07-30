@@ -1,5 +1,6 @@
 using Genocs.Fonet.DataTypes;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Genocs.Fonet.Fo.Expr;
 
@@ -68,10 +69,14 @@ internal class Numeric
             {
                 return (Length)len[0];
             }
-            else
+
+            var mixed = new List<Length>(len.Count);
+            foreach (Length item in len)
             {
-                return new MixedLength(len);
+                mixed.Add(item);
             }
+
+            return new MixedLength(mixed);
         }
         else
         {

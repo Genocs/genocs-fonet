@@ -2,8 +2,7 @@ using Genocs.Fonet.Fo;
 
 namespace Genocs.Fonet.DataTypes;
 
-
-internal class LengthRange : ICompoundDatatype
+internal class LengthRange : ICompoundDataType
 {
     private Property? _minimum;
     private Property? _optimum;
@@ -14,19 +13,19 @@ internal class LengthRange : ICompoundDatatype
     private int bfSet = 0;
     private bool bChecked = false;
 
-    public virtual void SetComponent(string sCmpnName, Property cmpnValue, bool bIsDefault)
+    public virtual void SetComponent(string componentName, Property componentValue, bool isDefault)
     {
-        if (sCmpnName.Equals("minimum"))
+        if (componentName.Equals("minimum"))
         {
-            SetMinimum(cmpnValue, bIsDefault);
+            SetMinimum(componentValue, isDefault);
         }
-        else if (sCmpnName.Equals("optimum"))
+        else if (componentName.Equals("optimum"))
         {
-            SetOptimum(cmpnValue, bIsDefault);
+            SetOptimum(componentValue, isDefault);
         }
-        else if (sCmpnName.Equals("maximum"))
+        else if (componentName.Equals("maximum"))
         {
-            SetMaximum(cmpnValue, bIsDefault);
+            SetMaximum(componentValue, isDefault);
         }
     }
 

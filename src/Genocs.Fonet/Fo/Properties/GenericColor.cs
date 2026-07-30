@@ -1,17 +1,16 @@
-using Genocs.Fonet.Fo;
 using System.Collections;
 
 namespace Genocs.Fonet.Fo.Properties;
 
 internal class GenericColor : ColorTypeProperty.Maker
 {
-    private static Hashtable s_htKeywords;
+    private static readonly Hashtable _colorKeys;
 
     protected GenericColor(string name) : base(name) { }
 
     static GenericColor()
     {
-        s_htKeywords = new Hashtable(147)
+        _colorKeys = new Hashtable(147)
         {
             { "aliceblue", "#f0f8ff" },
             { "antiquewhite", "#faebd7" },
@@ -164,13 +163,11 @@ internal class GenericColor : ColorTypeProperty.Maker
     }
 
     new public static PropertyMaker Maker(string propName)
-    {
-        return new GenericColor(propName);
-    }
+        => new GenericColor(propName);
 
     protected override string CheckValueKeywords(string keyword)
     {
-        string? val = (string?)s_htKeywords[keyword];
+        string? val = (string?)_colorKeys[keyword];
 
         if (val == null)
         {

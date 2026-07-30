@@ -1,12 +1,10 @@
-using Genocs.Fonet.Pdf;
-
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     The root of a document's object hierarchy is the catalog dictionary.
+/// The root of a document's object hierarchy is the catalog dictionary.
 /// </summary>
 /// <remarks>
-///     The document catalog is described in section 3.6.1 of the PDF specification.
+/// The document catalog is described in section 3.6.1 of the PDF specification.
 /// </remarks>
 public sealed class PdfCatalog : PdfDictionary
 {

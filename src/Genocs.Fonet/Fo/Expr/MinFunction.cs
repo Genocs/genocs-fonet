@@ -2,13 +2,7 @@ namespace Genocs.Fonet.Fo.Expr;
 
 internal class MinFunction : FunctionBase
 {
-    public override int NumArgs
-    {
-        get
-        {
-            return 2;
-        }
-    }
+    public override int NumArgs { get { return 2; } }
 
     public override Property Eval(Property[] args, PropertyInfo pInfo)
     {

@@ -1,10 +1,7 @@
-namespace Genocs.Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal static class Precedence
 {
-    internal class Precedence
-    {
-        public const int TRUE = Constants.TRUE;
-
-        public const int FALSE = Constants.FALSE;
-
-    }
+    public const int TRUE = Constants.TRUE;
+    public const int FALSE = Constants.FALSE;
 }

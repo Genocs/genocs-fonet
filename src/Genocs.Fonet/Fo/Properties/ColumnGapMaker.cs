@@ -26,7 +26,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = Make(propertyList, "0.25in", propertyList.getParentFObj());
+                m_defaultProp = Make(propertyList, "0.25in", propertyList.GetParentFObj());
             }
             return m_defaultProp;
 

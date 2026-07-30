@@ -3,73 +3,47 @@ using System.Collections;
 
 namespace Genocs.Fonet.Fo.Expr;
 
-internal class PropertyInfo
+internal class PropertyInfo(PropertyMaker maker, PropertyList propertyList, FObj? fo)
 {
-    private PropertyMaker maker;
-    private PropertyList plist;
-    private FObj fo;
-    private Stack stkFunction;
+    public PropertyList PropertyList { get; } = propertyList;
+    public FObj? FObj { get; } = fo;
 
-    public PropertyInfo(PropertyMaker maker, PropertyList plist, FObj fo)
-    {
-        this.maker = maker;
-        this.plist = plist;
-        this.fo = fo;
-    }
+    private Stack? _stkFunction;
 
-    public bool inheritsSpecified()
-    {
-        return maker.InheritsSpecified();
-    }
+    public bool InheritsSpecified()
+        => maker.InheritsSpecified();
 
-    public IPercentBase GetPercentBase()
+    public IPercentBase? GetPercentBase()
     {
-        IPercentBase pcbase = getFunctionPercentBase();
-        return (pcbase != null) ? pcbase : maker.GetPercentBase(fo, plist);
+        IPercentBase? percentageBase = getFunctionPercentBase();
+        return (percentageBase != null) ? percentageBase : maker.GetPercentBase(FObj, PropertyList);
     }
 
     public int currentFontSize()
     {
-        return plist.GetProperty("font-size").GetLength().MValue();
+        return PropertyList.GetProperty("font-size")?.GetLength()?.MValue() ?? 0;
     }
 
-    public FObj getFO()
+    public void Push(IFunction func)
     {
-        return fo;
+        _stkFunction ??= new Stack();
+        _stkFunction.Push(func);
     }
 
-    public PropertyList getPropertyList()
-    {
-        return plist;
-    }
+    public void Pop()
+        => _stkFunction?.Pop();
 
-    public void pushFunction(IFunction func)
+    private IPercentBase? getFunctionPercentBase()
     {
-        if (stkFunction == null)
+        if (_stkFunction != null)
         {
-            stkFunction = new Stack();
-        }
-        stkFunction.Push(func);
-    }
-
-    public void popFunction()
-    {
-        if (stkFunction != null)
-        {
-            stkFunction.Pop();
-        }
-    }
-
-    private IPercentBase getFunctionPercentBase()
-    {
-        if (stkFunction != null)
-        {
-            IFunction f = (IFunction)stkFunction.Peek();
+            IFunction? f = (IFunction?)_stkFunction.Peek();
             if (f != null)
             {
                 return f.GetPercentBase();
             }
         }
+
         return null;
     }
 }

@@ -7,18 +7,16 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
 {
     private class SP_MinimumMaker : LengthProperty.Maker
     {
-        protected internal SP_MinimumMaker(string sPropName) : base(sPropName) { }
+        protected internal SP_MinimumMaker(string propertyName)
+            : base(propertyName)
+        {
+        }
 
         protected override bool IsAutoLengthAllowed()
-        {
-            return true;
-        }
+            => true;
 
-        public override IPercentBase GetPercentBase(FObj fo, PropertyList propertyList)
-        {
-            return new LengthBase(fo, propertyList, LengthBase.CONTAINING_BOX);
-
-        }
+        public override IPercentBase? GetPercentBase(FObj? fo, PropertyList propertyList)
+            => new LengthBase(fo, propertyList, LengthBase.CONTAINING_BOX);
     }
 
     private static readonly PropertyMaker s_MinimumMaker =
@@ -33,12 +31,8 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
             return true;
         }
 
-        public override IPercentBase GetPercentBase(FObj fo, PropertyList propertyList)
-        {
-            return new LengthBase(fo, propertyList, LengthBase.CONTAINING_BOX);
-
-        }
-
+        public override IPercentBase? GetPercentBase(FObj? fo, PropertyList propertyList)
+            => new LengthBase(fo, propertyList, LengthBase.CONTAINING_BOX);
     }
 
     private static readonly PropertyMaker s_OptimumMaker =
@@ -128,7 +122,7 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
     {
         if (m_defaultProp == null)
         {
-            m_defaultProp = MakeCompound(propertyList, propertyList.getParentFObj());
+            m_defaultProp = MakeCompound(propertyList, propertyList.GetParentFObj());
         }
         return m_defaultProp;
     }
@@ -207,7 +201,7 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
 
         sbExpr.Length = 0;
 
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.BLOCKPROGDIM));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.BLOCKPROGDIM));
 
         if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
         {
@@ -216,7 +210,7 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
 
         sbExpr.Length = 0;
         sbExpr.Append("min-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.BLOCKPROGDIM));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.BLOCKPROGDIM));
 
         if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
         {
@@ -225,7 +219,7 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
 
         sbExpr.Length = 0;
         sbExpr.Append("max-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.BLOCKPROGDIM));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.BLOCKPROGDIM));
 
         if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
         {
@@ -237,11 +231,11 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
 
     public override Property Compute(PropertyList propertyList)
     {
-        FObj parentFO = propertyList.getParentFObj();
+        FObj parentFO = propertyList.GetParentFObj();
         StringBuilder sbExpr = new StringBuilder();
         Property p = null;
 
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.BLOCKPROGDIM));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.BLOCKPROGDIM));
 
         p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 
@@ -259,7 +253,7 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
 
         sbExpr.Length = 0;
         sbExpr.Append("min-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.BLOCKPROGDIM));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.BLOCKPROGDIM));
 
         subprop = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 
@@ -270,7 +264,7 @@ internal class BlockProgressionDimensionMaker : LengthRangeProperty.Maker
 
         sbExpr.Length = 0;
         sbExpr.Append("max-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.BLOCKPROGDIM));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.BLOCKPROGDIM));
 
         subprop = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 

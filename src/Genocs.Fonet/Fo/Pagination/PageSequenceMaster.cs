@@ -1,23 +1,11 @@
-using Genocs.Fonet;
-using Genocs.Fonet.Fo;
 using System.Collections;
 
 namespace Genocs.Fonet.Fo.Pagination;
 
 internal class PageSequenceMaster : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new PageSequenceMaster(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new PageSequenceMaster(parent, props));
 
     private LayoutMasterSet layoutMasterSet;
 
@@ -26,18 +14,17 @@ internal class PageSequenceMaster : FObj
     protected PageSequenceMaster(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:page-sequence-master";
+        Name = "fo:page-sequence-master";
 
         subSequenceSpecifiers = new ArrayList();
 
-        if (parent.GetName().Equals("fo:layout-master-set"))
+        if (parent.Name.Equals("fo:layout-master-set"))
         {
             this.layoutMasterSet = (LayoutMasterSet)parent;
-            string pm = this._properties.GetProperty("master-name").GetString();
+            string pm = this.Properties.GetProperty("master-name").GetString();
             if (pm == null)
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    "page-sequence-master does not have a page-master-name and so is being ignored");
+                FonetDriver.ActiveDriver?.FireFonetWarning("page-sequence-master does not have a page-master-name and so is being ignored");
             }
             else
             {
@@ -46,9 +33,7 @@ internal class PageSequenceMaster : FObj
         }
         else
         {
-            throw new FonetException("fo:page-sequence-master must be child "
-                + "of fo:layout-master-set, not "
-                + parent.GetName());
+            throw new FonetException($"fo:page-sequence-master must be child of fo:layout-master-set, not {parent.Name}");
         }
     }
 
@@ -57,12 +42,12 @@ internal class PageSequenceMaster : FObj
         subSequenceSpecifiers.Add(pageMasterReference);
     }
 
-    protected internal ISubSequenceSpecifier getSubSequenceSpecifier(int sequenceNumber)
+    protected internal ISubSequenceSpecifier? getSubSequenceSpecifier(int sequenceNumber)
     {
         if (sequenceNumber >= 0
             && sequenceNumber < GetSubSequenceSpecifierCount())
         {
-            return (ISubSequenceSpecifier)subSequenceSpecifiers[sequenceNumber];
+            return (ISubSequenceSpecifier?)subSequenceSpecifiers[sequenceNumber];
         }
         return null;
     }

@@ -1,32 +1,25 @@
 namespace Genocs.Fonet.Pdf.Gdi;
 
 /// <summary>
-///     Converts from logical TTF units to PDF units.
+/// Converts from logical TTF units to PDF units.
 /// </summary>
-internal class PdfUnitConverter
+/// <remarks>
+/// Class constructor.
+/// </remarks>
+/// <param name="emSquare">
+/// Specifies the number of logical units defining the x- or 
+/// y-dimension of the em square of a font.
+/// </param>
+internal class PdfUnitConverter(int emSquare)
 {
-    private int emSquare;
-
     /// <summary>
-    ///     Class constructor.
-    /// </summary>
-    /// <param name="emSquare">
-    ///     Specifies the number of logical units defining the x- or 
-    ///     y-dimension of the em square of a font.
-    /// </param>
-    public PdfUnitConverter(int emSquare)
-    {
-        this.emSquare = emSquare;
-    }
-
-    /// <summary>
-    ///     Convert the supplied integer from TrueType units to PDF units 
-    ///     based on the EmSquare
+    /// Converts the supplied integer from TrueType units to PDF units 
+    /// based on the EmSquare
     /// </summary>
     /// <param name="value"></param>
     /// <returns>
-    ///     If the value of <i>emSquare</i> is zero, this method will 
-    ///     always return <i>value</i>.
+    /// If the value of <i>emSquare</i> is zero, this method will 
+    /// always return <i>value</i>.
     /// </returns>
     public int ToPdfUnits(int value)
     {

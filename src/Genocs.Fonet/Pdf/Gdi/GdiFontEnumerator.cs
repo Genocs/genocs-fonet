@@ -1,28 +1,14 @@
-using Genocs.Fonet.Pdf.Gdi;
 using System.Collections;
 
 namespace Genocs.Fonet.Pdf.Gdi;
 
 /// <summary>
-///     Cross-platform font enumerator using SkiaSharp's FontManager.
+/// Cross-platform font enumerator using SkiaSharp's FontManager.
 /// </summary>
 public class GdiFontEnumerator
 {
-    private SortedList families = new SortedList();
-    private FontStyles styles = new FontStyles();
-    private GdiDeviceContent dc;
-
     /// <summary>
-    ///     Class constructor.
-    /// </summary>
-    /// <param name="dc">A non-null reference to a device context wrapper.</param>
-    public GdiFontEnumerator(GdiDeviceContent dc)
-    {
-        this.dc = dc;
-    }
-
-    /// <summary>
-    ///     Returns a list of font family names sorted in ascending order.
+    /// Returns a list of font family names sorted in ascending order.
     /// </summary>
     public string[] FamilyNames
     {
@@ -35,7 +21,7 @@ public class GdiFontEnumerator
     }
 
     /// <summary>
-    ///     Returns a list of font styles associated with <i>familyName</i>.
+    /// Returns a list of font styles associated with <i>familyName</i>.
     /// </summary>
     /// <param name="familyName">The font family name</param>
     /// <returns>Available font styles</returns>

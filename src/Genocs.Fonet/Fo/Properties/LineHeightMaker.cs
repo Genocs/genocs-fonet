@@ -26,7 +26,7 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Make(PropertyList propertyList)
         {
-            return Make(propertyList, "normal", propertyList.getParentFObj());
+            return Make(propertyList, "normal", propertyList.GetParentFObj());
 
         }
 
@@ -57,7 +57,7 @@ namespace Genocs.Fonet.Fo.Properties
             }
         }
 
-        protected override Property ConvertPropertyDatatype(Property p, PropertyList propertyList, FObj fo)
+        protected override Property ConvertPropertyDataType(Property p, PropertyList propertyList, FObj fo)
         {
             {
                 Number numval =
@@ -70,7 +70,7 @@ namespace Genocs.Fonet.Fo.Properties
                 }
             }
 
-            return base.ConvertPropertyDatatype(p, propertyList, fo);
+            return base.ConvertPropertyDataType(p, propertyList, fo);
         }
 
         public override IPercentBase GetPercentBase(FObj fo, PropertyList propertyList)

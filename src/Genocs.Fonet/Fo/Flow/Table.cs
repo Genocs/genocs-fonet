@@ -7,18 +7,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class Table : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new Table(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Table(parent, props));
 
     private const int MINCOLWIDTH = 10000;
 
@@ -63,7 +53,7 @@ internal class Table : FObj
     public Table(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:table";
+        Name = "fo:table";
     }
 
     public override Status Layout(Area area)
@@ -82,27 +72,18 @@ internal class Table : FObj
             MarginProps mProps = _propertyManager.GetMarginProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            this.breakBefore = this._properties.GetProperty("break-before").GetEnum();
-            this.breakAfter = this._properties.GetProperty("break-after").GetEnum();
-            this.spaceBefore =
-                this._properties.GetProperty("space-before.optimum").GetLength().MValue();
-            this.spaceAfter =
-                this._properties.GetProperty("space-after.optimum").GetLength().MValue();
-            this.ipd =
-                this._properties.GetProperty("inline-progression-dimension").
-                    GetLengthRange();
-            this.height = this._properties.GetProperty("height").GetLength().MValue();
-            this.bAutoLayout = (this._properties.GetProperty("table-layout").GetEnum() ==
-                TableLayout.AUTO);
+            this.breakBefore = this.Properties.GetProperty("break-before").GetEnum();
+            this.breakAfter = this.Properties.GetProperty("break-after").GetEnum();
+            this.spaceBefore = this.Properties.GetProperty("space-before.optimum").GetLength().MValue();
+            this.spaceAfter = this.Properties.GetProperty("space-after.optimum").GetLength().MValue();
+            this.ipd = this.Properties.GetProperty("inline-progression-dimension").GetLengthRange();
+            this.height = this.Properties.GetProperty("height").GetLength().MValue();
+            this.bAutoLayout = (this.Properties.GetProperty("table-layout").GetEnum() == TableLayout.AUTO);
 
-            this.id = this._properties.GetProperty("id").GetString();
+            this.id = this.Properties.GetProperty("id").GetString();
 
-            this.omitHeaderAtBreak =
-                this._properties.GetProperty("table-omit-header-at-break").GetEnum()
-                    == TableOmitHeaderAtBreak.TRUE;
-            this.omitFooterAtBreak =
-                this._properties.GetProperty("table-omit-footer-at-break").GetEnum()
-                    == TableOmitFooterAtBreak.TRUE;
+            this.omitHeaderAtBreak = this.Properties.GetProperty("table-omit-header-at-break").GetEnum() == TableOmitHeaderAtBreak.TRUE;
+            this.omitFooterAtBreak = this.Properties.GetProperty("table-omit-footer-at-break").GetEnum() == TableOmitFooterAtBreak.TRUE;
 
             if (area is BlockArea)
             {
@@ -135,7 +116,7 @@ internal class Table : FObj
 
         if ((spaceBefore != 0) && (this._marker == 0))
         {
-            area.addDisplaySpace(spaceBefore);
+            area.AddDisplaySpace(spaceBefore);
         }
 
         if (_marker == 0 && areaContainer == null)
@@ -144,14 +125,12 @@ internal class Table : FObj
         }
 
         int spaceLeft = area.spaceLeft();
-        this.areaContainer =
-            new AreaContainer(_propertyManager.GetFontState(area.getFontInfo()), 0, 0,
+        this.areaContainer = new AreaContainer(_propertyManager.GetFontState(area.GetFontInfo()), 0, 0,
                               area.getAllocationWidth(), area.spaceLeft(),
-                              Position.STATIC);
+                              Position.STATIC, area);
 
         areaContainer.foCreator = this;
-        areaContainer.setPage(area.getPage());
-        areaContainer.setParent(area);
+        areaContainer.Page = area.Page;
         areaContainer.setBackground(_propertyManager.GetBackgroundProps());
         areaContainer.setBorderAndPadding(_propertyManager.GetBorderAndPadding());
         areaContainer.start();
@@ -168,8 +147,7 @@ internal class Table : FObj
             FindColumns(areaContainer);
             if (this.bAutoLayout)
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    "table-layout=auto is not supported, using fixed!");
+                FonetDriver.ActiveDriver.FireFonetWarning("table-layout=auto is not supported, using fixed!");
             }
             this.contentWidth =
                 CalcFixedColumnWidths(areaContainer.getAllocationWidth());
@@ -184,8 +162,7 @@ internal class Table : FObj
             {
                 if (columns.Count == 0)
                 {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "Current implementation of tables requires a table-column for each column, indicating column-width");
+                    FonetDriver.ActiveDriver.FireFonetWarning("Current implementation of tables requires a table-column for each column, indicating column-width");
                     return new Status(Status.OK);
                 }
                 tableHeader = (TableHeader)fo;
@@ -195,8 +172,7 @@ internal class Table : FObj
             {
                 if (columns.Count == 0)
                 {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "Current implementation of tables requires a table-column for each column, indicating column-width");
+                    FonetDriver.ActiveDriver.FireFonetWarning("Current implementation of tables requires a table-column for each column, indicating column-width");
                     return new Status(Status.OK);
                 }
                 tableFooter = (TableFooter)fo;
@@ -206,8 +182,7 @@ internal class Table : FObj
             {
                 if (columns.Count == 0)
                 {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "Current implementation of tables requires a table-column for each column, indicating column-width");
+                    FonetDriver.ActiveDriver.FireFonetWarning("Current implementation of tables requires a table-column for each column, indicating column-width");
                     return new Status(Status.OK);
                 }
                 Status status;
@@ -242,22 +217,17 @@ internal class Table : FObj
                 if ((status = fo.Layout(areaContainer)).IsIncomplete())
                 {
                     this._marker = i;
-                    if (bodyCount == 0
-                        && status.GetCode() == Status.AREA_FULL_NONE)
+                    if (bodyCount == 0 && status.GetCode() == Status.AREA_FULL_NONE)
                     {
-                        if (tableHeader != null)
-                        {
-                            tableHeader.RemoveLayout(areaContainer);
-                        }
-                        if (tableFooter != null)
-                        {
-                            tableFooter.RemoveLayout(areaContainer);
-                        }
+                        tableHeader?.RemoveLayout(areaContainer);
+                        tableFooter?.RemoveLayout(areaContainer);
+
                         ResetMarker();
                     }
+
                     if (areaContainer.getContentHeight() > 0)
                     {
-                        area.addChild(areaContainer);
+                        area.AddChild(areaContainer);
                         area.increaseHeight(areaContainer.GetHeight());
                         if (this.omitHeaderAtBreak)
                         {
@@ -278,8 +248,7 @@ internal class Table : FObj
                 {
                     bodyCount++;
                 }
-                area.setMaxHeight(area.getMaxHeight() - spaceLeft
-                    + this.areaContainer.getMaxHeight());
+                area.setMaxHeight(area.getMaxHeight() - spaceLeft + this.areaContainer.getMaxHeight());
                 if (tableFooter != null && !this.omitFooterAtBreak)
                 {
                     ((TableBody)fo).SetYPosition(tableFooter.GetYPosition());
@@ -293,9 +262,8 @@ internal class Table : FObj
         {
             if (tableFooter.Layout(areaContainer).IsIncomplete())
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    "Footer could not fit on page, moving last body row to next page");
-                area.addChild(areaContainer);
+                FonetDriver.ActiveDriver?.FireFonetWarning("Footer could not fit on page, moving last body row to next page");
+                area.AddChild(areaContainer);
                 area.increaseHeight(areaContainer.GetHeight());
                 if (this.omitHeaderAtBreak)
                 {
@@ -315,13 +283,13 @@ internal class Table : FObj
         SetupColumnHeights();
 
         areaContainer.end();
-        area.addChild(areaContainer);
+        area.AddChild(areaContainer);
 
         area.increaseHeight(areaContainer.GetHeight());
 
         if (spaceAfter != 0)
         {
-            area.addDisplaySpace(spaceAfter);
+            area.AddDisplaySpace(spaceAfter);
         }
 
         if (area is BlockArea)
@@ -382,8 +350,7 @@ internal class Table : FObj
                     {
                         if (columns[currentColumnNumber - 1] != null)
                         {
-                            FonetDriver.ActiveDriver.FireFonetWarning(
-                                "More than one column object assigned to column " + currentColumnNumber);
+                            FonetDriver.ActiveDriver?.FireFonetWarning($"More than one column object assigned to column {currentColumnNumber}");
                         }
                     }
                     columns.Insert(currentColumnNumber - 1, c);
@@ -408,9 +375,7 @@ internal class Table : FObj
         {
             if (c == null)
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    "No table-column specification for column " +
-                        nextColumnNumber);
+                FonetDriver.ActiveDriver?.FireFonetWarning($"No table-column specification for column {nextColumnNumber}");
                 iEmptyCols++;
             }
             else
@@ -449,9 +414,7 @@ internal class Table : FObj
             }
             else
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(String.Format(
-                    "Sum of fixed column widths {0} greater than maximum available IPD {1}; no space for {2} propertional units",
-                    iFixedWidth, maxAllocationWidth, dTblUnits));
+                FonetDriver.ActiveDriver?.FireFonetWarning($"Sum of fixed column widths {iFixedWidth} greater than maximum available IPD {maxAllocationWidth}; no space for {dTblUnits} propertional units");
                 dUnitLength = MINCOLWIDTH / tuMin;
             }
         }
@@ -467,16 +430,12 @@ internal class Table : FObj
             {
                 if (this.maxIPD != 0)
                 {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "Sum of fixed column widths " + iFixedWidth +
-                            " greater than maximum specified IPD " + this.maxIPD);
+                    FonetDriver.ActiveDriver?.FireFonetWarning($"Sum of fixed column widths {iFixedWidth} greater than maximum specified IPD {this.maxIPD}");
                 }
             }
             else if (this.optIPD != -1 && iFixedWidth != this.optIPD)
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    "Sum of fixed column widths " + iFixedWidth +
-                        " differs from specified optimum IPD " + this.optIPD);
+                FonetDriver.ActiveDriver?.FireFonetWarning($"Sum of fixed column widths {iFixedWidth} differs from specified optimum IPD {this.optIPD}");
             }
         }
         int offset = 0;
@@ -485,21 +444,27 @@ internal class Table : FObj
             if (c != null)
             {
                 c.SetColumnOffset(offset);
+
                 Length l = c.GetColumnWidthAsLength();
+
                 if (dUnitLength > 0)
                 {
                     l.ResolveTableUnit(dUnitLength);
                 }
+
+
                 int colWidth = l.MValue();
+
                 if (colWidth <= 0)
                 {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "Zero-width table column!");
+                    FonetDriver.ActiveDriver?.FireFonetWarning("Zero-width table column!");
                 }
+
                 if (dWidthFactor > 0.0)
                 {
                     colWidth = (int)(colWidth * dWidthFactor);
                 }
+
                 c.SetColumnWidth(colWidth);
                 offset += colWidth;
             }
@@ -511,10 +476,7 @@ internal class Table : FObj
     {
         foreach (TableColumn c in columns)
         {
-            if (c != null)
-            {
-                c.Layout(tableArea);
-            }
+            c?.Layout(tableArea);
         }
     }
 
@@ -582,9 +544,7 @@ internal class Table : FObj
             }
             else
             {
-                FonetDriver.ActiveDriver.FireFonetError(
-                    "At least one of minimum, optimum, or maximum " +
-                        "IPD must be specified on table.");
+                FonetDriver.ActiveDriver?.FireFonetError($"At least one of minimum, optimum, or maximum IPD must be specified on table.");
                 this.optIPD = this.maxIPD;
             }
         }

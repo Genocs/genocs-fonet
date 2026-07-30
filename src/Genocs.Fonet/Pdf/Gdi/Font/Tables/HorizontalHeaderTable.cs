@@ -82,7 +82,7 @@ internal class HorizontalHeaderTable : FontTable
     public HorizontalHeaderTable(DirectoryEntry entry) : base(TableNames.Hhea, entry) { }
 
     /// <summary>
-    ///     Gets the number of horiztonal metrics.
+    /// Gets the number of horiztonal metrics.
     /// </summary>
     public int HMetricCount
     {
@@ -91,8 +91,8 @@ internal class HorizontalHeaderTable : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "hhea" table from the current position 
-    ///     in the supplied stream.
+    /// Reads the contents of the "hhea" table from the current position 
+    /// in the supplied stream.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)

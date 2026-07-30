@@ -5,18 +5,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class RegionBefore : Region
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new RegionBefore(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new RegionBefore(parent, props));
 
     public const string REGION_CLASS = "before";
 
@@ -25,7 +15,7 @@ internal class RegionBefore : Region
     protected RegionBefore(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        precedence = this._properties.GetProperty("precedence").GetEnum();
+        precedence = this.Properties.GetProperty("precedence").GetEnum();
     }
 
 
@@ -36,7 +26,7 @@ internal class RegionBefore : Region
     {
         BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
         BackgroundProps bProps = _propertyManager.GetBackgroundProps();
-        int extent = this._properties.GetProperty("extent").GetLength().MValue();
+        int extent = this.Properties.GetProperty("extent").GetLength().MValue();
 
         RegionArea area = new RegionArea(
             allocationRectangleXPosition,
@@ -47,7 +37,6 @@ internal class RegionBefore : Region
 
         return area;
     }
-
 
     protected override string GetDefaultRegionName()
     {

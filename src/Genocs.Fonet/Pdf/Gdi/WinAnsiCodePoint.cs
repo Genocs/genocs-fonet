@@ -6,7 +6,7 @@ namespace Genocs.Fonet.Pdf.Gdi;
 internal class WinAnsiMapping
 {
     /// <summary>
-    ///  First column is codepoint value. Second column is unicode value.
+    /// First column is codepoint value. Second column is unicode value.
     /// </summary>
     private static readonly int[] winAnsiEncoding
         = [
@@ -233,28 +233,28 @@ internal class WinAnsiMapping
             0xff, 0x00FF, // ydieresis
         ];
 
-    public static readonly WinAnsiMapping Mapping = new WinAnsiMapping();
+    public static readonly WinAnsiMapping Mapping = new();
 
-    private ushort[] latin1Map;
+    private readonly ushort[] _latin1Map;
 
     private WinAnsiMapping()
     {
-        latin1Map = new ushort[256];
+        _latin1Map = new ushort[256];
         for (int i = 0; i < winAnsiEncoding.Length; i += 2)
         {
             if (winAnsiEncoding[i + 1] < 256)
             {
-                latin1Map[winAnsiEncoding[i + 1]] = (char)winAnsiEncoding[i];
+                _latin1Map[winAnsiEncoding[i + 1]] = (char)winAnsiEncoding[i];
             }
         }
     }
 
     public ushort MapCharacter(char c)
     {
-        if (c > Byte.MaxValue)
+        if (c > byte.MaxValue)
         {
             return 0;
         }
-        return latin1Map[c];
+        return _latin1Map[c];
     }
 }

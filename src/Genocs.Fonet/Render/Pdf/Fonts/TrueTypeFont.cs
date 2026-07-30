@@ -16,12 +16,12 @@ internal class TrueTypeFont : Font, IFontDescriptor
     /// <summary>
     /// Wrapper around a Win32 HDC.
     /// </summary>
-    private GdiDeviceContent dc;
+    private GdiDeviceContent? _deviceContext;
 
     /// <summary>
     /// Provides font metrics using the Win32 Api.
     /// </summary>
-    private GdiFontMetrics metrics;
+    private GdiFontMetrics? _metrics;
 
     /// <summary>
     /// List of kerning pairs.
@@ -34,9 +34,9 @@ internal class TrueTypeFont : Font, IFontDescriptor
     private int[] widths;
 
     /// <summary>
-    ///     
+    /// 
     /// </summary>
-    protected FontProperties properties;
+    protected FontProperties _properties;
 
     /// <summary>
     /// Class constructor
@@ -44,7 +44,7 @@ internal class TrueTypeFont : Font, IFontDescriptor
     /// <param name="properties"></param>
     public TrueTypeFont(FontProperties properties)
     {
-        this.properties = properties;
+        _properties = properties;
         ObtainFontMetrics();
     }
 
@@ -53,9 +53,9 @@ internal class TrueTypeFont : Font, IFontDescriptor
     /// </summary>
     private void ObtainFontMetrics()
     {
-        dc = new GdiDeviceContent();
-        GdiFont font = GdiFont.CreateDesignFont(properties.FaceName, properties.IsBold, properties.IsItalic, dc);
-        metrics = font.GetMetrics(dc);
+        _deviceContext = new GdiDeviceContent();
+        GdiFont font = GdiFont.CreateDesignFont(_properties.FaceName, _properties.IsBold, _properties.IsItalic, _deviceContext);
+        _metrics = font.GetMetrics(_deviceContext);
     }
 
     public PdfArray Array
@@ -72,7 +72,7 @@ internal class TrueTypeFont : Font, IFontDescriptor
     #region Implementation of Font members
 
     /// <summary>
-    ///     Returns <see cref="PdfFontSubTypeEnum.TrueType"/>.
+    /// Returns <see cref="PdfFontSubTypeEnum.TrueType"/>.
     /// </summary>
     public override PdfFontSubTypeEnum SubType
     {
@@ -84,21 +84,21 @@ internal class TrueTypeFont : Font, IFontDescriptor
         get
         {
             // See section 5.5.2 "TrueType fonts" for more details
-            if (properties.IsBoldItalic)
+            if (_properties.IsBoldItalic)
             {
-                return String.Format("{0},BoldItalic", properties.FaceName);
+                return String.Format("{0},BoldItalic", _properties.FaceName);
             }
-            else if (properties.IsBold)
+            else if (_properties.IsBold)
             {
-                return String.Format("{0},Bold", properties.FaceName);
+                return String.Format("{0},Bold", _properties.FaceName);
             }
-            else if (properties.IsItalic)
+            else if (_properties.IsItalic)
             {
-                return String.Format("{0},Italic", properties.FaceName);
+                return String.Format("{0},Italic", _properties.FaceName);
             }
             else
             {
-                return properties.FaceName;
+                return _properties.FaceName;
             }
         }
     }
@@ -136,17 +136,17 @@ internal class TrueTypeFont : Font, IFontDescriptor
 
     public override int Ascender
     {
-        get { return metrics.Ascent; }
+        get { return _metrics.Ascent; }
     }
 
     public override int Descender
     {
-        get { return metrics.Descent; }
+        get { return _metrics.Descent; }
     }
 
     public override int CapHeight
     {
-        get { return metrics.CapHeight; }
+        get { return _metrics.CapHeight; }
     }
 
     public override int FirstChar
@@ -164,7 +164,7 @@ internal class TrueTypeFont : Font, IFontDescriptor
     }
 
     /// <summary>
-    ///     See <see cref="Font.GetWidth(ushort)"/>
+    /// See <see cref="Font.GetWidth(ushort)"/>
     /// </summary>
     /// <param name="charIndex">A WinAnsi codepoint.</param>
     /// <returns></returns>
@@ -189,42 +189,36 @@ internal class TrueTypeFont : Font, IFontDescriptor
 
     private void EnsureWidthsArray()
     {
-        if (widths == null)
-        {
-            widths = metrics.GetAnsiWidths();
-        }
+        widths ??= _metrics.GetAnsiWidths();
     }
 
     #region Implementation of IFontDescriptior interface
 
     public int Flags
     {
-        get { return metrics.Flags; }
+        get { return _metrics.Flags; }
     }
 
     public int[] FontBBox
     {
-        get { return metrics.BoundingBox; }
+        get { return _metrics.BoundingBox; }
     }
 
     public int ItalicAngle
     {
-        get { return metrics.ItalicAngle; }
+        get { return _metrics.ItalicAngle; }
     }
 
     public int StemV
     {
-        get { return metrics.StemV; }
+        get { return _metrics.StemV; }
     }
 
     public bool HasKerningInfo
     {
         get
         {
-            if (kerning == null)
-            {
-                kerning = metrics.AnsiKerningPairs;
-            }
+            kerning ??= _metrics.AnsiKerningPairs;
             return (kerning.Count != 0);
         }
     }
@@ -241,17 +235,14 @@ internal class TrueTypeFont : Font, IFontDescriptor
 
     public byte[] FontData
     {
-        get { return metrics.GetFontData(); }
+        get { return _metrics.GetFontData(); }
     }
 
     public GdiKerningPairs KerningInfo
     {
         get
         {
-            if (kerning == null)
-            {
-                kerning = metrics.AnsiKerningPairs;
-            }
+            kerning ??= _metrics.AnsiKerningPairs;
             return kerning;
         }
     }

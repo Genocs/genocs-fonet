@@ -36,7 +36,7 @@ internal class VisibilityMaker : EnumProperty.Maker
 
     public override Property Make(PropertyList propertyList)
     {
-        m_defaultProp ??= Make(propertyList, "visible", propertyList.getParentFObj());
+        m_defaultProp ??= Make(propertyList, "visible", propertyList.GetParentFObj());
         return m_defaultProp;
     }
 }

@@ -3,20 +3,20 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Class that represents the Glyf Data table ('glyf').
+/// Class that represents the Glyf Data table ('glyf').
 /// </summary>
 /// <remarks>
-///     http://www.microsoft.com/typography/otspec/glyf.htm
+/// http://www.microsoft.com/typography/otspec/glyf.htm
 /// </remarks>
 internal class GlyfDataTable : FontTable
 {
     /// <summary>
-    ///     Maps a glyph index to a <see cref="Glyph"/> object.
+    /// Maps a glyph index to a <see cref="Glyph"/> object.
     /// </summary>
     private IDictionary glyphDescriptions;
 
     /// <summary>
-    ///     Creates an instance of the <see cref="GlyfDataTable"/> class.
+    /// Creates an instance of the <see cref="GlyfDataTable"/> class.
     /// </summary>
     /// <param name="entry"></param>
     public GlyfDataTable(DirectoryEntry entry) : base(TableNames.Glyf, entry)
@@ -25,7 +25,7 @@ internal class GlyfDataTable : FontTable
     }
 
     /// <summary>
-    ///     Gets the <see cref="Glyph"/> instance located at <i>glyphIndex</i>
+    /// Gets the <see cref="Glyph"/> instance located at <i>glyphIndex</i>
     /// </summary>
     public Glyph this[int glyphIndex]
     {
@@ -34,7 +34,7 @@ internal class GlyfDataTable : FontTable
     }
 
     /// <summary>
-    ///     Gets the number of glyphs.
+    /// Gets the number of glyphs.
     /// </summary>
     public int Count
     {
@@ -42,8 +42,8 @@ internal class GlyfDataTable : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "glyf" table from the current position 
-    ///     in the supplied stream.
+    /// Reads the contents of the "glyf" table from the current position 
+    /// in the supplied stream.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)
@@ -72,7 +72,7 @@ internal class GlyfDataTable : FontTable
     }
 
     /// <summary>
-    ///     Writes the contents of the glyf table to the supplied stream.
+    /// Writes the contents of the glyf table to the supplied stream.
     /// </summary>
     /// <param name="writer"></param>
     protected internal override void Write(FontFileWriter writer)

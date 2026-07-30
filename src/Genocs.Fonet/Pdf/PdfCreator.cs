@@ -1,3 +1,4 @@
+using System.Collections;
 using Genocs.Fonet.DataTypes;
 using Genocs.Fonet.Image;
 using Genocs.Fonet.Layout;
@@ -5,16 +6,13 @@ using Genocs.Fonet.Pdf.Filter;
 using Genocs.Fonet.Pdf.Security;
 using Genocs.Fonet.Render.Pdf;
 using Genocs.Fonet.Util;
-using System.Collections;
 
 namespace Genocs.Fonet.Pdf;
 
 internal sealed class PdfCreator
 {
-    private PdfDocument _doc;
-
     // list of objects to write in the trailer.
-    private ArrayList _trailerObjects = new ArrayList();
+    private readonly ArrayList _trailerObjects = [];
 
     // the objects themselves
     // These objects are buffered and then written to the
@@ -24,13 +22,13 @@ internal sealed class PdfCreator
     // wait until the end of the PDF stream.  The trigger
     // to write these objects out is pulled by PdfRenderer,
     // at the end of it's Render page method.
-    private ArrayList objects = new ArrayList();
+    private readonly ArrayList _objects = [];
 
     // The root outline object
-    private PdfOutline outlineRoot;
+    private PdfOutline _outlineRoot;
 
     // the /Resources object
-    private PdfResources resources;
+    private PdfResources _resources;
 
     // the documents idReferences
     private IDReferences idReferences;
@@ -53,11 +51,13 @@ internal sealed class PdfCreator
     public PdfCreator(Stream stream)
     {
         // Create the underlying PDF document.
-        _doc = new PdfDocument(stream);
-        _doc.Version = PdfVersion.V13;
+        Doc = new PdfDocument(stream)
+        {
+            Version = PdfVersion.V13
+        };
 
-        resources = new PdfResources(_doc.NextObjectId());
-        AddTrailerObject(resources);
+        _resources = new PdfResources(Doc.NextObjectId());
+        AddTrailerObject(_resources);
         this.xrefTable = new XRefTable();
     }
 
@@ -66,17 +66,11 @@ internal sealed class PdfCreator
         this.idReferences = idReferences;
     }
 
-    public PdfDocument Doc
-    {
-        get
-        {
-            return _doc;
-        }
-    }
+    public PdfDocument Doc { get; }
 
     public void AddObject(PdfObject obj)
     {
-        objects.Add(obj);
+        _objects.Add(obj);
     }
 
     public PdfXObject AddImage(FonetImage img)
@@ -91,17 +85,17 @@ internal sealed class PdfCreator
             ColorSpace cs = img.ColorSpace;
             if (cs.HasICCProfile())
             {
-                iccStream = new PdfICCStream(_doc.NextObjectId(), cs.GetICCProfile())
+                iccStream = new PdfICCStream(Doc.NextObjectId(), cs.GetICCProfile())
                 {
                     NumComponents = new PdfNumeric(cs.GetNumComponents())
                 };
                 iccStream.AddFilter(new FlateFilter());
-                this.objects.Add(iccStream);
+                this._objects.Add(iccStream);
             }
 
             // else, create a new one
             PdfName name = new PdfName("XO" + xObjectsMap.Count);
-            xObject = new PdfXObject(img.Bitmaps, name, _doc.NextObjectId());
+            xObject = new PdfXObject(img.Bitmaps, name, Doc.NextObjectId());
             xObject.SubType = PdfName.Names.Image;
             xObject.Dictionary[PdfName.Names.Width] = new PdfNumeric(img.Width);
             xObject.Dictionary[PdfName.Names.Height] = new PdfNumeric(img.Height);
@@ -123,50 +117,49 @@ internal sealed class PdfCreator
 
             xObject.AddFilter(img.Filter);
 
-            this.objects.Add(xObject);
+            this._objects.Add(xObject);
             this.xObjectsMap.Add(url, xObject);
         }
         return xObject;
     }
 
-    public PdfPage makePage(PdfResources resources, PdfContentStream contents,
-                            int pagewidth, int pageheight, Page currentPage)
+    public PdfPage makePage(PdfResources resources, PdfContentStream contents, int pagewidth, int pageheight, Page currentPage)
     {
         PdfPage page = new PdfPage(
             resources, contents,
             pagewidth, pageheight,
-            _doc.NextObjectId());
+            Doc.NextObjectId());
 
         if (currentPage != null)
         {
             foreach (string id in currentPage.getIDList())
             {
-                idReferences.setInternalGoToPageReference(id, page.GetReference());
+                idReferences.SetInternalGoToPageReference(id, page.GetReference());
             }
         }
 
         /* Add it to the list of objects */
-        this.objects.Add(page);
+        this._objects.Add(page);
 
-        page.SetParent(_doc.Pages);
-        _doc.Pages.Kids.Add(page.GetReference());
+        page.SetParent(Doc.Pages);
+        Doc.Pages.Kids.Add(page.GetReference());
 
         return page;
     }
 
     public PdfLink makeLink(IntRectangle rect, string destination, int linkType)
     {
-        PdfLink link = new PdfLink(_doc.NextObjectId(), rect);
-        this.objects.Add(link);
+        PdfLink link = new PdfLink(Doc.NextObjectId(), rect);
+        this._objects.Add(link);
 
         if (linkType == LinkSet.EXTERNAL)
         {
             if (destination.EndsWith(".pdf"))
             { // FileSpec
-                PdfFileSpec fileSpec = new PdfFileSpec(_doc.NextObjectId(), destination);
-                this.objects.Add(fileSpec);
-                PdfGoToRemote gotoR = new PdfGoToRemote(fileSpec, _doc.NextObjectId());
-                this.objects.Add(gotoR);
+                PdfFileSpec fileSpec = new PdfFileSpec(Doc.NextObjectId(), destination);
+                this._objects.Add(fileSpec);
+                PdfGoToRemote gotoR = new PdfGoToRemote(fileSpec, Doc.NextObjectId());
+                this._objects.Add(gotoR);
                 link.SetAction(gotoR);
             }
             else
@@ -192,11 +185,11 @@ internal sealed class PdfCreator
         {
             if (idReferences.DoesGoToReferenceExist(destination))
             {
-                goTo = idReferences.getInternalLinkGoTo(destination);
+                goTo = idReferences.GetInternalLinkGoTo(destination);
             }
             else
             {
-                goTo = idReferences.createInternalLinkGoTo(destination, _doc.NextObjectId());
+                goTo = idReferences.CreateInternalLinkGoTo(destination, Doc.NextObjectId());
                 AddTrailerObject(goTo);
             }
         }
@@ -205,7 +198,7 @@ internal sealed class PdfCreator
             // id was not found, so create it
             idReferences.CreateUnvalidatedID(destination);
             idReferences.AddToIdValidationList(destination);
-            goTo = idReferences.createInternalLinkGoTo(destination, _doc.NextObjectId());
+            goTo = idReferences.CreateInternalLinkGoTo(destination, Doc.NextObjectId());
             AddTrailerObject(goTo);
         }
         return goTo.GetReference();
@@ -216,23 +209,23 @@ internal sealed class PdfCreator
 
     public PdfContentStream MakeContentStream()
     {
-        PdfContentStream obj = new PdfContentStream(_doc.NextObjectId());
+        PdfContentStream obj = new PdfContentStream(Doc.NextObjectId());
         obj.AddFilter(new FlateFilter());
-        this.objects.Add(obj);
+        this._objects.Add(obj);
         return obj;
     }
 
     public PdfAnnotList MakeAnnotList()
     {
-        PdfAnnotList obj = new PdfAnnotList(_doc.NextObjectId());
-        this.objects.Add(obj);
+        PdfAnnotList obj = new PdfAnnotList(Doc.NextObjectId());
+        this._objects.Add(obj);
         return obj;
     }
 
     public void SetOptions(PdfRendererOptions options)
     {
         // Configure the /Info dictionary.
-        info = new PdfInfo(_doc.NextObjectId());
+        info = new PdfInfo(Doc.NextObjectId());
         if (options.Title != null)
         {
             info.Title = new PdfString(options.Title);
@@ -258,7 +251,7 @@ internal sealed class PdfCreator
             info.Producer = new PdfString(PdfRendererOptions.Producer);
         }
         info.CreationDate = new PdfString(PdfDate.Format(DateTime.Now));
-        this.objects.Add(info);
+        this._objects.Add(info);
 
         // Configure the security options.
         if (options.UserPassword != null ||
@@ -273,62 +266,62 @@ internal sealed class PdfCreator
             securityOptions.EnableCopying(options.EnableCopy);
             securityOptions.EnablePrinting(options.EnablePrinting);
 
-            _doc.SecurityOptions = securityOptions;
-            encrypt = _doc.Writer.SecurityManager.GetEncrypt(_doc.NextObjectId());
-            this.objects.Add(encrypt);
+            Doc.SecurityOptions = securityOptions;
+            encrypt = Doc.Writer.SecurityManager.GetEncrypt(Doc.NextObjectId());
+            this._objects.Add(encrypt);
         }
     }
 
     public PdfOutline getOutlineRoot()
     {
-        if (outlineRoot != null)
+        if (_outlineRoot != null)
         {
-            return outlineRoot;
+            return _outlineRoot;
         }
 
-        outlineRoot = new PdfOutline(_doc.NextObjectId(), null, null);
-        AddTrailerObject(outlineRoot);
-        _doc.Catalog.Outlines = outlineRoot;
-        return outlineRoot;
+        _outlineRoot = new PdfOutline(Doc.NextObjectId(), null, null);
+        AddTrailerObject(_outlineRoot);
+        Doc.Catalog.Outlines = _outlineRoot;
+        return _outlineRoot;
     }
 
     public PdfOutline makeOutline(PdfOutline parent, string label, string destination)
     {
         PdfObjectReference goToRef = getGoToReference(destination);
 
-        PdfOutline obj = new(_doc.NextObjectId(), label, goToRef);
+        PdfOutline obj = new(Doc.NextObjectId(), label, goToRef);
 
         parent?.AddOutline(obj);
 
-        this.objects.Add(obj);
+        this._objects.Add(obj);
         return obj;
 
     }
 
     public PdfResources getResources()
     {
-        return this.resources;
+        return this._resources;
     }
 
     private void WritePdfObject(PdfObject obj)
     {
-        xrefTable.Add(obj.ObjectId, _doc.Writer.Position);
-        _doc.Writer.WriteLine(obj);
+        xrefTable.Add(obj.ObjectId, Doc.Writer.Position);
+        Doc.Writer.WriteLine(obj);
     }
 
     public void output()
     {
-        foreach (PdfObject obj in this.objects)
+        foreach (PdfObject obj in this._objects)
         {
             WritePdfObject(obj);
         }
 
-        objects.Clear();
+        _objects.Clear();
     }
 
     public void outputHeader()
     {
-        _doc.WriteHeader();
+        Doc.WriteHeader();
     }
 
     public void outputTrailer()
@@ -337,14 +330,14 @@ internal sealed class PdfCreator
 
         foreach (PdfXObject xobj in xObjectsMap.Values)
         {
-            resources.AddXObject(xobj);
+            _resources.AddXObject(xobj);
         }
 
-        xrefTable.Add(_doc.Catalog.ObjectId, _doc.Writer.Position);
-        _doc.Writer.WriteLine(_doc.Catalog);
+        xrefTable.Add(Doc.Catalog.ObjectId, Doc.Writer.Position);
+        Doc.Writer.WriteLine(Doc.Catalog);
 
-        xrefTable.Add(_doc.Pages.ObjectId, _doc.Writer.Position);
-        _doc.Writer.WriteLine(_doc.Pages);
+        xrefTable.Add(Doc.Pages.ObjectId, Doc.Writer.Position);
+        Doc.Writer.WriteLine(Doc.Pages);
 
         foreach (PdfObject o in _trailerObjects)
         {
@@ -352,14 +345,14 @@ internal sealed class PdfCreator
         }
 
         // output the xref table
-        long xrefOffset = _doc.Writer.Position;
-        xrefTable.Write(_doc.Writer);
+        long xrefOffset = Doc.Writer.Position;
+        xrefTable.Write(Doc.Writer);
 
         // output the file trailer
         PdfFileTrailer trailer = new PdfFileTrailer();
-        trailer.Size = new PdfNumeric(_doc.ObjectCount + 1);
-        trailer.Root = _doc.Catalog.GetReference();
-        trailer.Id = _doc.FileIdentifier;
+        trailer.Size = new PdfNumeric(Doc.ObjectCount + 1);
+        trailer.Root = Doc.Catalog.GetReference();
+        trailer.Id = Doc.FileIdentifier;
         if (info != null)
         {
             trailer.Info = info.GetReference();
@@ -369,6 +362,6 @@ internal sealed class PdfCreator
             trailer.Encrypt = encrypt.GetReference();
         }
         trailer.XRefOffset = xrefOffset;
-        _doc.Writer.Write(trailer);
+        Doc.Writer.Write(trailer);
     }
 }

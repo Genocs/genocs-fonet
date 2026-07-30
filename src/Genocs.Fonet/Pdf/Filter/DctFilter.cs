@@ -1,5 +1,3 @@
-using Genocs.Fonet.Pdf;
-
 namespace Genocs.Fonet.Pdf.Filter;
 
 public class DctFilter : IFilter

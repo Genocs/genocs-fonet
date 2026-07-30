@@ -5,18 +5,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class TableCell : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new TableCell(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new TableCell(parent, props));
 
     private string id;
     private int numColumnsSpanned;
@@ -41,7 +31,7 @@ internal class TableCell : FObj
     public TableCell(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:table-cell";
+        Name = "fo:table-cell";
         DoSetup();
     }
 
@@ -78,43 +68,43 @@ internal class TableCell : FObj
         BackgroundProps bProps = _propertyManager.GetBackgroundProps();
         RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-        this.iColNumber = _properties.GetProperty("column-number").GetNumber().IntValue();
+        this.iColNumber = Properties.GetProperty("column-number").GetNumber().IntValue();
         if (iColNumber < 0)
         {
             iColNumber = 0;
         }
 
-        this.numColumnsSpanned = _properties.GetProperty("number-columns-spanned").GetNumber().IntValue();
+        this.numColumnsSpanned = Properties.GetProperty("number-columns-spanned").GetNumber().IntValue();
         if (numColumnsSpanned < 1)
         {
             numColumnsSpanned = 1;
         }
 
-        this.numRowsSpanned = _properties.GetProperty("number-rows-spanned").GetNumber().IntValue();
+        this.numRowsSpanned = Properties.GetProperty("number-rows-spanned").GetNumber().IntValue();
         if (numRowsSpanned < 1)
         {
             numRowsSpanned = 1;
         }
 
-        this.id = this._properties.GetProperty("id").GetString();
+        this.id = this.Properties.GetProperty("id").GetString();
 
-        bSepBorders = (this._properties.GetProperty("border-collapse").GetEnum()
+        bSepBorders = (this.Properties.GetProperty("border-collapse").GetEnum()
             == BorderCollapse.SEPARATE);
 
         CalcBorders(_propertyManager.GetBorderAndPadding());
 
-        verticalAlign = _properties.GetProperty("display-align").GetEnum();
+        verticalAlign = Properties.GetProperty("display-align").GetEnum();
         if (verticalAlign == DisplayAlign.AUTO)
         {
             bRelativeAlign = true;
-            verticalAlign = _properties.GetProperty("relative-align").GetEnum();
+            verticalAlign = Properties.GetProperty("relative-align").GetEnum();
         }
         else
         {
             bRelativeAlign = false;
         }
 
-        this.minCellHeight = _properties.GetProperty("height").GetLength().MValue();
+        this.minCellHeight = Properties.GetProperty("height").GetLength().MValue();
     }
 
 
@@ -142,16 +132,14 @@ internal class TableCell : FObj
 
         int spaceLeft = area.spaceLeft() - m_borderSeparation;
         this.cellArea =
-            new AreaContainer(_propertyManager.GetFontState(area.getFontInfo()),
+            new AreaContainer(_propertyManager.GetFontState(area.GetFontInfo()),
                               startOffset + startAdjust, beforeOffset,
                               width - widthAdjust, spaceLeft,
-                              Position.RELATIVE);
+                              Position.RELATIVE, area);
 
         cellArea.foCreator = this;
-        cellArea.setPage(area.getPage());
-        cellArea.setParent(area);
-        cellArea.setBorderAndPadding(
-            (BorderAndPadding)_propertyManager.GetBorderAndPadding().Clone());
+        cellArea.Page = area.Page;
+        cellArea.setBorderAndPadding((BorderAndPadding)_propertyManager.GetBorderAndPadding().Clone());
         cellArea.setBackground(_propertyManager.GetBackgroundProps());
         cellArea.start();
 
@@ -177,7 +165,7 @@ internal class TableCell : FObj
                 }
                 else
                 {
-                    area.addChild(cellArea);
+                    area.AddChild(cellArea);
                     return new Status(Status.AREA_FULL_SOME);
                 }
             }
@@ -187,7 +175,7 @@ internal class TableCell : FObj
         }
         this.bDone = true;
         cellArea.end();
-        area.addChild(cellArea);
+        area.AddChild(cellArea);
 
         if (minCellHeight > cellArea.getContentHeight())
         {
@@ -247,14 +235,14 @@ internal class TableCell : FObj
         if (this.bSepBorders)
         {
             int iSep =
-                _properties.GetProperty("border-separation.inline-progression-direction").GetLength().MValue();
+                Properties.GetProperty("border-separation.inline-progression-direction").GetLength().MValue();
             this.startAdjust = iSep / 2 + bp.GetBorderLeftWidth(false)
                 + bp.GetPaddingLeft(false);
             this.widthAdjust = startAdjust + iSep - iSep / 2
                 + bp.GetBorderRightWidth(false)
                 + bp.GetPaddingRight(false);
             m_borderSeparation =
-                _properties.GetProperty("border-separation.block-progression-direction").GetLength().MValue();
+                Properties.GetProperty("border-separation.block-progression-direction").GetLength().MValue();
             this.beforeOffset = m_borderSeparation / 2
                 + bp.GetBorderTopWidth(false)
                 + bp.GetPaddingTop(false);

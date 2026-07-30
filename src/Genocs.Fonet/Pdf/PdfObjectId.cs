@@ -1,34 +1,3 @@
-namespace Genocs.Fonet.Pdf
-{
-    public struct PdfObjectId
-    {
-        private uint objectNumber;
+namespace Genocs.Fonet.Pdf;
 
-        private ushort generationNumber;
-
-        public PdfObjectId(uint objectNumber)
-        {
-            this.objectNumber = objectNumber;
-            this.generationNumber = 0;
-        }
-
-        public PdfObjectId(uint objectNumber, ushort generationNumber)
-        {
-            this.objectNumber = objectNumber;
-            this.generationNumber = generationNumber;
-        }
-
-        public uint ObjectNumber
-        {
-            get { return objectNumber; }
-        }
-
-        public ushort GenerationNumber
-        {
-            get { return generationNumber; }
-        }
-
-        // TODO: implement equals/hashcode etc.
-
-    }
-}
+public readonly record struct PdfObjectId(uint ObjectNumber, ushort GenerationNumber);

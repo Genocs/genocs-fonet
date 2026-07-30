@@ -5,19 +5,13 @@ namespace Genocs.Fonet.Fo;
 
 internal class Title : ToBeImplementedElement
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-            => new Title(parent, propertyList);
-    }
-
-    new public static FObj.Maker GetMaker()
-        => new Maker();
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Title(parent, props));
 
     protected Title(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "fo:title";
+        Name = "fo:title";
     }
 
     public override Status Layout(Area area)
@@ -26,25 +20,25 @@ internal class Title : ToBeImplementedElement
         AuralProps mAurProps = _propertyManager.GetAuralProps();
         BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
         BackgroundProps bProps = _propertyManager.GetBackgroundProps();
-        FontState fontState = _propertyManager.GetFontState(area.getFontInfo());
+        FontState fontState = _propertyManager.GetFontState(area.GetFontInfo());
         MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
 
-        Property prop = _properties.GetProperty("baseline-shift");
+        Property? prop = Properties.GetProperty("baseline-shift");
 
         if (prop is LengthProperty)
         {
-            Length bShift = prop.GetLength();
+            Length? bShift = prop.GetLength();
         }
         else if (prop is EnumProperty)
         {
             int bShift = prop.GetEnum();
         }
 
-        ColorType col = _properties.GetProperty("color").GetColorType();
-        Length lHeight = _properties.GetProperty("line-height").GetLength();
-        int lShiftAdj = _properties.GetProperty("line-height-shift-adjustment").GetEnum();
-        int vis = _properties.GetProperty("visibility").GetEnum();
-        Length zIndex = _properties.GetProperty("z-index").GetLength();
+        ColorType col = Properties.GetProperty("color").GetColorType();
+        Length lHeight = Properties.GetProperty("line-height").GetLength();
+        int lShiftAdj = Properties.GetProperty("line-height-shift-adjustment").GetEnum();
+        int vis = Properties.GetProperty("visibility").GetEnum();
+        Length zIndex = Properties.GetProperty("z-index").GetLength();
 
         return base.Layout(area);
     }

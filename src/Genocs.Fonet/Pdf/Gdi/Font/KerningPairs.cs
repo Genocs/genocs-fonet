@@ -5,20 +5,20 @@ namespace Genocs.Fonet.Pdf.Gdi.Font;
 internal class KerningPairs
 {
     /// <summary>
-    ///     Key - Kerning pair identifier
-    ///     Value - Kerning amount
+    /// Key - Kerning pair identifier
+    /// Value - Kerning amount
     /// </summary>
     private IDictionary pairs;
 
     /// <summary>
-    ///     Creates an instance of KerningPairs allocating space for 
-    ///     100 kerning pairs.
+    /// Creates an instance of KerningPairs allocating space for 
+    /// 100 kerning pairs.
     /// </summary>
     public KerningPairs() : this(100) { }
 
     /// <summary>
-    ///     Creates an instance of KerningPairs allocating space for 
-    ///     <i>numPairs</i> kerning pairs.
+    /// Creates an instance of KerningPairs allocating space for 
+    /// <i>numPairs</i> kerning pairs.
     /// </summary>
     /// <param name="numPairs"></param>
     public KerningPairs(int numPairs)
@@ -27,8 +27,8 @@ internal class KerningPairs
     }
 
     /// <summary>
-    ///     Returns true if a kerning value exists for the supplied 
-    ///     glyph index pair.
+    /// Returns true if a kerning value exists for the supplied 
+    /// glyph index pair.
     /// </summary>
     /// <param name="left">Glyph index for left-hand glyph.</param>
     /// <param name="right">Glyph index for right-hand glyph.</param>
@@ -39,7 +39,7 @@ internal class KerningPairs
     }
 
     /// <summary>
-    ///     Gets the kerning amount for the supplied glyph index pair.
+    /// Gets the kerning amount for the supplied glyph index pair.
     /// </summary>
     public int this[ushort left, ushort right]
     {
@@ -51,7 +51,7 @@ internal class KerningPairs
     }
 
     /// <summary>
-    ///     Gets the number of kernings pairs.
+    /// Gets the number of kernings pairs.
     /// </summary>
     public int Length
     {
@@ -59,7 +59,7 @@ internal class KerningPairs
     }
 
     /// <summary>
-    ///     Invokes <paramref name="action"/> for each stored glyph-index kerning pair.
+    /// Invokes <paramref name="action"/> for each stored glyph-index kerning pair.
     /// </summary>
     internal void ForEachPair(Action<ushort, ushort, int> action)
     {
@@ -73,10 +73,10 @@ internal class KerningPairs
     }
 
     /// <summary>
-    ///     Creates a new kerning pair.
+    /// Creates a new kerning pair.
     /// </summary>
     /// <remarks>
-    ///     This method will ignore duplicates.
+    /// This method will ignore duplicates.
     /// </remarks>
     /// <param name="left">The glyph index for the left-hand glyph in the kerning pair.</param>
     /// <param name="right">The glyph index for the right-hand glyph in the kerning pair. </param>
@@ -94,12 +94,12 @@ internal class KerningPairs
     }
 
     /// <summary>
-    ///     Returns a kerning pair identifier.
+    /// Returns a kerning pair identifier.
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    private uint GetIndex(ushort left, ushort right)
+    private static uint GetIndex(ushort left, ushort right)
     {
         return (uint)((left << 16) + right);
     }

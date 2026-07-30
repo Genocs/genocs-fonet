@@ -15,11 +15,11 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Compute(PropertyList propertyList)
         {
-            FObj parentFO = propertyList.getParentFObj();
+            FObj parentFO = propertyList.GetParentFObj();
             StringBuilder sbExpr = new StringBuilder();
             Property p = null;
             sbExpr.Append("border-");
-            sbExpr.Append(propertyList.wmAbsToRel(PropertyList.BOTTOM));
+            sbExpr.Append(propertyList.AbsoluteToRelative(PropertyList.BOTTOM));
             sbExpr.Append("-style");
             p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 
@@ -41,8 +41,8 @@ namespace Genocs.Fonet.Fo.Properties
                 listprop = (ListProperty)propertyList.GetExplicitProperty("border-bottom");
                 if (listprop != null)
                 {
-                    IShorthandParser shparser = new GenericShorthandParser(listprop);
-                    p = shparser.GetValueForProperty(PropName, this, propertyList);
+                    IShortHandParser shparser = new GenericShorthandParser(listprop);
+                    p = shparser.GetValueForProperty(PropertyName, this, propertyList);
                 }
             }
 
@@ -51,8 +51,8 @@ namespace Genocs.Fonet.Fo.Properties
                 listprop = (ListProperty)propertyList.GetExplicitProperty("border-style");
                 if (listprop != null)
                 {
-                    IShorthandParser shparser = new BoxPropShorthandParser(listprop);
-                    p = shparser.GetValueForProperty(PropName, this, propertyList);
+                    IShortHandParser shparser = new BoxPropShorthandParser(listprop);
+                    p = shparser.GetValueForProperty(PropertyName, this, propertyList);
                 }
             }
 
@@ -61,8 +61,8 @@ namespace Genocs.Fonet.Fo.Properties
                 listprop = (ListProperty)propertyList.GetExplicitProperty("border");
                 if (listprop != null)
                 {
-                    IShorthandParser shparser = new GenericShorthandParser(listprop);
-                    p = shparser.GetValueForProperty(PropName, this, propertyList);
+                    IShortHandParser shparser = new GenericShorthandParser(listprop);
+                    p = shparser.GetValueForProperty(PropertyName, this, propertyList);
                 }
             }
 

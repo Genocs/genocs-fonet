@@ -16,7 +16,7 @@ public sealed class PdfGoTo : PdfDictionary, IPdfAction
         this.pageReference = pageReference;
     }
 
-    public PdfObjectReference PageReference
+    public PdfObjectReference? PageReference
     {
         set { pageReference = value; }
     }
@@ -32,19 +32,21 @@ public sealed class PdfGoTo : PdfDictionary, IPdfAction
     }
 
     public PdfObject GetAction()
-    {
-        return GetReference();
-    }
+        => GetReference();
 
     protected internal override void Write(PdfWriter writer)
     {
-        PdfArray dest = new PdfArray();
-        dest.Add(pageReference);
-        dest.Add(PdfName.Names.XYZ);
-        dest.Add(new PdfNumeric(xPosition));
-        dest.Add(new PdfNumeric(yPosition));
-        dest.Add(PdfNull.Null);
+        PdfArray dest =
+        [
+            pageReference,
+            PdfName.Names.XYZ,
+            new PdfNumeric(xPosition),
+            new PdfNumeric(yPosition),
+            PdfNull.Null,
+        ];
+
         this[PdfName.Names.D] = dest;
+
         base.Write(writer);
     }
 }

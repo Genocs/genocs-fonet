@@ -1,32 +1,24 @@
-namespace Genocs.Fonet.Pdf
+namespace Genocs.Fonet.Pdf;
+
+/// <summary>
+/// Array class used to represent the /W entry in the CIDFont dictionary.
+/// </summary>
+public class PdfWArray(int StartCID) : PdfObject
 {
-    /// <summary>
-    ///     Array class used to represent the /W entry in the CIDFont dictionary.
-    /// </summary>
-    public class PdfWArray : PdfObject
+    private readonly PdfArray _array = [];
+
+    public void AddEntry(int[] widths)
     {
-        private int startCID;
+        _array.AddArray(widths);
+    }
 
-        private PdfArray array = new PdfArray();
-
-        public PdfWArray(int startCID)
-        {
-            this.startCID = startCID;
-        }
-
-        public void AddEntry(int[] widths)
-        {
-            array.AddArray(widths);
-        }
-
-        protected internal override void Write(PdfWriter writer)
-        {
-            writer.WriteKeyword(Keyword.ArrayBegin);
-            writer.WriteSpace();
-            writer.Write(startCID);
-            writer.WriteSpace();
-            array.Write(writer);
-            writer.WriteKeyword(Keyword.ArrayEnd);
-        }
+    protected internal override void Write(PdfWriter? writer)
+    {
+        writer!.WriteKeyword(Keyword.ArrayBegin);
+        writer.WriteSpace();
+        writer.Write(StartCID);
+        writer.WriteSpace();
+        _array.Write(writer);
+        writer.WriteKeyword(Keyword.ArrayEnd);
     }
 }

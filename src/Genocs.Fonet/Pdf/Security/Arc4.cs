@@ -31,10 +31,10 @@ internal class Arc4
     }
 
     /// <summary>
-    ///     Initialises internal state from the passed key.
+    /// Initialises internal state from the passed key.
     /// </summary>
     /// <remarks>
-    ///     Can be called again with a new key to reuse an Arc4 instance.
+    /// Can be called again with a new key to reuse an Arc4 instance.
     /// </remarks>
     /// <param name="key">The encryption key.</param>
     internal void Initialise(byte[] key)
@@ -55,16 +55,16 @@ internal class Arc4
     }
 
     /// <summary>
-    ///     Encrypts or decrypts the passed byte array.
+    /// Encrypts or decrypts the passed byte array.
     /// </summary>
     /// <param name="dataIn">
-    ///     The data to be encrypted or decrypted.
+    /// The data to be encrypted or decrypted.
     /// </param>
     /// <param name="dataOut">
-    ///     The location that the encrypted or decrypted data is to be placed.
-    ///     The passed array should be at least the same size as dataIn.
-    ///     It is permissible for the same array to be passed for both dataIn
-    ///     and dataOut.
+    /// The location that the encrypted or decrypted data is to be placed.
+    /// The passed array should be at least the same size as dataIn.
+    /// It is permissible for the same array to be passed for both dataIn
+    /// and dataOut.
     /// </param>
     internal void Encrypt(byte[] dataIn, byte[] dataOut)
     {
@@ -75,7 +75,7 @@ internal class Arc4
     }
 
     /// <summary>
-    ///     Generates a pseudorandom byte used to encrypt or decrypt.
+    /// Generates a pseudorandom byte used to encrypt or decrypt.
     /// </summary>
     private byte Arc4Byte()
     {

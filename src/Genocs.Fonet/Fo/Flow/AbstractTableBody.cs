@@ -18,8 +18,7 @@ internal abstract class AbstractTableBody : FObj
     {
         if (!(parent is Table))
         {
-            FonetDriver.ActiveDriver.FireFonetError(
-                "A table body must be child of fo:table, not " + parent.GetName());
+            FonetDriver.ActiveDriver?.FireFonetError("A table body must be child of fo:table, not " + parent.Name);
         }
     }
 
@@ -29,14 +28,10 @@ internal abstract class AbstractTableBody : FObj
     }
 
     public virtual void SetYPosition(int value)
-    {
-        areaContainer.setYPosition(value);
-    }
+        => areaContainer.YPosition = value;
 
     public virtual int GetYPosition()
-    {
-        return areaContainer.GetCurrentYPosition();
-    }
+        => areaContainer.GetCurrentYPosition();
 
     public int GetHeight()
     {
@@ -58,9 +53,9 @@ internal abstract class AbstractTableBody : FObj
             BackgroundProps bProps = _propertyManager.GetBackgroundProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            this.spaceBefore = this._properties.GetProperty("space-before.optimum").GetLength().MValue();
-            this.spaceAfter = this._properties.GetProperty("space-after.optimum").GetLength().MValue();
-            this.id = this._properties.GetProperty("id").GetString();
+            this.spaceBefore = this.Properties.GetProperty("space-before.optimum").GetLength().MValue();
+            this.spaceAfter = this.Properties.GetProperty("space-after.optimum").GetLength().MValue();
+            this.id = this.Properties.GetProperty("id").GetString();
 
             area.GetIDReferences().CreateID(id);
 
@@ -90,14 +85,15 @@ internal abstract class AbstractTableBody : FObj
 
         int spaceLeft = area.spaceLeft();
 
-        this.areaContainer =
-            new AreaContainer(_propertyManager.GetFontState(area.getFontInfo()), 0,
+        this.areaContainer = new AreaContainer(_propertyManager.GetFontState(area.GetFontInfo()), 0,
                               area.getContentHeight(),
                               area.getContentWidth(),
-                              area.spaceLeft(), Position.RELATIVE);
+                              area.spaceLeft(),
+                              Position.RELATIVE, area);
+
+
         areaContainer.foCreator = this;
-        areaContainer.setPage(area.getPage());
-        areaContainer.setParent(area);
+        areaContainer.Page = area.Page;
         areaContainer.setBackground(_propertyManager.GetBackgroundProps());
         areaContainer.setBorderAndPadding(_propertyManager.GetBorderAndPadding());
         areaContainer.start();
@@ -126,9 +122,9 @@ internal abstract class AbstractTableBody : FObj
             row.SetRowSpanMgr(rowSpanMgr);
             row.SetColumns(columns);
             row.DoSetup(areaContainer);
-            if ((row.GetKeepWithPrevious().GetKeepType() != KeepValue.KEEP_WITH_AUTO ||
-                row.GetKeepWithNext().GetKeepType() != KeepValue.KEEP_WITH_AUTO ||
-                row.GetKeepTogether().GetKeepType() != KeepValue.KEEP_WITH_AUTO) &&
+            if ((row.GetKeepWithPrevious().KeepType != KeepValue.KEEP_WITH_AUTO ||
+                row.GetKeepWithNext().KeepType != KeepValue.KEEP_WITH_AUTO ||
+                row.GetKeepTogether().KeepType != KeepValue.KEEP_WITH_AUTO) &&
                 lastRow != null && !keepWith.Contains(lastRow))
             {
                 keepWith.Add(lastRow, null);
@@ -160,7 +156,7 @@ internal abstract class AbstractTableBody : FObj
                 if (status.IsPageBreak())
                 {
                     this._marker = i;
-                    area.addChild(areaContainer);
+                    area.AddChild(areaContainer);
 
                     area.increaseHeight(areaContainer.GetHeight());
                     if (i == numChildren - 1)
@@ -198,7 +194,7 @@ internal abstract class AbstractTableBody : FObj
                 }
                 if (!((i == 0) && (areaContainer.getContentHeight() <= 0)))
                 {
-                    area.addChild(areaContainer);
+                    area.AddChild(areaContainer);
 
                     area.increaseHeight(areaContainer.GetHeight());
                 }
@@ -222,7 +218,7 @@ internal abstract class AbstractTableBody : FObj
                 + this.areaContainer.getMaxHeight());
             spaceLeft = area.spaceLeft();
         }
-        area.addChild(areaContainer);
+        area.AddChild(areaContainer);
         areaContainer.end();
 
         area.increaseHeight(areaContainer.GetHeight());
@@ -261,13 +257,11 @@ internal abstract class AbstractTableBody : FObj
 
     private bool startsAC(Area area)
     {
-        Area parent = null;
+        Area? parent;
 
-        while ((parent = area.getParent()) != null &&
-            parent.HasNonSpaceChildren() == false)
+        while ((parent = area.Parent) != null && parent.HasNonSpaceChildren() == false)
         {
-            if (parent is AreaContainer &&
-                ((AreaContainer)parent).getPosition() == Position.ABSOLUTE)
+            if (parent is AreaContainer container && container.getPosition() == Position.ABSOLUTE)
             {
                 return true;
             }

@@ -6,18 +6,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class PageNumberCitation : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new PageNumberCitation(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new PageNumberCitation(parent, props));
 
     private float red;
     private float green;
@@ -33,15 +23,14 @@ internal class PageNumberCitation : FObj
     public PageNumberCitation(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:page-number-citation";
+        Name = "fo:page-number-citation";
     }
 
     public override Status Layout(Area area)
     {
-        if (!(area is BlockArea))
+        if (area is not BlockArea)
         {
-            FonetDriver.ActiveDriver.FireFonetWarning(
-                "Page-number-citation outside block area");
+            FonetDriver.ActiveDriver?.FireFonetWarning("Page-number-citation outside block area");
             return new Status(Status.OK);
         }
 
@@ -56,23 +45,21 @@ internal class PageNumberCitation : FObj
             MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            ColorType c = this._properties.GetProperty("color").GetColorType();
+            ColorType c = this.Properties.GetProperty("color").GetColorType();
             this.red = c.Red;
             this.green = c.Green;
             this.blue = c.Blue;
 
-            this.wrapOption = this._properties.GetProperty("wrap-option").GetEnum();
-            this.whiteSpaceCollapse =
-                this._properties.GetProperty("white-space-collapse").GetEnum();
-
-            this.refId = this._properties.GetProperty("ref-id").GetString();
+            this.wrapOption = this.Properties.GetProperty("wrap-option").GetEnum();
+            this.whiteSpaceCollapse = this.Properties.GetProperty("white-space-collapse").GetEnum();
+            this.refId = this.Properties.GetProperty("ref-id").GetString();
 
             if (this.refId.Equals(""))
             {
                 throw new FonetException("page-number-citation must contain \"ref-id\"");
             }
 
-            this.id = this._properties.GetProperty("id").GetString();
+            this.id = this.Properties.GetProperty("id").GetString();
             idReferences.CreateID(id);
             ts = new TextState();
 
@@ -85,13 +72,13 @@ internal class PageNumberCitation : FObj
         }
 
 
-        pageNumber = idReferences.getPageNumber(refId);
+        pageNumber = idReferences.SetPageNumber(refId);
 
         if (pageNumber != null)
         {
             this._marker =
                 FOText.addText((BlockArea)area,
-                               _propertyManager.GetFontState(area.getFontInfo()), red,
+                               _propertyManager.GetFontState(area.GetFontInfo()), red,
                                green, blue, wrapOption, null,
                                whiteSpaceCollapse, pageNumber.ToCharArray(),
                                0, pageNumber.Length, ts,
@@ -105,7 +92,7 @@ internal class PageNumberCitation : FObj
             {
                 return new Status(Status.AREA_FULL_NONE);
             }
-            la.changeFont(_propertyManager.GetFontState(area.getFontInfo()));
+            la.changeFont(_propertyManager.GetFontState(area.GetFontInfo()));
             la.changeColor(red, green, blue);
             la.changeWrapOption(wrapOption);
             la.changeWhiteSpaceCollapse(whiteSpaceCollapse);

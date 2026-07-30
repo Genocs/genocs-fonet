@@ -12,7 +12,8 @@ internal class ToBeImplementedProperty : Property
             {
                 return p;
             }
-            ToBeImplementedProperty val = new(PropName);
+
+            ToBeImplementedProperty val = new(PropertyName);
             return val;
         }
     }

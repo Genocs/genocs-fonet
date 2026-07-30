@@ -1,7 +1,7 @@
 namespace Genocs.Fonet.Pdf.Gdi.Font
 {
     /// <summary>
-    ///     A helper designed that provides the size of each TrueType primitives.
+    /// A helper designed that provides the size of each TrueType primitives.
     /// </summary>
     internal abstract class PrimitiveSizes
     {

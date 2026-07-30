@@ -6,23 +6,23 @@ using Genocs.Fonet.Pdf.Gdi.Font;
 namespace Genocs.Fonet.Render.Pdf.Fonts
 {
     /// <summary>
-    ///     A subclass of Type2CIDFont that generates a subset of a 
-    ///     TrueType font.
+    /// A subclass of Type2CIDFont that generates a subset of a 
+    /// TrueType font.
     /// </summary>
     internal class Type2CIDSubsetFont : Type2CIDFont
     {
         /// <summary>
-        ///     Maps a glyph index to a subset index.
+        /// Maps a glyph index to a subset index.
         /// </summary>
         protected IndexMappings indexMappings;
 
         /// <summary>
-        ///     Quasi-unique six character name prefix.
+        /// Quasi-unique six character name prefix.
         /// </summary>
         protected string namePrefix;
 
         /// <summary>
-        ///     Class constructor.
+        /// Class constructor.
         /// </summary>
         /// <param name="properties"></param>
         public Type2CIDSubsetFont(FontProperties properties)
@@ -33,7 +33,7 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         }
 
         /// <summary>
-        ///     Creates the index mappings list and adds the .notedef glyphs
+        /// Creates the index mappings list and adds the .notedef glyphs
         /// </summary>
         private void InsertNotdefGlyphs()
         {

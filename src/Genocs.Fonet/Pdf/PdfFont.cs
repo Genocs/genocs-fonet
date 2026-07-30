@@ -12,7 +12,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Returns the internal name used for this font.
+        /// Returns the internal name used for this font.
         /// </summary>
         public PdfName Name
         {

@@ -46,7 +46,7 @@ internal class BlankOrNotBlankMaker : EnumProperty.Maker
     {
         if (m_defaultProp == null)
         {
-            m_defaultProp = Make(propertyList, "any", propertyList.getParentFObj());
+            m_defaultProp = Make(propertyList, "any", propertyList.GetParentFObj());
         }
         return m_defaultProp;
     }

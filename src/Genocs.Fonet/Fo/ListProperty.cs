@@ -2,25 +2,25 @@ using System.Collections;
 
 namespace Genocs.Fonet.Fo;
 
-internal class ListProperty(Property prop) : Property
+internal class ListProperty(Property property) : Property
 {
     internal class Maker(string name) : PropertyMaker(name)
     {
-        public override Property ConvertProperty(Property p, PropertyList propertyList, FObj fo)
+        public override Property ConvertProperty(Property property, PropertyList propertyList, FObj? fo)
         {
-            if (p is ListProperty)
+            if (property is ListProperty)
             {
-                return p;
+                return property;
             }
             else
             {
-                return new ListProperty(p);
+                return new ListProperty(property);
             }
         }
 
     }
 
-    protected ArrayList? _list = [prop];
+    protected ArrayList? _list = [property];
 
     public void AddProperty(Property prop)
         => _list.Add(prop);

@@ -4,10 +4,10 @@ namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 /// Class that represents the OS/2 ('OS/2') table
 /// </summary>
 /// <remarks>
-///     <p>For detailed information on the OS/2 table, visit the following link:
-///     http://www.microsoft.com/typography/otspec/os2.htm</p>
-///     <p>For more details on the Panose classification metrics, visit the following URL:
-///     http://www.panose.com/hardware/pan2.asp</p>
+/// <p>For detailed information on the OS/2 table, visit the following link:
+/// http://www.microsoft.com/typography/otspec/os2.htm</p>
+/// <p>For more details on the Panose classification metrics, visit the following URL:
+/// http://www.panose.com/hardware/pan2.asp</p>
 /// </remarks>
 internal class OS2Table : FontTable
 {
@@ -64,8 +64,8 @@ internal class OS2Table : FontTable
     public OS2Table(DirectoryEntry entry) : base(TableNames.Os2, entry) { }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether this font contains 
-    ///     italic _characters.
+    /// Gets a boolean value that indicates whether this font contains 
+    /// italic _characters.
     /// </summary>
     public bool IsItalic
     {
@@ -73,8 +73,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether _characters are 
-    ///     in the standard weight/style.
+    /// Gets a boolean value that indicates whether _characters are 
+    /// in the standard weight/style.
     /// </summary>
     public bool IsRegular
     {
@@ -82,8 +82,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether _characters possess
-    ///     a weight greater than or equal to 700.
+    /// Gets a boolean value that indicates whether _characters possess
+    /// a weight greater than or equal to 700.
     /// </summary>
     public bool IsBold
     {
@@ -91,8 +91,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether this font contains 
-    ///     _characters that all have the same width.
+    /// Gets a boolean value that indicates whether this font contains 
+    /// _characters that all have the same width.
     /// </summary>
     public bool IsMonospaced
     {
@@ -100,8 +100,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether this font contains 
-    ///     special _characters such as dingbats, icons, etc.
+    /// Gets a boolean value that indicates whether this font contains 
+    /// special _characters such as dingbats, icons, etc.
     /// </summary>
     public bool IsSymbolic
     {
@@ -109,8 +109,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether _characters  
-    ///     do possess serifs
+    /// Gets a boolean value that indicates whether _characters  
+    /// do possess serifs
     /// </summary>
     public bool IsSerif
     {
@@ -126,8 +126,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether _characters 
-    ///     are designed to simulate hand writing.
+    /// Gets a boolean value that indicates whether _characters 
+    /// are designed to simulate hand writing.
     /// </summary>
     public bool IsScript
     {
@@ -135,8 +135,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether _characters  
-    ///     do not possess serifs
+    /// Gets a boolean value that indicates whether _characters  
+    /// do not possess serifs
     /// </summary>
     public bool IsSansSerif
     {
@@ -144,8 +144,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Gets a boolean value that indicates whether this font may be 
-    ///     legally embedded.
+    /// Gets a boolean value that indicates whether this font may be 
+    /// legally embedded.
     /// </summary>
     public bool IsEmbeddable
     {
@@ -207,8 +207,8 @@ internal class OS2Table : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "os/2" table from the supplied stream 
-    ///     at the current position.
+    /// Reads the contents of the "os/2" table from the supplied stream 
+    /// at the current position.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)

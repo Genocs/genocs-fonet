@@ -5,41 +5,33 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class BasicLink : Inline
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new BasicLink(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new BasicLink(parent, props));
 
     public BasicLink(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "fo:basic-link";
+        Name = "fo:basic-link";
     }
 
     public override Status Layout(Area area)
     {
-        string destination;
+        string? destination;
         int linkType;
-        AccessibilityProps mAccProps = _propertyManager.GetAccessibilityProps();
-        AuralProps mAurProps = _propertyManager.GetAuralProps();
-        BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
-        BackgroundProps bProps = _propertyManager.GetBackgroundProps();
-        MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
-        RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-        if (!(destination = _properties.GetProperty("internal-destination").GetString()).Equals(""))
+        // TODO: Implement the following properties if needed
+        // AccessibilityProps accProps = _propertyManager.GetAccessibilityProps();
+        // AuralProps aurProps = _propertyManager.GetAuralProps();
+        // BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
+        // BackgroundProps bProps = _propertyManager.GetBackgroundProps();
+        // MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
+        // RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
+
+        if (!(destination = Properties.GetProperty("internal-destination").GetString()).Equals(""))
         {
             linkType = LinkSet.INTERNAL;
         }
-        else if (!(destination = _properties.GetProperty("external-destination").GetString()).Equals(""))
+        else if (!(destination = Properties.GetProperty("external-destination").GetString()).Equals(""))
         {
             linkType = LinkSet.EXTERNAL;
         }
@@ -50,40 +42,37 @@ internal class BasicLink : Inline
 
         if (_marker == MarkerStart)
         {
-            string id = _properties.GetProperty("id").GetString();
+            string? id = Properties.GetProperty("id")?.GetString();
             area.GetIDReferences().InitializeID(id, area);
             _marker = 0;
         }
 
-        LinkSet ls = new LinkSet(destination, area, linkType);
+        LinkSet ls = new(destination, area, linkType);
 
-        AreaContainer ac = area.getNearestAncestorAreaContainer();
+        AreaContainer? ac = area.getNearestAncestorAreaContainer();
         while (ac != null && ac.getPosition() != Position.ABSOLUTE)
         {
             ac = ac.getNearestAncestorAreaContainer();
         }
 
-        if (ac == null)
-        {
-            ac = area.getPage().getBody().getCurrentColumnArea();
-        }
+        ac ??= area.Page?.getBody().getCurrentColumnArea();
 
         int numChildren = this._children.Count;
         for (int i = this._marker; i < numChildren; i++)
         {
-            FONode fo = (FONode)_children[i];
+            FONode? fo = (FONode?)_children[i] ?? throw new FonetException("Child node is null in BasicLink layout.");
             fo.SetLinkSet(ls);
 
             Status status;
             if ((status = fo.Layout(area)).IsIncomplete())
             {
-                this._marker = i;
+                _marker = i;
                 return status;
             }
         }
 
         ls.applyAreaContainerOffsets(ac, area);
-        area.getPage().addLinkSet(ls);
+        area.Page?.addLinkSet(ls);
 
         return new Status(Status.OK);
     }

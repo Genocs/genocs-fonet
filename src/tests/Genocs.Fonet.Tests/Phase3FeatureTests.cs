@@ -14,6 +14,24 @@ public class Phase3FeatureTests : PdfTestBase
     }
 
     [Fact]
+    public void Phase3FloatSideTemplate_RendersValidPdf()
+    {
+        var pdfBytes = RenderFo("Phase3FloatSideTest.fo", AddNunitoFonts);
+
+        PdfAssertions.AssertValidPdf(pdfBytes);
+        PdfAssertions.AssertPdfPageCount(pdfBytes, expectedPages: 1);
+    }
+
+    [Fact]
+    public void Phase3ZIndexTemplate_RendersValidPdf()
+    {
+        var pdfBytes = RenderFo("Phase3ZIndexTest.fo", AddNunitoFonts);
+
+        PdfAssertions.AssertValidPdf(pdfBytes);
+        PdfAssertions.AssertPdfPageCount(pdfBytes, expectedPages: 1);
+    }
+
+    [Fact]
     public void ExistingTemplates_StillRenderAfterPhase3Changes()
     {
         var pdfBytes = RenderFo("StarWarsMovies.fo");

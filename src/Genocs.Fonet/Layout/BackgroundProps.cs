@@ -1,24 +1,19 @@
 using Genocs.Fonet.Image;
 using Genocs.Fonet.DataTypes;
 
-namespace Genocs.Fonet.Layout
+namespace Genocs.Fonet.Layout;
+
+internal class BackgroundProps
 {
-    internal class BackgroundProps
-    {
-        public int backAttachment = 0;
+    public int backAttachment = 0;
 
-        public ColorType backColor = null;
+    public ColorType backColor = null;
 
-        public FonetImage backImage = null;
+    public FonetImage backImage = null;
 
-        public int backRepeat = 0;
+    public int backRepeat = 0;
 
-        public Length backPosHorizontal = null;
+    public Length backPosHorizontal = null;
 
-        public Length backPosVertical = null;
-
-        public BackgroundProps()
-        {
-        }
-    }
+    public Length backPosVertical = null;
 }

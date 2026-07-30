@@ -5,23 +5,13 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class Leader : FObjMixed
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new Leader(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Leader(parent, props));
 
     public Leader(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:leader";
+        Name = "fo:leader";
     }
 
     public override Status Layout(Area area)
@@ -44,17 +34,17 @@ internal class Leader : FObjMixed
         BackgroundProps bProps = _propertyManager.GetBackgroundProps();
         MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
         RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
-        ColorType c = this._properties.GetProperty("color").GetColorType();
+        ColorType c = this.Properties.GetProperty("color").GetColorType();
         float red = c.Red;
         float green = c.Green;
         float blue = c.Blue;
 
-        int leaderPattern = this._properties.GetProperty("leader-pattern").GetEnum();
+        int leaderPattern = this.Properties.GetProperty("leader-pattern").GetEnum();
         int leaderLengthOptimum =
-            this._properties.GetProperty("leader-length.optimum").GetLength().MValue();
+            this.Properties.GetProperty("leader-length.optimum").GetLength().MValue();
         int leaderLengthMinimum =
-            this._properties.GetProperty("leader-length.minimum").GetLength().MValue();
-        Length maxlength = this._properties.GetProperty("leader-length.maximum").GetLength();
+            this.Properties.GetProperty("leader-length.minimum").GetLength().MValue();
+        Length maxlength = this.Properties.GetProperty("leader-length.maximum").GetLength();
         int leaderLengthMaximum;
         if (maxlength is PercentLength)
         {
@@ -66,18 +56,18 @@ internal class Leader : FObjMixed
             leaderLengthMaximum = maxlength.MValue();
         }
         int ruleThickness =
-            this._properties.GetProperty("rule-thickness").GetLength().MValue();
-        int ruleStyle = this._properties.GetProperty("rule-style").GetEnum();
+            this.Properties.GetProperty("rule-thickness").GetLength().MValue();
+        int ruleStyle = this.Properties.GetProperty("rule-style").GetEnum();
         int leaderPatternWidth =
-            this._properties.GetProperty("leader-pattern-width").GetLength().MValue();
+            this.Properties.GetProperty("leader-pattern-width").GetLength().MValue();
         int leaderAlignment =
-            this._properties.GetProperty("leader-alignment").GetEnum();
+            this.Properties.GetProperty("leader-alignment").GetEnum();
 
-        string id = this._properties.GetProperty("id").GetString();
+        string id = this.Properties.GetProperty("id").GetString();
         blockArea.GetIDReferences().InitializeID(id, blockArea);
 
         int succeeded = AddLeader(blockArea,
-                                  _propertyManager.GetFontState(area.getFontInfo()),
+                                  _propertyManager.GetFontState(area.GetFontInfo()),
                                   red, green, blue, leaderPattern,
                                   leaderLengthMinimum, leaderLengthOptimum,
                                   leaderLengthMaximum, ruleThickness,

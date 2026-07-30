@@ -1,38 +1,38 @@
-using Genocs.Fonet.Pdf.Gdi.Font.Tables;
 using System.Collections;
+using Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 namespace Genocs.Fonet.Pdf.Gdi.Font;
 
 /// <summary>
-///     A specialised stream writer for creating OpenType fonts.
+/// A specialised stream writer for creating OpenType fonts.
 /// </summary>
 internal class FontFileWriter
 {
     /// <summary>
-    ///     Size of the offset table in bytes.
+    /// Size of the offset table in bytes.
     /// </summary>
     private const int OffsetTableSize = PrimitiveSizes.Fixed + 4 * PrimitiveSizes.UShort;
 
     /// <summary>
-    ///     The underlying stream.
+    /// The underlying stream.
     /// </summary>
     private FontFileStream stream;
 
     /// <summary>
-    ///     List of font tables to write.
+    /// List of font tables to write.
     /// </summary>
     private IDictionary tables;
 
     /// <summary>
-    ///     Creates a new instance of the <see cref="FontFileWriter"/> class
-    ///     using <i>stream</i> as the underlying stream object.
+    /// Creates a new instance of the <see cref="FontFileWriter"/> class
+    /// using <i>stream</i> as the underlying stream object.
     /// </summary>
     /// <param name="stream"></param>
     /// <exception cref="ArgumentException">
-    ///     If <i>stream</i> is not writable.
+    /// If <i>stream</i> is not writable.
     /// </exception>
     /// <exception cref="ArgumentNullException">
-    ///     If <i>streamm</i> is a null reference.
+    /// If <i>streamm</i> is a null reference.
     /// </exception>
     public FontFileWriter(Stream stream)
     {
@@ -49,7 +49,7 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Gets the underlying <see cref="FontFileStream"/>.
+    /// Gets the underlying <see cref="FontFileStream"/>.
     /// </summary>
     public FontFileStream Stream
     {
@@ -57,14 +57,14 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Queues the supplied <see cref="FontTable"/> for writing 
-    ///     to the underlying stream.
+    /// Queues the supplied <see cref="FontTable"/> for writing 
+    /// to the underlying stream.
     /// </summary>
     /// <remarks>
-    ///     The method will not immediately write the supplied font 
-    ///     table to the underlying stream.  Instead it queues the 
-    ///     font table since the offset table must be written out 
-    ///     before any tables.
+    /// The method will not immediately write the supplied font 
+    /// table to the underlying stream.  Instead it queues the 
+    /// font table since the offset table must be written out 
+    /// before any tables.
     /// </remarks>
     /// <param name="table"></param>
     public void Write(FontTable table)
@@ -77,7 +77,7 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Writes the header and font tables to the underlying stream.
+    /// Writes the header and font tables to the underlying stream.
     /// </summary>
     public void Close()
     {
@@ -89,7 +89,7 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Updates the checkSumAdjustment field in the head table.
+    /// Updates the checkSumAdjustment field in the head table.
     /// </summary>
     private void WriteChecksumAdjustment()
     {
@@ -102,7 +102,7 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Writes out each table to the font stream.
+    /// Writes out each table to the font stream.
     /// </summary>
     private void WriteTables()
     {
@@ -133,8 +133,8 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Writes the offset table that appears at the beginning of 
-    ///     every TrueType/OpenType font.
+    /// Writes the offset table that appears at the beginning of 
+    /// every TrueType/OpenType font.
     /// </summary>
     private void WriteOffsetTable()
     {
@@ -177,8 +177,8 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Does not actually write the table directory - simply "allocates"
-    ///     space for it in the stream.
+    /// Does not actually write the table directory - simply "allocates"
+    /// space for it in the stream.
     /// </summary>
     private void SkipTableDirectory()
     {
@@ -186,7 +186,7 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Returns the maximum power of 2 &lt;= max
+    /// Returns the maximum power of 2 &lt;= max
     /// </summary>
     /// <param name="max"></param>
     /// <returns></returns>
@@ -202,11 +202,11 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Calculates the checksum of the entire font.
+    /// Calculates the checksum of the entire font.
     /// </summary>
     /// <remarks>
-    ///     The underlying <see cref="FontFileStream"/> must be aligned on
-    ///     a 4-byte boundary.
+    /// The underlying <see cref="FontFileStream"/> must be aligned on
+    /// a 4-byte boundary.
     /// </remarks>
     /// <returns></returns>
     private uint CalculateCheckSumAdjustment()
@@ -221,11 +221,11 @@ internal class FontFileWriter
     }
 
     /// <summary>
-    ///     Calculates the checksum of a <see cref="FontTable"/>.
+    /// Calculates the checksum of a <see cref="FontTable"/>.
     /// </summary>
     /// <remarks>
-    ///     The supplied <i>stream</i> must be positioned at the beginning of 
-    ///     the table.
+    /// The supplied <i>stream</i> must be positioned at the beginning of 
+    /// the table.
     /// </remarks>
     /// <param name="length"></param>
     /// <returns></returns>

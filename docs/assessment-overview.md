@@ -6,76 +6,76 @@ Genocs.Fonet is a .NET port of **Fonet**, an XSL-FO (Extensible Stylesheet Langu
 
 This assessment evaluates the current state of that migration and identifies what remains before the library can be used reliably in production.
 
+**Last updated:** August 2026
+
 ## Executive Summary
 
-The migration is **underway but incomplete**. The codebase has made meaningful progress:
+The migration has made substantial progress through Phases 0–2 and the initial Phase 3 Tier 1 batch:
 
 - Targets cross-platform .NET (`net8.0`, `net9.0`, `net10.0`)
 - Removed `System.Drawing` and native GDI P/Invoke
 - Integrated **SkiaSharp** for font typeface loading and image decoding
 - Preserved the original Fonet architecture (parse → layout → render → custom PDF writer)
+- Font pipeline complete: glyph mapping via `CmapReader`, file-based font table access, subsetting, and font descriptor metrics
+- Quality improvements: span-based image extraction, structured error reporting, namespace consolidation
+- CI via GitHub Actions; 22 tests with PDF structure validation on net8/9/10
 
-However, the library **cannot be considered production-ready**. The most critical gap is the **GDI compatibility shim** (`Pdf/Gdi/`) — it preserves the old API surface but many methods are stubs that return dummy values. Font glyph mapping, Unicode range detection, and font table access through this layer are broken or approximate. Combined with ~90 unimplemented XSL-FO properties and minimal test coverage, real-world FO documents will produce incorrect or incomplete PDFs.
+However, the library **cannot be considered production-ready**. ~87 XSL-FO properties and 11 elements remain stubbed. Side-float layout, RTL/bidi, and CJK text need further work and validation.
 
 ### Readiness Scorecard
 
 | Dimension | Rating | Notes |
 |-----------|--------|-------|
-| Compilability | ✅ Good | Solution builds; ~3,000+ nullable warnings |
+| Compilability | ✅ Good | Solution builds cleanly on net8/9/10 |
 | Cross-platform deps | ✅ Good | Single NuGet dep: SkiaSharp 2.88.9 |
 | FO parsing | ✅ Good | Largely platform-agnostic |
-| Layout engine | ⚠️ Partial | Core block/inline/table works; many properties stubbed |
+| Layout engine | ⚠️ Partial | Core block/inline/table works; ~87 properties stubbed |
 | PDF generation | ⚠️ Partial | Custom writer functional for basic output |
-| Font handling | ⚠️ Partial | Phase 1 complete for Latin/custom fonts; CJK needs CI validation |
-| Image handling | ⚠️ Partial | SkiaSharp works; per-pixel extraction is slow |
-| Test coverage | ❌ Poor | 5 smoke tests, no content validation |
-| CI / automation | ❌ None | No GitHub Actions or cross-platform CI |
-| Documentation | ⚠️ Partial | Root README exists but is partially stale |
+| Font handling | ✅ Good (Latin) | Custom + system fonts work; CJK needs validation |
+| Image handling | ✅ Good | SkiaSharp with span-based pixel extraction |
+| Test coverage | ⚠️ Partial | 22 tests with PDF structure validation; no content/visual checks |
+| CI / automation | ✅ Good | GitHub Actions build, test, pack workflows |
+| Documentation | ✅ Good | Migration docs updated through Phase 3 |
 
 ## What Works Today
 
-Based on code review and existing smoke tests:
+Based on code review and the 22 passing tests:
 
 - End-to-end FO → PDF for simple documents (text blocks, basic tables, lists)
 - PDF Base-14 fonts (Helvetica, Times, Courier families)
 - Custom/private font registration via `PdfRendererOptions.AddPrivateFont`
+- Custom font embedding with correct glyph mapping and subsetting (Nunito tests)
 - Image embedding via `<fo:external-graphic>` (SkiaSharp decode)
-- Expression evaluation for common length/number properties (actively being fixed)
+- Expression evaluation for common length/number properties
 - Custom PDF writer (no third-party PDF library dependency)
+- Phase 3 Tier 1: `visibility`, `word-spacing`, `margin` shorthand, table captions
 
 ## What Does Not Work Reliably
 
-- **System TrueType font metrics** when code paths hit `LibWrapper` stubs
-- **Glyph index mapping** for embedded/subset fonts (`GetGlyphIndices` returns count but never fills indices)
-- **Unicode / CJK text** — hardcoded Latin ranges; `Type2CIDFont` subsetting incomplete
-- **Advanced XSL-FO features** — floats, captions, bidi, aural properties, multi-switch, etc.
-- **Font subsetting table writes** — `OS2Table`, `NameTable`, `PostTable` throw `NotImplementedException`
-- **Cross-platform font discovery** — recursive filesystem scan with filename substring matching
+- **Side-float layout** — `fo:float` renders in flow; `float`/`clear`/`z-index` parse but do not affect layout
+- **Advanced XSL-FO features** — bidi, aural properties, multi-switch, inline-container, etc.
+- **Unicode / CJK text** — cmap format 12 supported in code but not validated with CJK font fixtures
+- **Cross-platform system font discovery** — recursive filesystem scan with filename substring matching; imprecise on Linux/macOS
 - **PDF encryption** — legacy RC4 only; non-ASCII password encoding incomplete
+- **~87 stubbed FO properties** — log warnings and are ignored during layout
 
-## Active Development Areas
+## Completed Migration Phases
 
-Recent uncommitted changes (as of assessment date) focus on:
+| Phase | Status | Key deliverables |
+|-------|--------|------------------|
+| Phase 0: Stabilize | ✅ Complete | CI, `PdfTestBase`, `PdfAssertions`, SkiaSharp crash fix |
+| Phase 1: Font Pipeline | ✅ Complete | `FontTableAccess`, `CmapReader`, glyph mapping, subsetting, metrics |
+| Phase 2: Quality | ✅ Complete | Image spans, PDF encoding, namespaces, error reporting, kerning |
+| Phase 3: FO Completeness | 🔄 In progress | Tier 1 properties/elements done; side-float deferred |
 
-- Nullable/type fixes in `DataTypes/` (Length, Color, PercentLength, etc.)
-- Expression engine hardening (`Fo/Expr/Numeric.cs`, Min/Max/Abs functions)
-- Property system alignment (`Property.cs`, `LengthProperty.cs`, `NumberProperty.cs`)
-- Cross-platform test template expansion (`CrossPlatformTest.fo`)
-
-Direction of travel: stabilizing the type system and expression evaluation — **not yet** removing the GDI shim.
-
-## Stale Documentation Note
-
-The root `README.md` states the solution "does not currently build cleanly" (dated 2026-06-12). That is **no longer accurate** — `BoxPropShorthandParser` exists and the solution compiles. The README should be updated to reflect current build status while documenting remaining functional limitations.
+See [Migration Plan](./migration-plan.md) and phase summaries for details.
 
 ## Recommended Next Steps
 
-See [Migration Plan](./migration-plan.md) for the full phased roadmap. Immediate priorities:
-
-1. **Fix the font pipeline** — replace `LibWrapper` stubs with SkiaSharp-backed implementations
-2. **Harden tests** — add PDF structure validation, not just file existence
-3. **Triage FO features** — implement properties/elements required by target document templates
-4. **Add CI** — build and test on Windows, Linux, and macOS
+1. **Complete Phase 3** — side-float layout, Tier 2 i18n properties, consumer template triage
+2. **CJK validation** — add CJK font fixture test and cross-platform CI coverage
+3. **Deepen tests** — glyph content validation, visual regression, negative cases
+4. **Phase 4 hardening** — NuGet publish, AES encryption, performance benchmarks
 
 ## Assessment Methodology
 
@@ -83,6 +83,6 @@ This assessment was produced by:
 
 - Static analysis of ~658 source files across `Fo/`, `Layout/`, `Pdf/`, `Render/`, `Image/`, `DataTypes/`
 - Grep for `TODO`, `FIXME`, `NotImplementedException`, `ToBeImplemented`, platform conditionals
-- Review of test project and FO templates
+- Review of test project (22 tests) and FO templates
 - Architecture tracing from `FonetDriver.Render()` through layout to `PdfRenderer` and `PdfCreator`
-- Comparison of `LibWrapper` against original GDI expectations
+- Verification against Phase 1–3 implementation summaries

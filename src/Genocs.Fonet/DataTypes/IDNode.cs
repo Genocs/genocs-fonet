@@ -6,8 +6,8 @@ internal class IDNode
 {
     private readonly string _idValue;
 
-    private PdfObjectReference? internalLinkGoToPageReference;
-    private PdfGoTo? internalLinkGoTo;
+    private PdfObjectReference? _internalLinkGoToPageReference;
+    private PdfGoTo? _internalLinkGoTo;
 
     private int pageNumber = -1;
     private int xPosition = 0;
@@ -24,58 +24,56 @@ internal class IDNode
     }
 
     public string? GetPageNumber()
-    {
-        return (pageNumber != -1) ? pageNumber.ToString() : null;
-    }
+        => (pageNumber != -1) ? pageNumber.ToString() : null;
 
     internal void CreateInternalLinkGoTo(PdfObjectId objectId)
     {
-        if (internalLinkGoToPageReference == null)
+        if (_internalLinkGoToPageReference == null)
         {
-            internalLinkGoTo = new PdfGoTo(null, objectId);
+            _internalLinkGoTo = new PdfGoTo(null, objectId);
         }
         else
         {
-            internalLinkGoTo = new PdfGoTo(internalLinkGoToPageReference, objectId);
+            _internalLinkGoTo = new PdfGoTo(_internalLinkGoToPageReference, objectId);
         }
 
         if (xPosition != 0)
         {
-            internalLinkGoTo.X = xPosition;
-            internalLinkGoTo.Y = yPosition;
+            _internalLinkGoTo.X = xPosition;
+            _internalLinkGoTo.Y = yPosition;
         }
     }
 
     internal void SetInternalLinkGoToPageReference(PdfObjectReference pageReference)
     {
-        if (internalLinkGoTo != null)
+        if (_internalLinkGoTo != null)
         {
-            internalLinkGoTo.PageReference = pageReference;
+            _internalLinkGoTo.PageReference = pageReference;
         }
         else
         {
-            internalLinkGoToPageReference = pageReference;
+            _internalLinkGoToPageReference = pageReference;
         }
     }
 
     internal string GetInternalLinkGoToReference()
-        => internalLinkGoTo != null ? $"{internalLinkGoTo.ObjectId.ObjectNumber} {internalLinkGoTo.ObjectId.GenerationNumber} R" : string.Empty;
+        => _internalLinkGoTo != null ? $"{_internalLinkGoTo.ObjectId.ObjectNumber} {_internalLinkGoTo.ObjectId.GenerationNumber} R" : string.Empty;
 
     protected string GetIDValue()
         => _idValue;
 
     internal PdfGoTo? GetInternalLinkGoTo()
-        => internalLinkGoTo;
+        => _internalLinkGoTo;
 
     internal bool IsThereInternalLinkGoTo()
-        => internalLinkGoTo != null;
+        => _internalLinkGoTo != null;
 
     internal void SetPosition(int x, int y)
     {
-        if (internalLinkGoTo != null)
+        if (_internalLinkGoTo != null)
         {
-            internalLinkGoTo.X = x;
-            internalLinkGoTo.Y = y;
+            _internalLinkGoTo.X = x;
+            _internalLinkGoTo.Y = y;
         }
         else
         {

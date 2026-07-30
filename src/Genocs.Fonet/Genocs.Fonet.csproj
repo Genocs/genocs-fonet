@@ -1,28 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
-		<PackageId>Genocs.Fonet</PackageId>
-		<RootNamespace>Genocs.Fonet</RootNamespace>
-		<AssemblyName>Genocs.Fonet</AssemblyName>
-		<Title>Genocs Fonet library</Title>
-		<Description>Fonet library for Genocs projects.</Description>
-		<Summary>The PDF building library based on Fonet.</Summary>
-		<PackageTags>genocs fonet pdf</PackageTags>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
+        <PackageId>Genocs.Fonet</PackageId>
+        <RootNamespace>Genocs.Fonet</RootNamespace>
+        <AssemblyName>Genocs.Fonet</AssemblyName>
+        <Title>Genocs Fonet library</Title>
+        <Description>Fonet library to build PDFs by transforming XML documents through XSLT.</Description>
+        <Summary>The PDF building library based on Fonet.</Summary>
+        <PackageTags>genocs fonet pdf</PackageTags>
+    </PropertyGroup>
 
-	<PropertyGroup>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="SkiaSharp" Version="4.150.1" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="SkiaSharp" Version="4.150.1" />
+        <PackageReference Include="Svg.Skia" Version="3.1.0" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<InternalsVisibleTo Include="Genocs.Fonet.Tests" />
-	</ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Genocs.Fonet.Tests" />
+    </ItemGroup>
 
 </Project>

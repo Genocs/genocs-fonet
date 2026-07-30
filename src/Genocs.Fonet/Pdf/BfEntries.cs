@@ -3,55 +3,55 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     A collection of <see cref="BfEntry"/> instances.
+/// A collection of <see cref="BfEntry"/> instances.
 /// </summary>
 internal class BfEntryList : IEnumerable
 {
-    private ArrayList entries = new ArrayList();
+    private readonly ArrayList _entries = [];
 
     /// <summary>
-    ///     Adds the supplied <see cref="BfEntry"/> to the end of the collection.
+    /// Adds the supplied <see cref="BfEntry"/> to the end of the collection.
     /// </summary>
     /// <param name="entry"></param>
     public void Add(BfEntry entry)
     {
-        entries.Add(entry);
+        _entries.Add(entry);
     }
 
     /// <summary>
-    ///     Gets the <see cref="BfEntry"/> at <i>index</i>.
+    /// Gets the <see cref="BfEntry"/> at <i>index</i>.
     /// </summary>
     public BfEntry this[int index]
     {
         get
         {
-            return (BfEntry)entries[index];
+            return (BfEntry)_entries[index];
         }
     }
 
     /// <summary>
-    ///     Gets the number of <see cref="BfEntry"/> objects contained by this 
-    ///     <see cref="BfEntryList"/>
+    /// Gets the number of <see cref="BfEntry"/> objects contained by this 
+    /// <see cref="BfEntryList"/>
     /// </summary>
     public int Count
     {
         get
         {
-            return entries.Count;
+            return _entries.Count;
         }
     }
 
     /// <summary>
-    ///     Returns the number of <see cref="BfEntry"/> instances that 
-    ///     represent bfrange's
+    /// Returns the number of <see cref="BfEntry"/> instances that 
+    /// represent bfrange's
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The number of <see cref="BfEntry"/> instances that represent bfrange's</returns>
     public int NumRanges
     {
         get
         {
             int count = 0;
-            foreach (BfEntry entry in entries)
+            foreach (BfEntry entry in _entries)
             {
                 if (entry.IsRange)
                 {
@@ -63,13 +63,13 @@ internal class BfEntryList : IEnumerable
     }
 
     /// <summary>
-    ///     
+    /// Gets an array of <see cref="BfEntry"/> instances that represent bfrange's
     /// </summary>
     public BfEntry[] Ranges
     {
         get
         {
-            ArrayList ranges = new ArrayList(NumRanges);
+            ArrayList ranges = new(NumRanges);
             foreach (BfEntry entry in this)
             {
                 if (entry.IsRange)
@@ -82,26 +82,26 @@ internal class BfEntryList : IEnumerable
     }
 
     /// <summary>
-    ///     Returns the number of <see cref="BfEntry"/> instances that 
-    ///     represent bfchar's
+    /// Returns the number of <see cref="BfEntry"/> instances that 
+    /// represent bfchar's
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The number of <see cref="BfEntry"/> instances that represent bfchar's</returns>
     public int NumChars
     {
         get
         {
-            return (entries.Count - NumRanges);
+            return (_entries.Count - NumRanges);
         }
     }
 
     /// <summary>
-    ///     
+    /// Gets an array of <see cref="BfEntry"/> instances that represent bfchar's
     /// </summary>
     public BfEntry[] Chars
     {
         get
         {
-            ArrayList chars = new ArrayList(NumChars);
+            ArrayList chars = new(NumChars);
             foreach (BfEntry entry in this)
             {
                 if (entry.IsChar)
@@ -114,88 +114,55 @@ internal class BfEntryList : IEnumerable
     }
 
     /// <summary>
-    ///     Returns an ArrayList enumerator that references a read-only version
-    ///     of the BfEntry list.
+    /// Returns an ArrayList enumerator that references a read-only version
+    /// of the BfEntry list.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An enumerator that references a read-only version of the BfEntry list.</returns>
     public IEnumerator GetEnumerator()
     {
-        return ArrayList.ReadOnly(entries).GetEnumerator();
+        return ArrayList.ReadOnly(_entries).GetEnumerator();
     }
 }
 
 /// <summary>
-///     A <see cref="BfEntry"/> class can represent either a bfrange 
-///     or bfchar.
+/// A <see cref="BfEntry"/> class can represent either a bfrange 
+/// or bfchar.
 /// </summary>
-internal class BfEntry
+/// <remarks>
+/// Class constructor.
+/// </remarks>
+/// <param name="startIndex"></param>
+/// <param name="unicodeValue"></param>
+internal class BfEntry(ushort startIndex, ushort unicodeValue)
 {
-    private ushort startIndex;
-    private ushort endIndex;
-    private ushort unicodeValue;
-
     /// <summary>
-    ///     Class cosntructor.
-    /// </summary>
-    /// <param name="startIndex"></param>
-    /// <param name="unicodeValue"></param>
-    public BfEntry(ushort startIndex, ushort unicodeValue)
-    {
-        this.startIndex = startIndex;
-        this.endIndex = startIndex;
-        this.unicodeValue = unicodeValue;
-    }
-
-    /// <summary>
-    ///     Increments the end index by one.
+    /// Increments the end index by one.
     /// </summary>
     /// <remarks>
-    ///     Incrementing the end index turns this BfEntry into a bfrange.
+    /// Incrementing the end index turns this BfEntry into a bfrange.
     /// </remarks>
     public void IncrementEndIndex()
-    {
-        endIndex++;
-    }
+        => EndGlyphIndex++;
 
-    public ushort StartGlyphIndex
-    {
-        get
-        {
-            return startIndex;
-        }
-    }
-
-    public ushort EndGlyphIndex
-    {
-        get
-        {
-            return endIndex;
-        }
-    }
-
-    public ushort UnicodeValue
-    {
-        get
-        {
-            return unicodeValue;
-        }
-    }
+    public ushort StartGlyphIndex { get; } = startIndex;
+    public ushort EndGlyphIndex { get; private set; }
+    public ushort UnicodeValue { get; } = unicodeValue;
 
     /// <summary>
-    ///     Returns <b>true</b> if this BfEntry represents a glyph range, i.e.
-    ///     the start index is not equal to the end index.
+    /// Returns <b>true</b> if this BfEntry represents a glyph range, i.e.
+    /// the start index is not equal to the end index.
     /// </summary>
     public bool IsRange
     {
         get
         {
-            return (startIndex != endIndex);
+            return (StartGlyphIndex != EndGlyphIndex);
         }
     }
 
     /// <summary>
-    ///     Returns <b>true</b> if this BfEntry represents a bfchar entry, i.e.
-    ///     the start index is equal to the end index.
+    /// Returns <b>true</b> if this BfEntry represents a bfchar entry, i.e.
+    /// the start index is equal to the end index.
     /// </summary>
     public bool IsChar
     {

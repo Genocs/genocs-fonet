@@ -4,20 +4,12 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class RepeatablePageMasterAlternatives : FObj, ISubSequenceSpecifier
 {
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new RepeatablePageMasterAlternatives(parent, props));
+
     private const int INFINITE = -1;
 
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new RepeatablePageMasterAlternatives(parent, propertyList);
-        }
-    }
 
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
 
     private PageSequenceMaster pageSequenceMaster;
 
@@ -30,11 +22,11 @@ internal class RepeatablePageMasterAlternatives : FObj, ISubSequenceSpecifier
     public RepeatablePageMasterAlternatives(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:repeatable-page-master-alternatives";
+        Name = "fo:repeatable-page-master-alternatives";
 
         conditionalPageMasterRefs = new ArrayList();
 
-        if (parent.GetName().Equals("fo:page-sequence-master"))
+        if (parent.Name.Equals("fo:page-sequence-master"))
         {
             this.pageSequenceMaster = (PageSequenceMaster)parent;
             this.pageSequenceMaster.AddSubsequenceSpecifier(this);
@@ -43,10 +35,10 @@ internal class RepeatablePageMasterAlternatives : FObj, ISubSequenceSpecifier
         {
             throw new FonetException("fo:repeatable-page-master-alternatives"
                 + "must be child of fo:page-sequence-master, not "
-                + parent.GetName());
+                + parent.Name);
         }
 
-        string mr = GetProperty("maximum-repeats").GetString();
+        string? mr = GetProperty("maximum-repeats").GetString();
         if (mr.Equals("no-limit"))
         {
             setMaximumRepeats(INFINITE);
@@ -62,7 +54,6 @@ internal class RepeatablePageMasterAlternatives : FObj, ISubSequenceSpecifier
                 throw new FonetException("Invalid number for 'maximum-repeats' property");
             }
         }
-
     }
 
     public string? GetNextPageMaster(int currentPageNumber, bool thisIsFirstPage, bool isEmptyPage)

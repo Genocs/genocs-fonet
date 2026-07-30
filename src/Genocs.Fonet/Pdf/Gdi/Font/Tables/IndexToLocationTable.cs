@@ -63,7 +63,7 @@ internal class IndexToLocationTable : FontTable
     }
 
     /// <summary>
-    ///     Removes all offsets.
+    /// Removes all offsets.
     /// </summary>
     public void Clear()
     {
@@ -71,7 +71,7 @@ internal class IndexToLocationTable : FontTable
     }
 
     /// <summary>
-    ///     Includes the supplied offset.
+    /// Includes the supplied offset.
     /// </summary>
     /// <param name="offset"></param>
     public void AddOffset(uint offset)
@@ -80,7 +80,7 @@ internal class IndexToLocationTable : FontTable
     }
 
     /// <summary>
-    ///     Gets the number of glyph offsets.
+    /// Gets the number of glyph offsets.
     /// </summary>
     public int Count
     {

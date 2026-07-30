@@ -4,23 +4,13 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class ListItemLabel : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new ListItemLabel(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new ListItemLabel(parent, props));
 
     public ListItemLabel(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:list-item-label";
+        Name = "fo:list-item-label";
     }
 
     public override Status Layout(Area area)
@@ -33,14 +23,14 @@ internal class ListItemLabel : FObj
         }
 
         AccessibilityProps mAccProps = _propertyManager.GetAccessibilityProps();
-        string id = this._properties.GetProperty("id").GetString();
+        string id = this.Properties.GetProperty("id").GetString();
         area.GetIDReferences().InitializeID(id, area);
 
         Block block = (Block)_children[0];
 
         Status status;
         status = block.Layout(area);
-        area.addDisplaySpace(-block.GetAreaHeight());
+        area.AddDisplaySpace(-block.GetAreaHeight());
         return status;
     }
 }

@@ -3,36 +3,36 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     Class that defines a mapping between character codes (CIDs) 
-///     to a character selector (Identity-H encoding)
+/// Class that defines a mapping between character codes (CIDs) 
+/// to a character selector (Identity-H encoding).
 /// </summary>
 public class PdfCMap : PdfContentStream
 {
     public const string DefaultName = "Adobe-Identity-UCS";
 
-    private PdfCIDSystemInfo systemInfo;
+    private PdfCIDSystemInfo _systemInfo;
 
-    private SortedList ranges;
+    private readonly SortedList _ranges;
 
     public PdfCMap(PdfObjectId id)
         : base(id)
     {
-        this.ranges = new SortedList();
+        _ranges = [];
     }
 
     public PdfCIDSystemInfo SystemInfo
     {
         set
         {
-            this.systemInfo = value;
+            _systemInfo = value;
         }
     }
 
     /// <summary>
-    ///     Adds the supplied glyph -> unicode pairs.
+    /// Adds the supplied glyph -> unicode pairs.
     /// </summary>
     /// <remarks>
-    ///     Both the key and value must be a ushort.
+    /// Both the key and value must be a ushort.
     /// </remarks>
     /// <param name="map"></param>
     public void AddBfRanges(IDictionary map)
@@ -46,17 +46,17 @@ public class PdfCMap : PdfContentStream
     }
 
     /// <summary>
-    ///     Adds the supplied glyph index to unicode value mapping.
+    /// Adds the supplied glyph index to unicode value mapping.
     /// </summary>
     /// <param name="glyphIndex"></param>
     /// <param name="unicodeValue"></param>
     public void AddBfRange(ushort glyphIndex, ushort unicodeValue)
     {
-        ranges.Add(glyphIndex, unicodeValue);
+        _ranges.Add(glyphIndex, unicodeValue);
     }
 
     /// <summary>
-    ///     Overriden to create CMap content stream.
+    /// Overriden to create CMap content stream.
     /// </summary>
     /// <param name="writer"></param>
     protected internal override void Write(PdfWriter writer)
@@ -65,13 +65,13 @@ public class PdfCMap : PdfContentStream
         WriteLine("12 dict begin");
         WriteLine("begincmap");
         WriteLine("/CIDSystemInfo");
-        WriteLine(systemInfo);
+        WriteLine(_systemInfo);
         WriteLine("def");
-        WriteLine(String.Format("/CMapName /{0} def", DefaultName));
+        WriteLine($"/CMapName /{DefaultName} def");
         WriteLine("/CMapType 2 def");
 
         // No bfranges represents an error - we should really through an exception
-        if (ranges.Count > 0)
+        if (_ranges.Count > 0)
         {
             // Groups CMap entries into bfranges
             BfEntryList groups = GroupCMapEntries();
@@ -98,13 +98,12 @@ public class PdfCMap : PdfContentStream
         BfEntry last = entries[entries.Count - 1];
 
         WriteLine("1 begincodespacerange");
-        WriteLine(String.Format("<{0:X4}> <{1:X4}>",
-                                first.StartGlyphIndex, last.EndGlyphIndex));
+        WriteLine($"<{first.StartGlyphIndex:X4}> <{last.EndGlyphIndex:X4}>");
         WriteLine("endcodespacerange");
     }
 
     /// <summary>
-    ///     Writes the bfchar entries to the content stream in groups of 100.
+    /// Writes the bfchar entries to the content stream in groups of 100.
     /// </summary>
     /// <param name="entries"></param>
     private void WriteBfChars(BfEntryList entries)
@@ -115,7 +114,7 @@ public class PdfCMap : PdfContentStream
 
         for (int i = 0; i < numBlocks; i++)
         {
-            int blockSize = 0;
+            int blockSize;
             if ((i + 1) == numBlocks)
             {
                 blockSize = charEntries.Length - (i * 100);
@@ -125,21 +124,20 @@ public class PdfCMap : PdfContentStream
                 blockSize = 100;
             }
 
-            WriteLine(String.Format("{0} beginbfchar", blockSize));
+            WriteLine($"{blockSize} beginbfchar");
 
             for (int j = 0; j < blockSize; j++)
             {
                 BfEntry entry = charEntries[(i * 100) + j];
-                WriteLine(String.Format("<{0:X4}> <{1:X4}>",
-                                        entry.StartGlyphIndex,
-                                        entry.UnicodeValue));
+                WriteLine($"<{entry.StartGlyphIndex:X4}> <{entry.UnicodeValue:X4}>");
             }
+
             WriteLine("endbfchar");
         }
     }
 
     /// <summary>
-    ///     Writes the bfrange entries to the content stream in groups of 100.
+    /// Writes the bfrange entries to the content stream in groups of 100.
     /// </summary>
     /// <param name="entries"></param>
     private void WriteBfRanges(BfEntryList entries)
@@ -150,7 +148,7 @@ public class PdfCMap : PdfContentStream
 
         for (int i = 0; i < numBlocks; i++)
         {
-            int blockSize = 0;
+            int blockSize;
             if ((i + 1) == numBlocks)
             {
                 blockSize = rangeEntries.Length - (i * 100);
@@ -160,15 +158,12 @@ public class PdfCMap : PdfContentStream
                 blockSize = 100;
             }
 
-            WriteLine(String.Format("{0} beginbfrange", blockSize));
+            WriteLine($"{blockSize} beginbfrange");
 
             for (int j = 0; j < blockSize; j++)
             {
                 BfEntry entry = rangeEntries[(i * 100) + j];
-                WriteLine(String.Format("<{0:X4}> <{1:X4}> <{2:X4}>",
-                                        entry.StartGlyphIndex,
-                                        entry.EndGlyphIndex,
-                                        entry.UnicodeValue));
+                WriteLine($"<{entry.StartGlyphIndex:X4}> <{entry.EndGlyphIndex:X4}> <{entry.UnicodeValue:X4}>");
             }
             WriteLine("endbfrange");
         }
@@ -179,15 +174,15 @@ public class PdfCMap : PdfContentStream
         // List of grouped bfranges
         BfEntryList groups = new BfEntryList();
 
-        ushort prevGlyphIndex = (ushort)ranges.GetKey(0);
-        ushort prevUnicodeValue = (ushort)ranges[prevGlyphIndex];
+        ushort prevGlyphIndex = (ushort)_ranges.GetKey(0);
+        ushort prevUnicodeValue = (ushort)_ranges[prevGlyphIndex];
         BfEntry range = new BfEntry(prevGlyphIndex, prevUnicodeValue);
         groups.Add(range);
 
-        for (int i = 1; i < ranges.Count; i++)
+        for (int i = 1; i < _ranges.Count; i++)
         {
-            ushort glyphIndex = (ushort)ranges.GetKey(i);
-            ushort unicodeValue = (ushort)ranges[glyphIndex];
+            ushort glyphIndex = (ushort)_ranges.GetKey(i);
+            ushort unicodeValue = (ushort)_ranges[glyphIndex];
 
             if (unicodeValue == prevUnicodeValue + 1 &&
                 glyphIndex == prevGlyphIndex + 1)

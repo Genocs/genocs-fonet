@@ -3,23 +3,23 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf.Gdi.Font
 {
     /// <summary>
-    ///     Utility class that stores a list of glyph indices and their 
-    ///     asociated subset indices.
+    /// Utility class that stores a list of glyph indices and their 
+    /// asociated subset indices.
     /// </summary>
     public class IndexMappings
     {
         /// <summary>
-        ///     Maps a glyph index to a subset index.
+        /// Maps a glyph index to a subset index.
         /// </summary>
         private SortedList glyphToSubset;
 
         /// <summary>
-        ///     Maps a subset index to glyph index.
+        /// Maps a subset index to glyph index.
         /// </summary>
         private SortedList subsetToGlyph;
 
         /// <summary>
-        ///     Class constructor.
+        /// Class constructor.
         /// </summary>
         public IndexMappings()
         {
@@ -28,7 +28,7 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Gets the number of glyph to subset index mappings.
+        /// Gets the number of glyph to subset index mappings.
         /// </summary>
         public int Count
         {
@@ -36,7 +36,7 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Determines whether a mapping exists for the supplied glyph index.
+        /// Determines whether a mapping exists for the supplied glyph index.
         /// </summary>
         /// <param name="glyphIndex"></param>
         /// <returns></returns>
@@ -46,8 +46,8 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Returns the subset index for <i>glyphIndex</i>.  If a subset 
-        ///     index does not exist for <i>glyphIndex</i> one is generated.
+        /// Returns the subset index for <i>glyphIndex</i>.  If a subset 
+        /// index does not exist for <i>glyphIndex</i> one is generated.
         /// </summary>
         /// <param name="glyphIndex"></param>
         /// <returns>A subset index.</returns>
@@ -68,8 +68,8 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Adds the list of supplied glyph indices to the index mappings using 
-        ///     the next available subset index for each glyph index.
+        /// Adds the list of supplied glyph indices to the index mappings using 
+        /// the next available subset index for each glyph index.
         /// </summary>
         /// <param name="glyphIndices"></param>
         public void Add(params int[] glyphIndices)
@@ -81,11 +81,11 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Gets the subset index of <i>glyphIndex</i>.
+        /// Gets the subset index of <i>glyphIndex</i>.
         /// </summary>
         /// <param name="glyphIndex"></param>
         /// <returns>
-        ///     A glyph index or <b>-1</b> if a glyph to subset mapping does not exist.
+        /// A glyph index or <b>-1</b> if a glyph to subset mapping does not exist.
         /// </returns>
         public int GetSubsetIndex(int glyphIndex)
         {
@@ -97,11 +97,11 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Gets the glyph index of <i>subsetIndex</i>.
+        /// Gets the glyph index of <i>subsetIndex</i>.
         /// </summary>
         /// <param name="subsetIndex"></param>
         /// <returns>
-        ///     A subset index or <b>-1</b> if a subset to glyph mapping does not exist.
+        /// A subset index or <b>-1</b> if a subset to glyph mapping does not exist.
         /// </returns>
         public int GetGlyphIndex(int subsetIndex)
         {
@@ -113,7 +113,7 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Gets a list of glyph indices sorted in ascending order.
+        /// Gets a list of glyph indices sorted in ascending order.
         /// </summary>
         public IList GlyphIndices
         {
@@ -121,7 +121,7 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         }
 
         /// <summary>
-        ///     Gets a list of subset indices sorted in ascending order.
+        /// Gets a list of subset indices sorted in ascending order.
         /// </summary>
         public IList SubsetIndices
         {

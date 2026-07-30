@@ -16,8 +16,8 @@ internal class GenericMargin : LengthProperty.Maker
         ListProperty? listprop = (ListProperty?)propertyList.GetExplicitProperty("margin");
         if (listprop != null)
         {
-            IShorthandParser shparser = new BoxPropShorthandParser(listprop);
-            return shparser.GetValueForProperty(PropName, this, propertyList);
+            IShortHandParser shparser = new BoxPropShorthandParser(listprop);
+            return shparser.GetValueForProperty(PropertyName, this, propertyList);
         }
 
         return null;

@@ -1,4 +1,3 @@
-using Genocs.Fonet.Pdf;
 using System.IO.Compression;
 
 namespace Genocs.Fonet.Pdf.Filter;
@@ -36,10 +35,10 @@ public class FlateFilter : IFilter
 
     public byte[] Encode(byte[] data)
     {
-        MemoryStream ms = new MemoryStream(data.Length);
+        MemoryStream ms = new(data.Length);
         ms.WriteByte(0x78); // ZLib Header for compression level 3.
         ms.WriteByte(0x5e);
-        DeflateStream ds = new DeflateStream(ms, CompressionMode.Compress);
+        DeflateStream ds = new(ms, CompressionMode.Compress);
         ds.Write(data, 0, data.Length);
         ds.Close();
         return ms.ToArray();

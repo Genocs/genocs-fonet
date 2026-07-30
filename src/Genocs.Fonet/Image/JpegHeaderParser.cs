@@ -37,22 +37,22 @@ internal sealed class JpegParser
     public const string ICC_PROFILE = "ICC_PROFILE\0";
 
     /// <summary>
-    ///     JPEG image data
+    /// JPEG image data
     /// </summary>
     private MemoryStream ms;
 
     /// <summary>
-    ///     Contains number of bitplanes, color space and optional ICC Profile
+    /// Contains number of bitplanes, color space and optional ICC Profile
     /// </summary>
     private JpegInfo headerInfo;
 
     /// <summary>
-    ///     Raw ICC Profile
+    /// Raw ICC Profile
     /// </summary>
-    private MemoryStream iccProfileData;
+    private MemoryStream? iccProfileData;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     /// <param name="data"></param>
     public JpegParser(byte[] data)
@@ -132,7 +132,7 @@ internal sealed class JpegParser
     }
 
     /// <summary>
-    ///     
+    /// Reads the JPEG header information from the underlying stream and stores it in the headerInfo object.
     /// </summary>
     private void ReadHeader()
     {
@@ -141,26 +141,26 @@ internal sealed class JpegParser
     }
 
     /// <summary>
-    ///     Reads a 16-bit integer from the underlying stream
+    /// Reads a 16-bit integer from the underlying stream
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The 16-bit integer read from the stream.</returns>
     private int ReadInt()
     {
         return (ReadByte() << 8) + ReadByte();
     }
 
     /// <summary>
-    ///     Reads a 32-bit integer from the underlying stream
+    /// Reads a 32-bit integer from the underlying stream
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The 32-bit integer read from the stream.</returns>
     private byte ReadByte()
     {
         return (byte)ms.ReadByte();
     }
 
     /// <summary>
-    ///     Reads the specified number of bytes from theunderlying stream 
-    ///     and converts them to a string using the ASCII encoding.
+    /// Reads the specified number of bytes from theunderlying stream
+    /// and converts them to a string using the ASCII encoding.
     /// </summary>
     /// <param name="numBytes"></param>
     /// <returns></returns>
@@ -173,13 +173,13 @@ internal sealed class JpegParser
     }
 
     /// <summary>
-    ///     Reads the initial marker which should be SOI.
+    /// Reads the initial marker which should be SOI.
     /// </summary>
     /// <remarks>
-    ///     After invoking this method the stream will point to the location 
-    ///     immediately after the fiorst marker.
+    /// After invoking this method the stream will point to the location
+    /// immediately after the first marker.
     /// </remarks>
-    /// <returns></returns>
+    /// <returns>The marker code of the first marker.</returns>
     private int ReadFirstMarker()
     {
         int b1 = ms.ReadByte();
@@ -193,9 +193,9 @@ internal sealed class JpegParser
     }
 
     /// <summary>
-    ///     Reads the next JPEG marker and returns its marker code.
+    /// Reads the next JPEG marker and returns its marker code.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The marker code of the next marker.</returns>
     private int ReadNextMarker()
     {
         // Skip stream contents until we reach a FF tag
@@ -242,22 +242,14 @@ internal class JpegInfo
 
     private void SetNumColourComponents(int colourComponents)
     {
-        // Translate number of colur components into a ColourSpace constant
-        switch (colourComponents)
+        // Translate number of colour components into a ColourSpace constant
+        ColourSpace = colourComponents switch
         {
-            case 1:
-                ColourSpace = ColorSpace.DeviceGray;
-                break;
-            case 3:
-                ColourSpace = ColorSpace.DeviceRgb;
-                break;
-            case 4:
-                ColourSpace = ColorSpace.DeviceCmyk;
-                break;
-            default:
-                ColourSpace = ColorSpace.DeviceUnknown;
-                break;
-        }
+            1 => ColorSpace.DeviceGray,
+            3 => ColorSpace.DeviceRgb,
+            4 => ColorSpace.DeviceCmyk,
+            _ => ColorSpace.DeviceUnknown,
+        };
     }
 
     internal void SetHeaderInfo(int bitsPerSample, int width, int height, int colourComponents)

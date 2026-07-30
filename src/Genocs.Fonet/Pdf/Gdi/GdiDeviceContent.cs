@@ -11,19 +11,19 @@ public class GdiDeviceContent : IDisposable
     /// <summary>
     /// Dummy device context handle for API compatibility
     /// </summary>
-    private IntPtr hDC;
+    private IntPtr _hDC;
 
     /// <summary>
     /// Currently selected font typeface
     /// </summary>
-    private SKTypeface currentTypeface;
+    private SKTypeface? _currentTypeface;
 
     /// <summary>
-    ///     Creates a new device context wrapper
+    /// Creates a new device context wrapper
     /// </summary>
     public GdiDeviceContent()
     {
-        hDC = new IntPtr(Interlocked.Increment(ref nextHandle));
+        _hDC = new IntPtr(Interlocked.Increment(ref nextHandle));
         LibWrapper.RegisterDeviceContext(this);
     }
 
@@ -44,13 +44,13 @@ public class GdiDeviceContent : IDisposable
     }
 
     /// <summary>
-    ///     Cleans up resources
+    /// Cleans up resources
     /// </summary>
     protected virtual void Dispose(bool disposing)
     {
         LibWrapper.UnregisterDeviceContext(this);
-        hDC = IntPtr.Zero;
-        currentTypeface = null!;
+        _hDC = IntPtr.Zero;
+        _currentTypeface = null!;
     }
 
     /// <summary>
@@ -63,8 +63,8 @@ public class GdiDeviceContent : IDisposable
         // Store the current typeface
         if (font != null)
         {
-            var previous = currentTypeface;
-            currentTypeface = font.Typeface;
+            var previous = _currentTypeface;
+            _currentTypeface = font.Typeface;
             return previous != null ? new IntPtr(1) : IntPtr.Zero;
         }
         return IntPtr.Zero;
@@ -75,7 +75,7 @@ public class GdiDeviceContent : IDisposable
     /// </summary>
     public IntPtr GetCurrentObject(GdiDcObject objectType)
     {
-        if (objectType == GdiDcObject.Font && currentTypeface != null)
+        if (objectType == GdiDcObject.Font && _currentTypeface != null)
         {
             return new IntPtr(1); // Dummy handle indicating a font is selected
         }
@@ -85,10 +85,10 @@ public class GdiDeviceContent : IDisposable
     /// <summary>
     /// Returns the dummy device context handle
     /// </summary>
-    internal IntPtr Handle { get { return hDC; } }
+    internal IntPtr Handle { get { return _hDC; } }
 
     /// <summary>
     /// Gets the currently selected typeface
     /// </summary>
-    internal SKTypeface CurrentTypeface { get { return currentTypeface; } }
+    internal SKTypeface? CurrentTypeface { get { return _currentTypeface; } }
 }

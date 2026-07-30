@@ -1,6 +1,6 @@
-﻿using Genocs.Fonet.Render.Pdf;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Xml;
+using Genocs.Fonet.Render.Pdf;
 
 namespace Genocs.Fonet.XsltTransformer.Transformers;
 
@@ -20,10 +20,8 @@ public static class PdfPrinterDriver
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static void MakePdf(XmlDocument xslFoDocument, string outputFileAbsolutePath, string? fontDir = null)
     {
-        using (var fileStream = File.Create(outputFileAbsolutePath))
-        {
-            MakePdf(xslFoDocument, fileStream, fontDir);
-        }
+        using var fileStream = File.Create(outputFileAbsolutePath);
+        MakePdf(xslFoDocument, fileStream, fontDir);
     }
 
     /// <summary>
@@ -75,6 +73,8 @@ public static class PdfPrinterDriver
     /// <summary>
     /// Returns PDF bytes generated from XSL-FO document.
     /// </summary>
+    /// <param name="xslFoDocument">XSL-FO document.</param>
+    /// <param name="fontDir">Optional font directory path.</param>
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static Stream MakePdfStream(XmlDocument xslFoDocument, string? fontDir = null)
     {
@@ -91,6 +91,7 @@ public static class PdfPrinterDriver
     /// <summary>
     /// Initializes FonetDriver.
     /// </summary>
+    /// <param name="closeOnExit">Indicates whether to close the driver on exit.</param>
     private static FonetDriver InitFonetDriver(bool closeOnExit = true)
     {
         // Creating Fonet Driver and generating PDF file...
@@ -114,6 +115,8 @@ public static class PdfPrinterDriver
     /// <summary>
     /// Handles OnInfo events triggered by FonetDriver.
     /// </summary>   
+    /// <param name="driver">The FonetDriver instance.</param>
+    /// <param name="e">The FonetEventArgs containing event data.</param>
     private static void OnInfo(object driver, FonetEventArgs e)
     {
         //Log.InfoFormat("PdfPrinter: {0}", e.GetMessage());
@@ -121,7 +124,9 @@ public static class PdfPrinterDriver
 
     /// <summary>
     /// Handles OnWarning events triggered by FonetDriver.
-    /// </summary>  
+    /// </summary>
+    /// <param name="driver">The FonetDriver instance.</param>
+    /// <param name="e">The FonetEventArgs containing event data.</param>
     private static void OnWarning(object driver, FonetEventArgs e)
     {
         //Log.WarnFormat("PdfPrinter: {0}", e.GetMessage());

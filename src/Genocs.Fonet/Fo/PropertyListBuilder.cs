@@ -8,59 +8,57 @@ internal sealed class PropertyListBuilder
 {
     private const string FONTSIZEATTR = "font-size";
 
-    private Hashtable propertyListTable = new Hashtable();
+    private Hashtable _propertyListTable = new(10);
 
-    internal PropertyListBuilder() { }
+    internal PropertyListBuilder()
+    {
+    }
 
     internal void AddList(Hashtable list)
     {
         foreach (object o in list.Keys)
         {
-            propertyListTable.Add(o, list[o]);
+            _propertyListTable.Add(o, list[o]);
         }
     }
 
-    internal PropertyList MakeList(
-        string ns,
-        string elementName,
-        Attributes attributes,
-        FObj parentFO)
+    internal PropertyList MakeList(string nameSpace, string elementName, Attributes attributes, FObj? parentFO)
     {
-        Debug.Assert(ns != null, "Namespace should never be null.");
+        Debug.Assert(nameSpace != null, "Namespace should never be null.");
 
         string space = "http://www.w3.org/TR/1999/XSL/Format";
-        if (ns != null)
+        if (nameSpace != null)
         {
-            space = ns;
+            space = nameSpace;
         }
 
-        PropertyList parentPropertyList = parentFO != null ? parentFO._properties : null;
-        PropertyList par = null;
+        PropertyList? parentPropertyList = parentFO?.Properties;
+        PropertyList? par = null;
+
         if (parentPropertyList != null && space.Equals(parentPropertyList.GetNameSpace()))
         {
             par = parentPropertyList;
         }
 
-        PropertyList p = new PropertyList(par, space, elementName);
+        PropertyList p = new(par, space, elementName);
         p.SetBuilder(this);
 
-        StringCollection propsDone = new StringCollection();
+        StringCollection propsDone = [];
 
         string fontsizeval = attributes.getValue(FONTSIZEATTR);
         if (fontsizeval != null)
         {
-            PropertyMaker propertyMaker = FindMaker(FONTSIZEATTR);
+            PropertyMaker? propertyMaker = FindMaker(FONTSIZEATTR);
+
             if (propertyMaker != null)
             {
                 try
                 {
-                    p.Add(FONTSIZEATTR,
-                          propertyMaker.Make(p, fontsizeval, parentFO));
+                    p.Add(FONTSIZEATTR, propertyMaker.Make(p, fontsizeval, parentFO));
                 }
                 catch (FonetException e)
                 {
-                    FonetDriver.ActiveDriver.FireFonetError(
-                        $"Invalid font-size value '{fontsizeval}': {e.Message}");
+                    FonetDriver.ActiveDriver?.FireFonetError($"Invalid font-size value '{fontsizeval}': {e.Message}");
                 }
             }
             propsDone.Add(FONTSIZEATTR);
@@ -71,8 +69,8 @@ internal sealed class PropertyListBuilder
             string attributeName = attributes.getQName(i);
             int sepchar = attributeName.IndexOf('.');
             string propName = attributeName;
-            string subpropName = null;
-            Property propVal = null;
+            string? subpropName = null;
+            Property? propVal;
             if (sepchar > -1)
             {
                 propName = attributeName.Substring(0, sepchar);
@@ -83,7 +81,7 @@ internal sealed class PropertyListBuilder
                 continue;
             }
 
-            PropertyMaker propertyMaker = FindMaker(propName);
+            PropertyMaker? propertyMaker = FindMaker(propName);
 
             if (propertyMaker != null)
             {
@@ -91,7 +89,7 @@ internal sealed class PropertyListBuilder
                 {
                     if (subpropName != null)
                     {
-                        Property baseProp = p.GetExplicitBaseProperty(propName);
+                        Property? baseProp = p.GetExplicitBaseProperty(propName);
                         if (baseProp == null)
                         {
                             string baseValue = attributes.getValue(propName);
@@ -101,10 +99,7 @@ internal sealed class PropertyListBuilder
                                 propsDone.Add(propName);
                             }
                         }
-                        propVal = propertyMaker.Make(baseProp, subpropName,
-                                                     p,
-                                                     attributes.getValue(i),
-                                                     parentFO);
+                        propVal = propertyMaker.Make(baseProp, subpropName, p, attributes.getValue(i), parentFO);
                     }
                     else
                     {
@@ -119,15 +114,14 @@ internal sealed class PropertyListBuilder
                 }
                 catch (FonetException e)
                 {
-                    FonetDriver.ActiveDriver.FireFonetError(e.Message);
+                    FonetDriver.ActiveDriver?.FireFonetError(e.Message);
                 }
             }
             else
             {
                 if (!attributeName.StartsWith("xmlns"))
                 {
-                    FonetDriver.ActiveDriver.FireFonetWarning(
-                        "property " + attributeName + " ignored");
+                    FonetDriver.ActiveDriver?.FireFonetWarning($"property {attributeName} ignored");
                 }
             }
         }
@@ -135,10 +129,9 @@ internal sealed class PropertyListBuilder
         return p;
     }
 
-    internal Property GetSubpropValue(
-        string propertyName, Property p, string subpropName)
+    internal Property? GetSubpropValue(string propertyName, Property p, string subpropName)
     {
-        PropertyMaker maker = FindMaker(propertyName);
+        PropertyMaker? maker = FindMaker(propertyName);
         if (maker != null)
         {
             return maker.GetSubpropValue(p, subpropName);
@@ -149,37 +142,35 @@ internal sealed class PropertyListBuilder
         }
     }
 
-    internal Property GetShorthand(PropertyList propertyList, string propertyName)
+    internal Property? GetShorthand(PropertyList propertyList, string propertyName)
     {
-        PropertyMaker propertyMaker = FindMaker(propertyName);
+        PropertyMaker? propertyMaker = FindMaker(propertyName);
         if (propertyMaker != null)
         {
             return propertyMaker.GetShorthand(propertyList);
         }
         else
         {
-            FonetDriver.ActiveDriver.FireFonetError("No maker for " + propertyName);
+            FonetDriver.ActiveDriver?.FireFonetError($"No maker for {propertyName}");
             return null;
         }
     }
 
-    internal Property MakeProperty(PropertyList propertyList, string propertyName)
+    internal Property? MakeProperty(PropertyList propertyList, string propertyName)
     {
-        Property p = null;
-        PropertyMaker propertyMaker = FindMaker(propertyName);
+        Property? p = null;
+        PropertyMaker? propertyMaker = FindMaker(propertyName);
         if (propertyMaker != null)
         {
             p = propertyMaker.Make(propertyList);
         }
         else
         {
-            FonetDriver.ActiveDriver.FireFonetWarning("property " + propertyName + " ignored");
+            FonetDriver.ActiveDriver?.FireFonetWarning($"property {propertyName} ignored");
         }
         return p;
     }
 
-    internal PropertyMaker FindMaker(string propertyName)
-    {
-        return (PropertyMaker)propertyListTable[propertyName];
-    }
+    internal PropertyMaker? FindMaker(string propertyName)
+        => (PropertyMaker?)_propertyListTable[propertyName];
 }

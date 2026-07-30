@@ -18,7 +18,7 @@ internal class StringProperty(string str) : Property
                     {
                         return new StringProperty(value.Substring(1, vlen - 2));
                     }
-                    FonetDriver.ActiveDriver.FireFonetWarning($"String-valued property starts with quote but doesn't end with quote: {value}");
+                    FonetDriver.ActiveDriver?.FireFonetWarning($"String-valued property starts with quote but doesn't end with quote: {value}");
                 }
             }
             return new StringProperty(value);

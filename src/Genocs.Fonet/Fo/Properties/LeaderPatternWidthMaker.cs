@@ -21,7 +21,7 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Make(PropertyList propertyList)
         {
-            return Make(propertyList, "use-font-metrics", propertyList.getParentFObj());
+            return Make(propertyList, "use-font-metrics", propertyList.GetParentFObj());
 
         }
 

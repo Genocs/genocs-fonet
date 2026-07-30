@@ -4,10 +4,7 @@ namespace Genocs.Fonet.Fo.Expr;
 
 internal interface IFunction
 {
-    int NumArgs
-    {
-        get;
-    }
+    int NumArgs { get; }
 
     IPercentBase GetPercentBase();
 

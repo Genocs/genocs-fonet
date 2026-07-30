@@ -11,21 +11,24 @@ internal class XMLElement : XMLObj
     new internal class Maker : FObj.Maker
     {
         private readonly string _tag;
+        private readonly Attributes _attributes;
 
-        internal Maker(string tag)
-            => _tag = tag;
+        internal Maker(string tag, Attributes attributes)
+        {
+            _tag = tag;
+            _attributes = attributes;
+        }
 
         public override FObj Make(FObj parent, PropertyList propertyList)
-            => new XMLElement(parent, propertyList, _tag);
+            => new XMLElement(parent, propertyList, _tag, _attributes);
     }
 
-    public static FObj.Maker GetMaker(string tag)
-        => new Maker(tag);
+    public static FObj.Maker GetMaker(string tag, Attributes attributes)
+        => new Maker(tag, attributes);
 
-    public XMLElement(FObj parent, PropertyList propertyList, string tag)
-        : base(parent, propertyList, tag)
+    public XMLElement(FObj parent, PropertyList propertyList, string tag, Attributes attributes)
+        : base(parent, propertyList, tag, attributes)
     {
-        Init();
     }
 
     public override Status Layout(Area area)
@@ -37,10 +40,6 @@ internal class XMLElement : XMLObj
 
         return new Status(Status.OK);
     }
-
-    private void Init()
-        => CreateBasicDocument();
-
     public override string GetNameSpace()
         => _namespace;
 }

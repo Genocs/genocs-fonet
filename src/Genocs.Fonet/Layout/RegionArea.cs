@@ -11,9 +11,9 @@ internal class RegionArea(int xPosition, int yPosition, int width, int height)
     protected int height = height;
     protected BackgroundProps? background;
 
-    public AreaContainer makeAreaContainer()
+    public AreaContainer MakeAreaContainer()
     {
-        AreaContainer area = new AreaContainer(null, xPosition, yPosition, width, height, Position.ABSOLUTE);
+        AreaContainer area = new(null, xPosition, yPosition, width, height, Position.ABSOLUTE, null);
         area.setBackground(getBackground());
         return area;
     }

@@ -1,12 +1,16 @@
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Class that represents the Font Header table.
+/// Class that represents the Font Header table.
 /// </summary>
 /// <remarks>
-///     http://www.microsoft.com/typography/otspec/head.htm
+/// http://www.microsoft.com/typography/otspec/head.htm
 /// </remarks>
-internal class HeaderTable : FontTable
+/// <remarks>
+/// Class constructor.
+/// </remarks>
+/// <param name="entry"></param>
+internal class HeaderTable(DirectoryEntry entry) : FontTable(TableNames.Head, entry)
 {
     internal int versionNo;
     internal int fontRevision;
@@ -26,19 +30,11 @@ internal class HeaderTable : FontTable
     internal short indexToLocFormat;
     internal short glyphDataFormat;
 
-    private static readonly DateTime BaseDate =
-        new DateTime(1904, 1, 1, 0, 0, 0);
+    private static readonly DateTime BaseDate = new(1904, 1, 1, 0, 0, 0);
 
     /// <summary>
-    ///     Class constructor.
-    /// </summary>
-    /// <param name="entry"></param>
-    public HeaderTable(DirectoryEntry entry)
-        : base(TableNames.Head, entry) { }
-
-    /// <summary>
-    ///     Gets a value that indicates whether glyph offsets in the 
-    ///     loca table are stored as a ushort or ulong.
+    /// Gets a value that indicates whether glyph offsets in the 
+    /// loca table are stored as a ushort or ulong.
     /// </summary>
     public bool IsShortFormat
     {
@@ -46,8 +42,8 @@ internal class HeaderTable : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "head" table from the current position 
-    ///     in the supplied stream.
+    /// Reads the contents of the "head" table from the current position 
+    /// in the supplied stream.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)
@@ -59,9 +55,10 @@ internal class HeaderTable : FontTable
         magicNumber = stream.ReadULong();
         flags = stream.ReadUShort();
         unitsPermEm = stream.ReadUShort();
+
         // Some fonts have dodgy date offsets that cause AddSeconds to throw an exception
-        createDate = GetDate(stream.ReadLongDateTime());
-        updateDate = GetDate(stream.ReadLongDateTime());
+        createDate = HeaderTable.GetDate(stream.ReadLongDateTime());
+        updateDate = HeaderTable.GetDate(stream.ReadLongDateTime());
         xMin = stream.ReadShort();
         yMin = stream.ReadShort();
         xMax = stream.ReadShort();
@@ -74,11 +71,11 @@ internal class HeaderTable : FontTable
     }
 
     /// <summary>
-    ///     Returns a DateTime instance which is the result of adding <i>seconds</i>
-    ///     to BaseDate.  If an exception occurs, BaseDate is returned.
+    /// Returns a DateTime instance which is the result of adding <i>seconds</i>
+    /// to BaseDate. If an exception occurs, BaseDate is returned.
     /// </summary>
     /// <param name="seconds"></param>
-    private DateTime GetDate(long seconds)
+    private static DateTime GetDate(long seconds)
     {
         try
         {
@@ -91,7 +88,7 @@ internal class HeaderTable : FontTable
     }
 
     /// <summary>
-    ///     Writes the contents of the head table to the supplied stream.
+    /// Writes the contents of the head table to the supplied stream.
     /// </summary>
     /// <param name="writer"></param>
     protected internal override void Write(FontFileWriter writer)
@@ -99,6 +96,7 @@ internal class HeaderTable : FontTable
         FontFileStream stream = writer.Stream;
         stream.WriteFixed(versionNo);
         stream.WriteFixed(fontRevision);
+
         // TODO: Calculate based on entire font 
         stream.WriteULong(0);
         stream.WriteULong(0x5F0F3CF5);
@@ -113,6 +111,7 @@ internal class HeaderTable : FontTable
         stream.WriteUShort(macStyle);
         stream.WriteUShort(lowestRecPPEM);
         stream.WriteShort(fontDirectionHint);
+
         // TODO: Always write loca offsets as ulongs
         stream.WriteShort(1);
         stream.WriteShort(glyphDataFormat);

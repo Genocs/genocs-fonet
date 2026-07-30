@@ -1,49 +1,28 @@
-using System;
 using System.Text;
 
-namespace Genocs.Fonet.Pdf
+namespace Genocs.Fonet.Pdf;
+
+public class PdfVersion
 {
-    public class PdfVersion
+    public static readonly PdfVersion V14 = new(1, 4);
+    public static readonly PdfVersion V13 = new(1, 3);
+    public static readonly PdfVersion V12 = new(1, 2);
+    public static readonly PdfVersion V11 = new(1, 1);
+    public static readonly PdfVersion V10 = new(1, 0);
+    public byte Major { get; }
+    public byte Minor { get; }
+
+    private PdfVersion(byte major, byte minor)
     {
-        public static readonly PdfVersion V14 = new PdfVersion(1, 4);
-        public static readonly PdfVersion V13 = new PdfVersion(1, 3);
-        public static readonly PdfVersion V12 = new PdfVersion(1, 2);
-        public static readonly PdfVersion V11 = new PdfVersion(1, 1);
-        public static readonly PdfVersion V10 = new PdfVersion(1, 0);
+        Major = major;
+        Minor = minor;
+    }
 
-        private byte major;
-
-        private byte minor;
-
-        private byte[] header;
-
-        private PdfVersion(byte major, byte minor)
+    public byte[] Header
+    {
+        get
         {
-            this.major = major;
-            this.minor = minor;
-        }
-
-        public byte[] Header
-        {
-            get
-            {
-                if (header == null)
-                {
-                    header = Encoding.ASCII.GetBytes(
-                        String.Format("%PDF-{0}.{1}", major, minor));
-                }
-                return header;
-            }
-        }
-
-        public byte Major
-        {
-            get { return major; }
-        }
-
-        public byte Minor
-        {
-            get { return minor; }
+            return Encoding.ASCII.GetBytes($"%PDF-{Major}.{Minor}");
         }
     }
 }

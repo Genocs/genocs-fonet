@@ -1,193 +1,179 @@
-using System;
-using System.Collections;
-using Genocs.Fonet.Pdf.Security;
-using Genocs.Fonet.Pdf;
 using Genocs.Fonet.Pdf.Filter;
+using Genocs.Fonet.Pdf.Security;
+using System.Collections;
 
-namespace Genocs.Fonet.Pdf
+namespace Genocs.Fonet.Pdf;
+
+public class PdfStream : PdfObject
 {
-    public class PdfStream : PdfObject
+    private IList? _filters;
+
+    protected byte[]? _data;
+
+    protected PdfDictionary dictionary = [];
+
+    public PdfStream() { }
+
+    public PdfStream(PdfObjectId objectId) : base(objectId)
     {
-        protected byte[] data;
+    }
 
-        protected PdfDictionary dictionary = new PdfDictionary();
+    public PdfStream(byte[] data)
+    {
+        _data = data;
+    }
 
-        private IList filters;
+    public PdfStream(byte[] data, PdfObjectId objectId)
+        : base(objectId)
+    {
+        _data = data;
+    }
 
-        public PdfStream() { }
+    public void AddFilter(IFilter filter)
+    {
+        ArgumentNullException.ThrowIfNull(filter);
 
-        public PdfStream(PdfObjectId objectId) : base(objectId) { }
+        _filters ??= new ArrayList();
+        _filters.Add(filter);
+    }
 
-        public PdfStream(byte[] data)
+    private PdfObject FilterName
+    {
+        get
         {
-            this.data = data;
-        }
-
-        public PdfStream(byte[] data, PdfObjectId objectId)
-            : base(objectId)
-        {
-            this.data = data;
-        }
-
-        public void AddFilter(IFilter filter)
-        {
-            if (filter == null)
+            if (!HasFilters)
             {
-                throw new ArgumentNullException("filter");
+                return PdfNull.Null;
             }
-            if (filters == null)
+            else if (_filters.Count == 1)
             {
-                filters = new ArrayList();
+                IFilter filter = (IFilter)_filters[0];
+                return filter.Name;
             }
-            filters.Add(filter);
-        }
-
-        private PdfObject FilterName
-        {
-            get
+            else
             {
-                if (!HasFilters)
+                PdfArray names = new PdfArray();
+                foreach (IFilter filter in _filters)
                 {
-                    return PdfNull.Null;
+                    names.Add(filter.Name);
                 }
-                else if (filters.Count == 1)
-                {
-                    IFilter filter = (IFilter)filters[0];
-                    return filter.Name;
-                }
-                else
-                {
-                    PdfArray names = new PdfArray();
-                    foreach (IFilter filter in filters)
-                    {
-                        names.Add(filter.Name);
-                    }
-                    return names;
-                }
+                return names;
             }
         }
+    }
 
-        private PdfObject FilterDecodeParms
+    private PdfObject FilterDecodeParms
+    {
+        get
         {
-            get
+            if (!HasFilters)
             {
-                if (!HasFilters)
+                return PdfNull.Null;
+            }
+            else if (_filters.Count == 1)
+            {
+                IFilter filter = (IFilter)_filters[0];
+                return filter.DecodeParms;
+            }
+            else
+            {
+                PdfArray decodeParams = new PdfArray();
+                foreach (IFilter filter in _filters)
                 {
-                    return PdfNull.Null;
+                    decodeParams.Add(filter.DecodeParms);
                 }
-                else if (filters.Count == 1)
-                {
-                    IFilter filter = (IFilter)filters[0];
-                    return filter.DecodeParms;
-                }
-                else
-                {
-                    PdfArray decodeParams = new PdfArray();
-                    foreach (IFilter filter in filters)
-                    {
-                        decodeParams.Add(filter.DecodeParms);
-                    }
-                    return decodeParams;
-                }
+                return decodeParams;
             }
         }
+    }
 
-        private bool HasFilters
+    private bool HasFilters
+    {
+        get
         {
-            get
-            {
-                if (filters != null)
-                {
-                    return filters.Count > 0;
-                }
-                else
-                {
-                    return false;
-                }
-            }
+            return _filters != null && _filters.Count > 0;
         }
+    }
 
-        private bool HasDecodeParams
+
+
+    private bool HasDecodeParams
+    {
+        get
         {
-            get
+            if (_filters == null)
             {
-                if (filters == null)
-                {
-                    return false;
-                }
-                foreach (IFilter filter in filters)
-                {
-                    if (filter.HasDecodeParams)
-                    {
-                        return true;
-                    }
-                }
                 return false;
             }
-        }
-
-        private byte[] ApplyFilters(byte[] data)
-        {
-            if (filters == null)
+            foreach (IFilter filter in _filters)
             {
-                return data;
-            }
-
-            byte[] encoded = data;
-            for (int x = filters.Count - 1; x >= 0; x--)
-            {
-                IFilter filter = (IFilter)filters[x];
-                encoded = filter.Encode(encoded);
-            }
-            return encoded;
-        }
-
-        protected internal override void Write(PdfWriter writer)
-        {
-            if (writer == null)
-            {
-                throw new ArgumentNullException("writer");
-            }
-            if (data == null)
-            {
-                throw new InvalidOperationException("No data for stream.");
-            }
-
-            // Prepare the stream's data.
-            byte[] bytes = (byte[])data.Clone();
-
-            // Apply any filters.
-            if (HasFilters)
-            {
-                bytes = ApplyFilters(data);
-            }
-
-            // Encrypt the data if required.
-            SecurityManager sm = writer.SecurityManager;
-            if (sm != null)
-            {
-                bytes = sm.Encrypt(bytes, writer.EnclosingIndirect.ObjectId);
-            }
-
-            // Create the stream's dictionary.
-            dictionary[PdfName.Names.Length] = new PdfNumeric(bytes.Length);
-            if (HasFilters)
-            {
-                dictionary[PdfName.Names.Filter] = FilterName;
-                if (HasDecodeParams)
+                if (filter.HasDecodeParams)
                 {
-                    dictionary[PdfName.Names.DecodeParams] = FilterDecodeParms;
+                    return true;
                 }
             }
+            return false;
+        }
+    }
 
-            // Write out the dictionary.
-            writer.WriteLine(dictionary);
-
-            // Write out the stream data.
-            writer.WriteKeywordLine(Keyword.Stream);
-            writer.WriteLine(bytes);
-            writer.WriteKeyword(Keyword.EndStream);
+    private byte[] ApplyFilters(byte[] data)
+    {
+        if (_filters == null)
+        {
+            return data;
         }
 
+        byte[] encoded = data;
+        for (int x = _filters.Count - 1; x >= 0; x--)
+        {
+            IFilter filter = (IFilter)_filters[x];
+            encoded = filter.Encode(encoded);
+        }
+        return encoded;
+    }
+
+    protected internal override void Write(PdfWriter writer)
+    {
+        ArgumentNullException.ThrowIfNull(writer);
+
+        if (_data == null)
+        {
+            throw new InvalidOperationException("No data for stream.");
+        }
+
+        // Prepare the stream's data.
+        byte[] bytes = (byte[])_data.Clone();
+
+        // Apply any filters.
+        if (HasFilters)
+        {
+            bytes = ApplyFilters(_data);
+        }
+
+        // Encrypt the data if required.
+        SecurityManager sm = writer.SecurityManager;
+        if (sm != null)
+        {
+            bytes = sm.Encrypt(bytes, writer.EnclosingIndirect.ObjectId);
+        }
+
+        // Create the stream's dictionary.
+        dictionary[PdfName.Names.Length] = new PdfNumeric(bytes.Length);
+        if (HasFilters)
+        {
+            dictionary[PdfName.Names.Filter] = FilterName;
+            if (HasDecodeParams)
+            {
+                dictionary[PdfName.Names.DecodeParams] = FilterDecodeParms;
+            }
+        }
+
+        // Write out the dictionary.
+        writer.WriteLine(dictionary);
+
+        // Write out the stream data.
+        writer.WriteKeywordLine(Keyword.Stream);
+        writer.WriteLine(bytes);
+        writer.WriteKeyword(Keyword.EndStream);
     }
 }

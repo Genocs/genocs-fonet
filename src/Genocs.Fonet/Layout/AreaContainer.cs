@@ -1,62 +1,32 @@
-using Genocs.Fonet.Layout;
 using Genocs.Fonet.Render.Pdf;
 
 namespace Genocs.Fonet.Layout;
 
-internal class AreaContainer : Area
+internal class AreaContainer(FontState fontState, int xPosition, int yPosition, int allocationWidth, int maxHeight, int position, Area? parent) 
+    : Area(fontState, allocationWidth, maxHeight, parent)
 {
-    private int xPosition;
-    private int yPosition;
-    private int position;
+    internal int XPosition { get; set; } = xPosition;
+    internal int YPosition { get; set; } = yPosition;
+    internal int Position { get; set; } = position;
 
     private string areaName;
 
-    public AreaContainer(FontState fontState, int xPosition, int yPosition, int allocationWidth, int maxHeight, int position)
-        : base(fontState, allocationWidth, maxHeight)
-    {
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
-        this.position = position;
-    }
-
     public override void Render(PdfRenderer renderer)
-    {
-        renderer.RenderAreaContainer(this);
-    }
+        => renderer.RenderAreaContainer(this);
 
     public int getPosition()
     {
-        return position;
-    }
-
-    public int getXPosition()
-    {
-        return xPosition;
-    }
-
-    public void setXPosition(int value)
-    {
-        xPosition = value;
-    }
-
-    public int GetYPosition()
-    {
-        return yPosition;
+        return Position;
     }
 
     public int GetCurrentYPosition()
     {
-        return yPosition;
-    }
-
-    public void setYPosition(int value)
-    {
-        yPosition = value;
+        return YPosition;
     }
 
     public void shiftYPosition(int value)
     {
-        yPosition += value;
+        YPosition += value;
     }
 
     public string getAreaName()

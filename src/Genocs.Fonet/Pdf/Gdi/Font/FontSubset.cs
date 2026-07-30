@@ -70,8 +70,7 @@ public class FontSubset
         HorizontalMetricsTable hmtxOld = reader.GetHorizontalMetricsTable();
 
         DirectoryEntry entry = new DirectoryEntry(TableNames.Hmtx);
-        HorizontalMetricsTable hmtx =
-            new HorizontalMetricsTable(entry, glyfTable.Count);
+        HorizontalMetricsTable hmtx = new HorizontalMetricsTable(entry, glyfTable.Count);
 
         // Copy required horizontal metrics.
         IndexMappings mappings = reader.IndexMappings;

@@ -30,9 +30,9 @@ internal class PropertyParser : PropertyTokenizer
         functionTable.Add("_fop-property-value", new FonetPropValFunction());
     }
 
-    public static Property parse(string expr, PropertyInfo propInfo)
+    public static Property Parse(string expr, PropertyInfo propInfo)
     {
-        return new PropertyParser(expr, propInfo).parseProperty();
+        return new PropertyParser(expr, propInfo).ParseProperty();
     }
 
     private PropertyParser(string propExpr, PropertyInfo pInfo)
@@ -41,17 +41,17 @@ internal class PropertyParser : PropertyTokenizer
         this.propInfo = pInfo;
     }
 
-    private Property parseProperty()
+    private Property ParseProperty()
     {
         next();
         if (currentToken == TOK_EOF)
         {
             return new StringProperty("");
         }
-        ListProperty propList = null;
+        ListProperty? propList = null;
         while (true)
         {
-            Property prop = parseAdditiveExpr();
+            Property prop = ParseAdditiveExpr();
             if (currentToken == TOK_EOF)
             {
                 if (propList != null)
@@ -78,7 +78,7 @@ internal class PropertyParser : PropertyTokenizer
         }
     }
 
-    private Property parseAdditiveExpr()
+    private Property ParseAdditiveExpr()
     {
         Property prop = parseMultiplicativeExpr();
         bool cont = true;
@@ -88,14 +88,12 @@ internal class PropertyParser : PropertyTokenizer
             {
                 case TOK_PLUS:
                     next();
-                    prop = evalAddition(prop.GetNumeric(),
-                                        parseMultiplicativeExpr().GetNumeric());
+                    prop = EvalAddition(prop.GetNumeric(), parseMultiplicativeExpr().GetNumeric());
                     break;
                 case TOK_MINUS:
                     next();
                     prop =
-                        evalSubtraction(prop.GetNumeric(),
-                                        parseMultiplicativeExpr().GetNumeric());
+                        EvalSubtraction(prop.GetNumeric(), parseMultiplicativeExpr().GetNumeric());
                     break;
                 default:
                     cont = false;
@@ -115,18 +113,15 @@ internal class PropertyParser : PropertyTokenizer
             {
                 case TOK_DIV:
                     next();
-                    prop = evalDivide(prop.GetNumeric(),
-                                      parseUnaryExpr().GetNumeric());
+                    prop = EvalDivide(prop.GetNumeric(), parseUnaryExpr().GetNumeric());
                     break;
                 case TOK_MOD:
                     next();
-                    prop = evalModulo(prop.GetNumber(),
-                                      parseUnaryExpr().GetNumber());
+                    prop = EvalModulo(prop.GetNumber(), parseUnaryExpr().GetNumber());
                     break;
                 case TOK_MULTIPLY:
                     next();
-                    prop = evalMultiply(prop.GetNumeric(),
-                                        parseUnaryExpr().GetNumeric());
+                    prop = EvalMultiply(prop.GetNumeric(), parseUnaryExpr().GetNumeric());
                     break;
                 default:
                     cont = false;
@@ -141,7 +136,7 @@ internal class PropertyParser : PropertyTokenizer
         if (currentToken == TOK_MINUS)
         {
             next();
-            return evalNegate(parseUnaryExpr().GetNumeric());
+            return EvalNegate(parseUnaryExpr().GetNumeric());
         }
         return parsePrimaryExpr();
     }
@@ -162,7 +157,7 @@ internal class PropertyParser : PropertyTokenizer
         {
             case TOK_LPAR:
                 next();
-                prop = parseAdditiveExpr();
+                prop = ParseAdditiveExpr();
                 expectRpar();
                 return prop;
 
@@ -185,7 +180,7 @@ internal class PropertyParser : PropertyTokenizer
             case TOK_PERCENT:
                 double pcval = ParseDouble(
                     currentTokenValue.Substring(0, currentTokenValue.Length - 1)) / 100.0;
-                IPercentBase pcBase = this.propInfo.GetPercentBase();
+                IPercentBase? pcBase = this.propInfo.GetPercentBase();
                 if (pcBase != null)
                 {
                     if (pcBase.GetDimension() == 0)
@@ -194,8 +189,7 @@ internal class PropertyParser : PropertyTokenizer
                     }
                     else if (pcBase.GetDimension() == 1)
                     {
-                        prop = new LengthProperty(new PercentLength(pcval,
-                                                                    pcBase));
+                        prop = new LengthProperty(new PercentLength(pcval, pcBase));
                     }
                     else
                     {
@@ -212,7 +206,7 @@ internal class PropertyParser : PropertyTokenizer
                 int numLen = currentTokenValue.Length - currentUnitLength;
                 string unitPart = currentTokenValue.Substring(numLen);
                 double numPart = ParseDouble(currentTokenValue.Substring(0, numLen));
-                Length length = null;
+                Length? length;
                 if (unitPart.Equals(RELUNIT))
                 {
                     length = new FixedLength(numPart, propInfo.currentFontSize());
@@ -237,17 +231,11 @@ internal class PropertyParser : PropertyTokenizer
 
             case TOK_FUNCTION_LPAR:
                 {
-                    IFunction function =
-                        (IFunction)functionTable[currentTokenValue];
-                    if (function == null)
-                    {
-                        throw new PropertyException("no such function: "
-                            + currentTokenValue);
-                    }
+                    IFunction? function = (IFunction?)functionTable[currentTokenValue] ?? throw new PropertyException($"no such function: {currentTokenValue}");
                     next();
-                    propInfo.pushFunction(function);
-                    prop = function.Eval(parseArgs(function.NumArgs), propInfo);
-                    propInfo.popFunction();
+                    propInfo.Push(function);
+                    prop = function.Eval(ParseArgs(function.NumArgs), propInfo);
+                    propInfo.Pop();
                     return prop;
                 }
             default:
@@ -257,7 +245,7 @@ internal class PropertyParser : PropertyTokenizer
         return prop;
     }
 
-    private Property[] parseArgs(int nbArgs)
+    private Property[] ParseArgs(int nbArgs)
     {
         Property[] args = new Property[nbArgs];
         Property prop;
@@ -270,7 +258,7 @@ internal class PropertyParser : PropertyTokenizer
         {
             while (true)
             {
-                prop = parseAdditiveExpr();
+                prop = ParseAdditiveExpr();
                 if (i < nbArgs)
                 {
                     args[i++] = prop;
@@ -290,7 +278,7 @@ internal class PropertyParser : PropertyTokenizer
         return args;
     }
 
-    private Property evalAddition(Numeric op1, Numeric op2)
+    private static Property EvalAddition(Numeric? op1, Numeric? op2)
     {
         if (op1 == null || op2 == null)
         {
@@ -299,7 +287,7 @@ internal class PropertyParser : PropertyTokenizer
         return new NumericProperty(op1.Add(op2));
     }
 
-    private Property evalSubtraction(Numeric op1, Numeric op2)
+    private Property EvalSubtraction(Numeric? op1, Numeric? op2)
     {
         if (op1 == null || op2 == null)
         {
@@ -308,7 +296,7 @@ internal class PropertyParser : PropertyTokenizer
         return new NumericProperty(op1.subtract(op2));
     }
 
-    private Property evalNegate(Numeric op)
+    private static Property EvalNegate(Numeric? op)
     {
         if (op == null)
         {
@@ -317,7 +305,7 @@ internal class PropertyParser : PropertyTokenizer
         return new NumericProperty(op.Multiply(negOne));
     }
 
-    private Property evalMultiply(Numeric op1, Numeric op2)
+    private static Property EvalMultiply(Numeric? op1, Numeric? op2)
     {
         if (op1 == null || op2 == null)
         {
@@ -326,7 +314,7 @@ internal class PropertyParser : PropertyTokenizer
         return new NumericProperty(op1.Multiply(op2));
     }
 
-    private Property evalDivide(Numeric op1, Numeric op2)
+    private static Property EvalDivide(Numeric? op1, Numeric? op2)
     {
         if (op1 == null || op2 == null)
         {
@@ -335,7 +323,7 @@ internal class PropertyParser : PropertyTokenizer
         return new NumericProperty(op1.divide(op2));
     }
 
-    private Property evalModulo(Number op1, Number op2)
+    private static Property EvalModulo(Number? op1, Number? op2)
     {
         if (op1 == null || op2 == null)
         {
@@ -344,8 +332,8 @@ internal class PropertyParser : PropertyTokenizer
         return new NumberProperty(op1.DoubleValue() % op2.DoubleValue());
     }
 
-    private double ParseDouble(string s)
+    private static double ParseDouble(string s)
     {
-        return Double.Parse(s, CultureInfo.InvariantCulture.NumberFormat);
+        return double.Parse(s, CultureInfo.InvariantCulture.NumberFormat);
     }
 }

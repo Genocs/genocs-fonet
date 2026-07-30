@@ -1,95 +1,51 @@
 namespace Genocs.Fonet.Fo.Properties;
 
-internal class Constants
+internal static class Constants
 {
     public const int ABSOLUTE = 1;
-
     public const int AFTER = 2;
-
     public const int ALL = 3;
-
     public const int ALPHABETIC = 4;
-
     public const int ALWAYS = 5;
-
     public const int ANY = 6;
-
     public const int AUTO = 7;
-
     public const int BASELINE = 8;
-
     public const int BEFORE = 9;
-
     public const int BLANK = 10;
-
     public const int BLINK = 11;
-
     public const int BOTTOM = 12;
-
     public const int CENTER = 13;
-
     public const int COLLAPSE = 14;
-
     public const int COLUMN = 15;
-
     public const int DASHED = 16;
-
     public const int DISCARD = 17;
-
     public const int DOCUMENT = 18;
-
     public const int DOTS = 19;
-
     public const int DOTTED = 20;
-
     public const int DOUBLE = 21;
-
     public const int END = 22;
-
     public const int END_ON_EVEN = 23;
-
     public const int END_ON_ODD = 24;
-
     public const int EVEN = 25;
-
     public const int EVEN_PAGE = 26;
-
     public const int FALSE = 27;
-
     public const int FIC = 28;
-
     public const int FIRST = 29;
-
     public const int FIXED = 30;
-
     public const int FORCE = 31;
-
     public const int FSWP = 32;
-
     public const int GROOVE = 33;
-
     public const int HIDDEN = 34;
-
     public const int INHERIT = 35;
-
     public const int INSET = 36;
-
     public const int JUSTIFY = 37;
-
     public const int LAST = 38;
-
     public const int LEWP = 39;
-
     public const int LINE_THROUGH = 40;
-
     public const int LR_TB = 41;
-
     public const int LSWP = 42;
-
     public const int MIDDLE = 43;
-
     public const int NO_BLINK = 44;
-
     public const int NO_FORCE = 45;
 
     public const int NO_LINE_THROUGH = 46;
@@ -193,5 +149,4 @@ internal class Constants
     public const int RIGHT = 95;
 
     public const int BOTH = 96;
-
 }

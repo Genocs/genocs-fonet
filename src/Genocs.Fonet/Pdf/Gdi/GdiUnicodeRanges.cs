@@ -1,18 +1,15 @@
-using Genocs.Fonet.Pdf.Gdi;
-using SkiaSharp;
 using System.Collections;
 
 namespace Genocs.Fonet.Pdf.Gdi;
 
 /// <summary>
-///     Custom collection that maintains a list of Unicode ranges 
-///     a font supports and the glyph indices of each character.
-///     Cross-platform implementation using cmap table parsing.
+/// Custom collection that maintains a list of Unicode ranges 
+/// a font supports and the glyph indices of each character.
+/// Cross-platform implementation using cmap table parsing.
 /// </summary>
 public class GdiUnicodeRanges
 {
-    private static readonly IComparer SearchComparer =
-        new UnicodeRangeComparer();
+    private static readonly IComparer SearchComparer = new UnicodeRangeComparer();
 
     private UnicodeRange[] unicodeRanges = [];
 
@@ -47,8 +44,7 @@ public class GdiUnicodeRanges
         }
         catch (Exception ex)
         {
-            FonetDriver.ActiveDriver?.FireFonetWarning(
-                $"Unable to retrieve unicode ranges for font; using Latin-1 fallback: {ex.Message}");
+            FonetDriver.ActiveDriver?.FireFonetWarning($"Unable to retrieve unicode ranges for font; using Latin-1 fallback: {ex.Message}");
             unicodeRanges = [new UnicodeRange(dc, 0x0020, 0x007E)];
         }
     }

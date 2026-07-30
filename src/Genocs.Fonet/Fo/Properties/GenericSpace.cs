@@ -147,7 +147,7 @@ internal class GenericSpace : SpaceProperty.Maker
     {
         if (m_defaultProp == null)
         {
-            m_defaultProp = MakeCompound(propertyList, propertyList.getParentFObj());
+            m_defaultProp = MakeCompound(propertyList, propertyList.GetParentFObj());
         }
         return m_defaultProp;
     }

@@ -3,36 +3,21 @@ using System.Collections;
 
 namespace Genocs.Fonet.Apps;
 
-internal class FormattingResults
+internal sealed class FormattingResults
 {
-    private int _pageCount;
+    public int PageCount { get; private set; }
 
-    private ArrayList? _pageSequences;
-
-    internal int GetPageCount()
-    {
-        return _pageCount;
-    }
-
-    internal ArrayList? GetPageSequences()
-    {
-        return _pageSequences;
-    }
+    public ArrayList PageSequences { get; private set; } = [];
 
     internal void Reset()
     {
-        _pageCount = 0;
-        _pageSequences?.Clear();
+        PageCount = 0;
+        PageSequences.Clear();
     }
 
     internal void HaveFormattedPageSequence(PageSequence pageSequence)
     {
-        _pageCount += pageSequence.PageCount;
-        _pageSequences ??= [];
-
-        _pageSequences.Add(
-            new PageSequenceResults(
-                pageSequence.GetProperty("id").GetString(),
-                pageSequence.PageCount));
+        PageCount += pageSequence.PageCount;
+        PageSequences.Add(new PageSequenceResults(pageSequence.GetProperty("id")?.GetString(), pageSequence.PageCount));
     }
 }

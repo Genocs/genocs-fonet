@@ -4,7 +4,7 @@ using Genocs.Fonet.Pdf.Gdi.Font.Tables;
 namespace Genocs.Fonet.Pdf.Gdi;
 
 /// <summary>
-///     Retrieves all pertinent TrueType tables by invoking GetFontData.
+/// Retrieves all pertinent TrueType tables by invoking GetFontData.
 /// </summary>
 public class GdiFontCreator
 {
@@ -108,7 +108,7 @@ public class GdiFontCreator
         var data = FontTableAccess.ReadTable(dc.CurrentTypeface, tableName);
         if (data == null || data.Length == 0)
         {
-            throw new Exception("Failed to retrieve table " + tableName);
+            throw new Exception($"Failed to retrieve table {tableName}");
         }
 
         return data;

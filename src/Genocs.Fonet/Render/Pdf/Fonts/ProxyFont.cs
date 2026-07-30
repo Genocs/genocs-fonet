@@ -42,7 +42,7 @@ internal class ProxyFont : Font, IFontDescriptor
     }
 
     /// <summary>
-    ///     Loads the underlying font.
+    /// Loads the underlying font.
     /// </summary>
     private void LoadIfNecessary()
     {
@@ -116,7 +116,7 @@ internal class ProxyFont : Font, IFontDescriptor
     }
 
     /// <summary>
-    ///     Gets the underlying font.
+    /// Gets the underlying font.
     /// </summary>
     public Font RealFont
     {

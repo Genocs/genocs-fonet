@@ -42,7 +42,7 @@ internal class CaptionSideMaker : EnumProperty.Maker
 
     public override Property Make(PropertyList propertyList)
     {
-        m_defaultProp ??= Make(propertyList, "before", propertyList.getParentFObj());
+        m_defaultProp ??= Make(propertyList, "before", propertyList.GetParentFObj());
         return m_defaultProp;
     }
 }

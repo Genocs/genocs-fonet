@@ -2,6 +2,8 @@
 
 Current test state, gaps, and recommended testing layers for the migration.
 
+**Last updated:** August 2026
+
 ## Current State
 
 ### Test Project
@@ -10,20 +12,20 @@ Current test state, gaps, and recommended testing layers for the migration.
 |-----------|-------|
 | Project | `src/tests/Genocs.Fonet.Tests/` |
 | Framework | xUnit 2.9.3 |
-| Target | `net10.0` only (library targets net8/9/10) |
-| Test count | 5 |
-| Test type | Integration/smoke only |
-| Assertion depth | File existence (`Assert.True(File.Exists(...))`) |
+| Target | `net8.0`, `net9.0`, `net10.0` |
+| Test count | 22 |
+| Test type | Integration (11) + font pipeline (4) + Phase 3 property/feature (7) |
+| Assertion depth | PDF header, page count, size bounds via `PdfAssertions` |
+| Infrastructure | `PdfTestBase` with temp directories; CI via GitHub Actions |
 
 ### Existing Tests
 
-| Test | Template | What It Exercises |
-|------|----------|-------------------|
-| `BuildPdfTest` | `StarWarsMovies.fo` | Basic FO → PDF (system fonts) |
-| `BuildNunitoFontPdfTest` | `NunitoFontTest.fo` | Custom font via `AddPrivateFont` |
-| `BuildNunitoFontCustomPdfTest` | `NunitoFontCustomTest.fo` | Custom font variants |
-| `ScaleToFitPropertyTest` | `ScaleToFitTest.fo` | `scale-to-fit` property parsing |
-| `CrossPlatformFontAndImageTest` | `CrossPlatformTest.fo` | SkiaSharp fonts + image embedding |
+| Test class | Count | What It Exercises |
+|------------|-------|-------------------|
+| `PdfBuilderUnitTests` | 11 | FO → PDF integration (StarWars, Nunito, ScaleToFit, CrossPlatform) |
+| `FontPipelineTests` | 4 | Glyph mapping, font table access, embedding, subsetting |
+| `Phase3FeatureTests` | 2 | Tier 1 FO template + regression on StarWars |
+| `Phase3PropertyTests` | 5 | visibility, caption-side, float, clear, margin parsing |
 
 ### FO Templates Available
 
@@ -34,18 +36,17 @@ src/tests/Genocs.Fonet.Tests/templates/
 ├── NunitoFontCustomTest.fo
 ├── ScaleToFitTest.fo
 ├── CrossPlatformTest.fo
+├── Phase3Tier1Test.fo
 └── nunito-test.fo (unused in tests)
 ```
 
-### Problems with Current Tests
+### Remaining Gaps
 
-1. **No content validation** — A blank PDF file would pass all tests
-2. **Side effects** — Tests write PDFs into `templates/` directory
-3. **No isolation** — Tests depend on working directory being test project root
-4. **Unreliable** — `CrossPlatformFontAndImageTest` can crash test host (SkiaSharp native error)
-5. **No negative tests** — Invalid FO, missing fonts, corrupt images not tested
-6. **Single TFM** — Tests only run on `net10.0`; library multi-targeting not verified
-7. **No CI** — Tests not run automatically on PR/push
+1. **No text content validation** — PDF structure checked but rendered text not extracted
+2. **No visual regression** — Layout correctness not pixel-compared
+3. **No negative tests** — Invalid FO, missing fonts, corrupt images not tested
+4. **No CJK fixture** — Complex script rendering not validated
+5. **No cross-platform font CI matrix** — CI runs on Ubuntu only (net10.0)
 
 ## Recommended Testing Layers
 
@@ -174,38 +175,13 @@ For layout-sensitive features where text extraction is insufficient:
 
 ## Test Infrastructure Improvements
 
-### Phase 0: Immediate
+### Phase 0: Implemented ✅
 
-```csharp
-public class PdfTestBase
-{
-    protected string TempDir { get; } = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+`PdfTestBase` and `PdfAssertions` are in place. CI runs via `.github/workflows/build-and-test.yml` on Ubuntu with .NET 10.0. Tests target net8/9/10 locally.
 
-    protected byte[] RenderFo(string foPath, Action<PdfRendererOptions>? configure = null)
-    {
-        Directory.CreateDirectory(TempDir);
-        var driver = FonetDriver.Make();
-        driver.Options = new PdfRendererOptions();
-        configure?.Invoke(driver.Options);
+### CI Matrix (future improvement)
 
-        var outputPath = Path.Combine(TempDir, "output.pdf");
-        using var input = File.OpenRead(foPath);
-        using var output = File.Create(outputPath);
-        driver.Render(input, output);
-        return File.ReadAllBytes(outputPath);
-    }
-}
-```
-
-### CI Matrix (Phase 0)
-
-```yaml
-# .github/workflows/ci.yml
-strategy:
-  matrix:
-    os: [windows-latest, ubuntu-latest, macos-latest]
-    dotnet: ['8.0.x', '9.0.x', '10.0.x']
-```
+Multi-OS CI matrix (Windows/Linux/macOS) is not yet configured — current workflow runs on `ubuntu-latest` only.
 
 ### Coverage Targets
 

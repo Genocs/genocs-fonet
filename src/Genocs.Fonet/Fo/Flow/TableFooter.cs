@@ -2,13 +2,8 @@ namespace Genocs.Fonet.Fo.Flow
 {
     internal class TableFooter : AbstractTableBody
     {
-        new internal class Maker : FObj.Maker
-        {
-            public override FObj Make(FObj parent, PropertyList propertyList)
-            {
-                return new TableFooter(parent, propertyList);
-            }
-        }
+        public static FObj.Maker CreateMaker()
+            => FObj.Maker.For((parent, props) => new TableFooter(parent, props));
 
         public override int GetYPosition()
         {
@@ -17,18 +12,14 @@ namespace Genocs.Fonet.Fo.Flow
 
         public override void SetYPosition(int value)
         {
-            areaContainer.setYPosition(value + 2 * spaceBefore);
+            areaContainer.YPosition = value + 2 * spaceBefore;
         }
 
-        new public static FObj.Maker GetMaker()
-        {
-            return new TableFooter.Maker();
-        }
 
         public TableFooter(FObj parent, PropertyList propertyList)
             : base(parent, propertyList)
         {
-            this._name = "fo:table-footer";
+            Name = "fo:table-footer";
         }
     }
 }

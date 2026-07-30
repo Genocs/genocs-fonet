@@ -4,23 +4,13 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class ListItemBody : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new ListItemBody(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new ListItemBody(parent, props));
 
     public ListItemBody(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:list-item-body";
+        Name = "fo:list-item-body";
     }
 
     public override Status Layout(Area area)
@@ -29,7 +19,7 @@ internal class ListItemBody : FObj
         {
             AccessibilityProps mAccProps = _propertyManager.GetAccessibilityProps();
             this._marker = 0;
-            string id = this._properties.GetProperty("id").GetString();
+            string id = this.Properties.GetProperty("id").GetString();
             area.GetIDReferences().InitializeID(id, area);
         }
 

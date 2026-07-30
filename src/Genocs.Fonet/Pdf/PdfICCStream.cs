@@ -3,14 +3,14 @@ using Genocs.Fonet.Pdf;
 namespace Genocs.Fonet.Pdf
 {
     /// <summary>
-    ///     An International Color Code stream
+    /// An International Color Code stream
     /// </summary>
     public class PdfICCStream : PdfStream
     {
         public PdfICCStream(PdfObjectId id, byte[] profileData)
             : base(id)
         {
-            this.data = profileData;
+            this._data = profileData;
         }
 
         public PdfNumeric NumComponents

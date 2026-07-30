@@ -1,19 +1,13 @@
 namespace Genocs.Fonet.Apps;
 
-internal class PageSequenceResults
+internal sealed class PageSequenceResults
 {
-    private readonly string _id;
-    private readonly int _pageCount;
+    public string? Id { get; }
+    public int PageCount { get; }
 
-    internal PageSequenceResults(string id, int pageCount)
+    internal PageSequenceResults(string? id, int pageCount)
     {
-        _id = id;
-        _pageCount = pageCount;
+        Id = id;
+        PageCount = pageCount;
     }
-
-    internal string GetID()
-        => _id;
-
-    internal int GetPageCount()
-        => _pageCount;
 }

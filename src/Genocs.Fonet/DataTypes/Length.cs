@@ -2,7 +2,7 @@ using Genocs.Fonet.Fo.Expr;
 
 namespace Genocs.Fonet.DataTypes;
 
-internal class Length
+internal abstract class Length
 {
     protected int _millipoints;
     protected bool _isComputed;
@@ -13,6 +13,7 @@ internal class Length
         {
             ComputeValue();
         }
+
         return _millipoints;
     }
 
@@ -25,10 +26,10 @@ internal class Length
         SetComputedValue(millipoints, true);
     }
 
-    protected void SetComputedValue(int millipoints, bool bSetComputed)
+    protected void SetComputedValue(int millipoints, bool isComputed)
     {
         _millipoints = millipoints;
-        _isComputed = bSetComputed;
+        _isComputed = isComputed;
     }
 
     public virtual bool IsAuto()
@@ -40,13 +41,12 @@ internal class Length
     public virtual double GetTableUnits()
         => 0.0;
 
-    public virtual void ResolveTableUnit(double dTableUnit)
-    {
-    }
-
     public virtual Numeric? AsNumeric()
         => null;
 
     public override string ToString()
         => $"{_millipoints}mpt";
+
+    public virtual void ResolveTableUnit(double tableUnit)
+        => FonetDriver.ActiveDriver?.FireFonetError($"NOP for ResolveTableUnit: {tableUnit}");
 }

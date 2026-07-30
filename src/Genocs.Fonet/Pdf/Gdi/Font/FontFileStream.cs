@@ -3,37 +3,37 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf.Gdi.Font;
 
 /// <summary>
-///     Class designed to read and write primitive datatypes from/to a 
-///     TrueType font file.
+/// Class designed to read and write primitive datatypes from/to a 
+/// TrueType font file.
 /// </summary>
 /// <remarks>
-///     <p>All OpenType fonts use Motorola-style byte ordering (Big Endian).</p>
-///     <p>The following table lists the primitives and their definition. 
-///     Note the difference between the .NET CLR definition of certain 
-///     types and the TrueType definition.</p>
-///     <p>
-///     BYTE         8-bit unsigned integer. 
-///     CHAR         8-bit signed integer. 
-///     USHORT       16-bit unsigned integer. 
-///     SHORT        16-bit signed integer. 
-///     ULONG        32-bit unsigned integer. 
-///     LONG         32-bit signed integer. 
-///     Fixed        32-bit signed fixed-point number (16.16) 
-///     FWORD        16-bit signed integer (SHORT) that describes a 
-///                  quantity in FUnits. 
-///     UFWORD       16-bit unsigned integer (USHORT) that describes a 
-///                  quantity in FUnits. 
-///     F2DOT14      16-bit signed fixed number with the low 14 bits of 
-///                  fraction (2.14). 
-///     LONGDATETIME Date represented in number of seconds since 12:00 
-///                  midnight, January 1, 1904. The value is represented 
-///                  as a signed 64-bit integer. 
-///     Tag          Array of four uint8s (length = 32 bits) used to identify 
-///                  a script, language system, feature, or baseline 
-///     GlyphID      Glyph index number, same as uint16(length = 16 bits) 
-///     Offset       Offset to a table, same as uint16 (length = 16 bits), 
-///                  NULL offset = 0x0000 
-///     </p>
+/// <p>All OpenType fonts use Motorola-style byte ordering (Big Endian).</p>
+/// <p>The following table lists the primitives and their definition. 
+/// Note the difference between the .NET CLR definition of certain 
+/// types and the TrueType definition.</p>
+/// <p>
+/// BYTE         8-bit unsigned integer. 
+/// CHAR         8-bit signed integer. 
+/// USHORT       16-bit unsigned integer. 
+/// SHORT        16-bit signed integer. 
+/// ULONG        32-bit unsigned integer. 
+/// LONG         32-bit signed integer. 
+/// Fixed        32-bit signed fixed-point number (16.16) 
+/// FWORD        16-bit signed integer (SHORT) that describes a 
+///              quantity in FUnits. 
+/// UFWORD       16-bit unsigned integer (USHORT) that describes a 
+///              quantity in FUnits. 
+/// F2DOT14      16-bit signed fixed number with the low 14 bits of 
+///              fraction (2.14). 
+/// LONGDATETIME Date represented in number of seconds since 12:00 
+///              midnight, January 1, 1904. The value is represented 
+///              as a signed 64-bit integer. 
+/// Tag          Array of four uint8s (length = 32 bits) used to identify 
+///              a script, language system, feature, or baseline 
+/// GlyphID      Glyph index number, same as uint16(length = 16 bits) 
+/// Offset       Offset to a table, same as uint16 (length = 16 bits), 
+///              NULL offset = 0x0000 
+/// </p>
 /// </remarks>
 internal class FontFileStream
 {
@@ -42,15 +42,15 @@ internal class FontFileStream
     private Stack markers = new();
 
     /// <summary>
-    ///     Initialises a new instance of the <see cref="FontFileStream"/> 
-    ///     class using the supplied byte array as the underlying buffer.
+    /// Initialises a new instance of the <see cref="FontFileStream"/> 
+    /// class using the supplied byte array as the underlying buffer.
     /// </summary>
     /// <param name="data">The font data encoded in a byte array.</param>
     /// <exception cref="ArgumentNullException">
-    ///     <i>data</i> is a null reference.
+    /// <i>data</i> is a null reference.
     /// </exception>
     /// <exception cref="ArgumentException">
-    ///     <i>data</i> is a zero-length array.
+    /// <i>data</i> is a zero-length array.
     /// </exception>
     public FontFileStream(byte[] data)
     {
@@ -67,12 +67,12 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Initialises a new instance of the <see cref="FontFileStream"/>
-    ///     class using the supplied stream as the underlying buffer.
+    /// Initialises a new instance of the <see cref="FontFileStream"/>
+    /// class using the supplied stream as the underlying buffer.
     /// </summary>
     /// <param name="stream">Reference to an existing stream.</param>
     /// <exception cref="ArgumentNullException">
-    ///     <i>stream</i> is a null reference.
+    /// <i>stream</i> is a null reference.
     /// </exception>
     public FontFileStream(Stream stream)
     {
@@ -80,7 +80,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads an unsigned byte from the font file.
+    /// Reads an unsigned byte from the font file.
     /// </summary>
     /// <returns></returns>
     public byte ReadByte()
@@ -89,7 +89,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes an unsigned byte from the font file.
+    /// Writes an unsigned byte from the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteByte(byte value)
@@ -98,7 +98,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads an signed byte from the font file.
+    /// Reads an signed byte from the font file.
     /// </summary>
     /// <returns></returns>
     public sbyte ReadChar()
@@ -107,7 +107,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a signed byte from the font file.
+    /// Writes a signed byte from the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteChar(sbyte value)
@@ -116,7 +116,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a short (16-bit signed integer) from the font file.
+    /// Reads a short (16-bit signed integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public short ReadShort()
@@ -125,7 +125,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a short (16-bit signed integer) to the font file.
+    /// Writes a short (16-bit signed integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteShort(int value)
@@ -135,7 +135,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a short (16-bit signed integer) from the font file.
+    /// Reads a short (16-bit signed integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public short ReadFWord()
@@ -144,7 +144,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a short (16-bit signed integer) to the font file.
+    /// Writes a short (16-bit signed integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteFWord(int value)
@@ -153,7 +153,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a ushort (16-bit unsigned integer) from the font file.
+    /// Reads a ushort (16-bit unsigned integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public ushort ReadUShort()
@@ -162,7 +162,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a ushort (16-bit unsigned integer) to the font file.
+    /// Writes a ushort (16-bit unsigned integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteUShort(int value)
@@ -172,7 +172,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a ushort (16-bit unsigned integer) from the font file.
+    /// Reads a ushort (16-bit unsigned integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public ushort ReadUFWord()
@@ -181,7 +181,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a ushort (16-bit unsigned integer) to the font file.
+    /// Writes a ushort (16-bit unsigned integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteUFWord(int value)
@@ -190,7 +190,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads an int (32-bit signed integer) from the font file.
+    /// Reads an int (32-bit signed integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public int ReadLong()
@@ -204,7 +204,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes an int (32-bit signed integer) to the font file.
+    /// Writes an int (32-bit signed integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteLong(int value)
@@ -216,7 +216,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a uint (32-bit unsigned integer) from the font file.
+    /// Reads a uint (32-bit unsigned integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public uint ReadULong()
@@ -230,7 +230,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a uint (32-bit unsigned integer) to the font file.
+    /// Writes a uint (32-bit unsigned integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteULong(uint value)
@@ -242,7 +242,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads an int (32-bit signed integer) from the font file.
+    /// Reads an int (32-bit signed integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public int ReadFixed()
@@ -251,7 +251,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes an int (32-bit unsigned integer) to the font file.
+    /// Writes an int (32-bit unsigned integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteFixed(int value)
@@ -260,7 +260,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a long (64-bit signed integer) from the font file.
+    /// Reads a long (64-bit signed integer) from the font file.
     /// </summary>
     /// <returns></returns>
     public long ReadLongDateTime()
@@ -278,7 +278,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a long (64-bit signed integer) to the font file.
+    /// Writes a long (64-bit signed integer) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteDateTime(long value)
@@ -294,7 +294,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a tag (array of four bytes) from the font stream.
+    /// Reads a tag (array of four bytes) from the font stream.
     /// </summary>
     /// <returns></returns>
     public byte[] ReadTag()
@@ -309,7 +309,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a tab (array of four bytes) to the font file.
+    /// Writes a tab (array of four bytes) to the font file.
     /// </summary>
     /// <returns></returns>
     public void WriteTag(byte[] value)
@@ -321,13 +321,13 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Ensures the stream is padded on a 4-byte boundary.
+    /// Ensures the stream is padded on a 4-byte boundary.
     /// </summary>
     /// <remarks>
-    ///     This method will output between 0 and 3 bytes to the stream.
+    /// This method will output between 0 and 3 bytes to the stream.
     /// </remarks>
     /// <returns>
-    ///     A value between 0 and 3 (inclusive).
+    /// A value between 0 and 3 (inclusive).
     /// </returns>
     public int Pad()
     {
@@ -341,7 +341,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Writes a sequence of bytes to the underlying stream.
+    /// Writes a sequence of bytes to the underlying stream.
     /// </summary>
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
@@ -352,8 +352,8 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Reads a block of bytes from the current stream and writes 
-    ///     the data to buffer.
+    /// Reads a block of bytes from the current stream and writes 
+    /// the data to buffer.
     /// </summary>
     /// <param name="buffer">A byte buffer big enough to store <i>count</i> bytes.</param>
     /// <param name="offset">The byte offset in buffer to begin reading.</param>
@@ -364,7 +364,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Gets or sets the current position of the font stream.
+    /// Gets or sets the current position of the font stream.
     /// </summary>
     public long Position
     {
@@ -373,7 +373,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Gets the length of the font stream in bytes.
+    /// Gets the length of the font stream in bytes.
     /// </summary>
     public long Length
     {
@@ -381,7 +381,7 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Offsets the stream position by the supplied number of bytes.
+    /// Offsets the stream position by the supplied number of bytes.
     /// </summary>
     /// <param name="offset"></param>
     public void Skip(long offset)
@@ -390,10 +390,10 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Saves the current stream position onto a marker stack.
+    /// Saves the current stream position onto a marker stack.
     /// </summary>
     /// <returns>
-    ///     Returns the current stream position.
+    /// Returns the current stream position.
     /// </returns>
     public long SetRestorePoint()
     {
@@ -403,14 +403,14 @@ internal class FontFileStream
     }
 
     /// <summary>
-    ///     Sets the stream <see cref="Position"/> using the marker at the 
-    ///     head of the marker stack.
+    /// Sets the stream <see cref="Position"/> using the marker at the 
+    /// head of the marker stack.
     /// </summary>
     /// <returns>
-    ///     Returns the stream position before it was reset.
+    /// Returns the stream position before it was reset.
     /// </returns>
     /// <exception cref="InvalidOperationException">
-    ///     If the markers stack is empty.
+    /// If the markers stack is empty.
     /// </exception>
     public long Restore()
     {

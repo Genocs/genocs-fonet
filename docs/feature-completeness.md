@@ -2,14 +2,31 @@
 
 XSL-FO property and element implementation status for migration tracking.
 
+**Last updated:** August 2026
+
 ## Summary
 
 | Category | Implemented | Stubbed (`ToBeImplemented`) | Total |
 |----------|-------------|----------------------------|-------|
-| Properties | ~200+ | ~87 | ~287 |
-| Elements | ~40+ | 13 | ~53+ |
+| Properties | ~207 | 87 | ~294 |
+| Elements | ~43 | 11 | ~54 |
 
 Stubbed properties log a warning and are ignored during layout. Stubbed elements parse but produce no output.
+
+## Recently Implemented (Phase 3 Tier 1)
+
+| Property/Element | File | Status | Test |
+|-----------------|------|--------|------|
+| `visibility` | `Properties/VisibilityMaker.cs` | ✅ Layout integrated | `Phase3Tier1Test.fo` |
+| `word-spacing` | `Properties/WordSpacingMaker.cs` | ✅ Layout integrated | `Phase3Tier1Test.fo` |
+| `margin` (shorthand) | `Properties/MarginMaker.cs` | ✅ Done | `Phase3Tier1Test.fo` |
+| `caption-side` | `Properties/CaptionSideMaker.cs` | ✅ Done | `Phase3Tier1Test.fo` |
+| `float` | `Properties/FloatMaker.cs` | ✅ Side-float via `fo:float` | `Phase3FloatSideTest.fo` |
+| `clear` | `Properties/ClearMaker.cs` | ✅ Layout integrated | `Phase3FloatSideTest.fo` |
+| `z-index` | `Properties/ZIndexMaker.cs` | ✅ Z-order rendering | `Phase3ZIndexTest.fo` |
+| `fo:table-caption` | `Flow/TableCaption.cs` | ✅ Done | `Phase3Tier1Test.fo` |
+| `fo:table-and-caption` | `Flow/TableAndCaption.cs` | ✅ Done | `Phase3Tier1Test.fo` |
+| `fo:float` | `Flow/Float.cs` | ✅ Side placement + wrap | `Phase3FloatSideTest.fo` |
 
 ## Unimplemented Elements
 
@@ -17,9 +34,6 @@ These extend `ToBeImplementedElement` — they exist in the FO tree but contribu
 
 | Element | File | Category | Migration Priority |
 |---------|------|----------|-------------------|
-| `fo:float` | `Fo/Flow/Float.cs` | Layout | **Tier 1** — partial (in-flow render) |
-| `fo:table-caption` | `Fo/Flow/TableCaption.cs` | Tables | **Tier 1** — ✅ Done |
-| `fo:table-and-caption` | `Fo/Flow/TableAndCaption.cs` | Tables | **Tier 1** — ✅ Done |
 | `fo:inline-container` | `Fo/Flow/InlineContainer.cs` | Layout | Tier 2 |
 | `fo:bidi-override` | `Fo/Flow/BidiOverride.cs` | i18n | Tier 2 |
 | `fo:multi-switch` | `Fo/Flow/MultiSwitch.cs` | Conditional | Tier 3 |
@@ -40,13 +54,8 @@ Properties using `ToBeImplementedProperty.Maker`. Grouped by functional area.
 
 | Property | Maker File | Impact |
 |----------|-----------|--------|
-| `float` | `FloatMaker.cs` | Floating content |
-| `clear` | `ClearMaker.cs` | Clear floats |
-| `z-index` | `ZIndexMaker.cs` | Stacking order |
 | `relative-position` | `RelativePositionMaker.cs` | Relative positioning |
-| `visibility` | `VisibilityMaker.cs` | Show/hide |
 | `clip` | `ClipMaker.cs` | Clipping |
-| `margin` (shorthand) | `MarginMaker.cs` | Margin shorthand |
 | `size` | `SizeMaker.cs` | Page size shorthand |
 | `min-width` | `MinWidthMaker.cs` | Minimum width |
 | `min-height` | `MinHeightMaker.cs` | Minimum height |
@@ -63,13 +72,11 @@ Properties using `ToBeImplementedProperty.Maker`. Grouped by functional area.
 | `border-spacing` | `BorderSpacingMaker.cs` | Table cell spacing |
 | `border-*-precedence` (4) | Various | Border conflict resolution |
 | `empty-cells` | `EmptyCellsMaker.cs` | Empty table cell display |
-| `caption-side` | `CaptionSideMaker.cs` | Table caption position |
 
 ### Text & Typography (Tier 1–2)
 
 | Property | Maker File | Impact |
 |----------|-----------|--------|
-| `word-spacing` | `WordSpacingMaker.cs` | Word spacing |
 | `white-space` | `WhiteSpaceMaker.cs` | Whitespace handling |
 | `white-space-treatment` | `WhiteSpaceTreatmentMaker.cs` | Whitespace treatment |
 | `linefeed-treatment` | `LinefeedTreatmentMaker.cs` | Line feed handling |
@@ -207,6 +214,12 @@ Based on existing tests and code review:
 | Keep properties | `DataTypes/Keep.cs` implemented |
 | Borders (individual sides) | Implemented makers (not shorthand) |
 | Padding (individual sides) | Implemented makers |
+| `visibility` | `Phase3Tier1Test.fo` |
+| `word-spacing` | `Phase3Tier1Test.fo` |
+| `margin` shorthand | `Phase3Tier1Test.fo` |
+| `background-color`, `background-image` | Pre-existing |
+| `letter-spacing` | Pre-existing |
+| Table captions | `Phase3Tier1Test.fo` |
 
 ## Feature Triage Process
 
@@ -219,19 +232,3 @@ When a consumer reports a missing feature:
 5. **Implement** property maker or element class with layout logic
 6. **Test** — add FO template + PDF validation test
 7. **Update** this matrix
-
-## Tracking Template
-
-| Property/Element | Status | Tier | Implemented In | Test |
-|-----------------|--------|------|----------------|------|
-| `background-color` | ✅ Done | — | `BackgroundColorMaker.cs` | — |
-| `float` | ✅ Tier 1 partial | 1 | `FloatMaker.cs` | Enum only; side placement deferred |
-| `visibility` | ✅ Done | 1 | `VisibilityMaker.cs` | `Phase3Tier1Test.fo` |
-| `margin` (shorthand) | ✅ Done | 1 | `MarginMaker.cs` | `Phase3Tier1Test.fo` |
-| `word-spacing` | ✅ Done | 1 | `WordSpacingMaker.cs` | `Phase3Tier1Test.fo` |
-| `letter-spacing` | ✅ Done | — | `LetterSpacingMaker.cs` | — |
-| `caption-side` | ✅ Done | 1 | `CaptionSideMaker.cs` | `Phase3Tier1Test.fo` |
-| `z-index` | ✅ Parse only | 1 | `ZIndexMaker.cs` | — |
-| `clear` | ✅ Parse only | 1 | `ClearMaker.cs` | — |
-
-Update this table as features are implemented during Phase 3.

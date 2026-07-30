@@ -1,4 +1,3 @@
-using Genocs.Fonet.Pdf.Gdi;
 using SkiaSharp;
 
 namespace Genocs.Fonet.Pdf.Gdi;
@@ -8,37 +7,33 @@ namespace Genocs.Fonet.Pdf.Gdi;
 /// </summary>
 public class GdiFont
 {
-    private IntPtr hFont; // Dummy handle for API compatibility
-    private SKTypeface typeface;
-    private string faceName;
-    private int height;
+    private SKTypeface? _typeface;
+    private readonly string _faceName;
+    private readonly int _height;
 
     /// <summary>
     /// Class constructor
     /// </summary>
-    /// <param name="hFont">Dummy handle (for compatibility)</param>
     /// <param name="typeface">SkiaSharp typeface object</param>
     /// <param name="faceName">Face name of the font</param>
     /// <param name="height">Font height</param>
-    public GdiFont(IntPtr hFont, SKTypeface typeface, string faceName, int height)
+    public GdiFont(SKTypeface typeface, string faceName, int height)
     {
-        this.hFont = hFont;
-        this.typeface = typeface;
-        this.faceName = faceName;
-        this.height = height;
+        _typeface = typeface;
+        _faceName = faceName;
+        _height = height;
     }
 
     /// <summary>
     /// Constructor for backward compatibility with handle-only creation
     /// </summary>
-    public GdiFont(IntPtr hFont, string faceName, int height)
+    public GdiFont(string faceName, int height)
     {
-        this.hFont = hFont;
-        this.faceName = faceName;
-        this.height = height;
+        _faceName = faceName;
+        _height = height;
 
         // Try to load typeface by name
-        this.typeface = FontManager.Instance.LoadTypeface(faceName, false, false);
+        _typeface = FontManager.Instance.LoadTypeface(faceName, false, false);
     }
 
     /// <summary>
@@ -58,8 +53,7 @@ public class GdiFont
     protected virtual void Dispose(bool disposing)
     {
         // Typefaces are owned and cached by FontManager; do not dispose here.
-        hFont = IntPtr.Zero;
-        typeface = null!;
+        _typeface = null!;
     }
 
     /// <summary>
@@ -78,9 +72,7 @@ public class GdiFont
         var fontManager = FontManager.Instance;
         var typeface = fontManager.LoadTypeface(faceName, bold, italic) ?? throw new ArgumentException($"Font '{faceName}' not found on system.");
 
-        // Create a dummy handle for backward compatibility
-        var handle = new IntPtr(Guid.NewGuid().GetHashCode());
-        return new GdiFont(handle, typeface, faceName, height);
+        return new GdiFont(typeface, faceName, height);
     }
 
     /// <summary>
@@ -111,20 +103,15 @@ public class GdiFont
     /// <summary>
     /// Gets the face name
     /// </summary>
-    public string FaceName { get { return faceName; } }
+    public string FaceName { get { return _faceName; } }
 
     /// <summary>
     /// Gets the font height
     /// </summary>
-    public int Height { get { return height; } }
-
-    /// <summary>
-    /// Gets the dummy handle for API compatibility
-    /// </summary>
-    internal IntPtr Handle { get { return hFont; } }
+    public int Height { get { return _height; } }
 
     /// <summary>
     /// Gets the SkiaSharp typeface
     /// </summary>
-    internal SKTypeface Typeface { get { return typeface; } }
+    internal SKTypeface? Typeface { get { return _typeface; } }
 }

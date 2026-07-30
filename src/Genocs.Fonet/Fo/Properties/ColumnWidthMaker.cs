@@ -17,7 +17,7 @@ namespace Genocs.Fonet.Fo.Properties
 
         public override Property Make(PropertyList propertyList)
         {
-            return Make(propertyList, "proportional-column-width(1)", propertyList.getParentFObj());
+            return Make(propertyList, "proportional-column-width(1)", propertyList.GetParentFObj());
 
         }
 

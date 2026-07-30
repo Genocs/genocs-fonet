@@ -34,7 +34,7 @@ internal class LengthProperty(Length length) : Property
                 return new LengthProperty(val);
             }
 
-            return ConvertPropertyDatatype(p, propertyList, fo);
+            return ConvertPropertyDataType(p, propertyList, fo);
         }
     }
 

@@ -1,11 +1,10 @@
-using Genocs.Fonet.Pdf;
 using System.Collections;
 
 namespace Genocs.Fonet.Pdf;
 
 public class PdfDictionary : PdfObject, IEnumerable
 {
-    protected Hashtable entries = new Hashtable();
+    protected Hashtable _entries = [];
 
     public PdfDictionary()
     {
@@ -18,63 +17,50 @@ public class PdfDictionary : PdfObject, IEnumerable
 
     public void Add(PdfName key, PdfObject value)
     {
-        if (key == null)
+        ArgumentNullException.ThrowIfNull(key);
+
+        if (_entries.ContainsKey(key))
         {
-            throw new ArgumentNullException("key");
-        }
-        if (entries.ContainsKey(key))
-        {
-            throw new ArgumentException("Already contains entry " + key);
+            throw new ArgumentException($"Already contains entry {key}");
         }
 
-        entries.Add(key, value);
+        _entries.Add(key, value);
     }
 
     public void Clear()
     {
-        entries.Clear();
+        _entries.Clear();
     }
 
     public bool Contains(PdfName key)
     {
-        if (key == null)
-        {
-            throw new ArgumentNullException("key");
-        }
-        return entries.ContainsKey(key);
+        ArgumentNullException.ThrowIfNull(key);
+
+        return _entries.ContainsKey(key);
     }
 
     public void Remove(PdfName key)
     {
-        if (key == null)
-        {
-            throw new ArgumentNullException("key");
-        }
-        entries.Remove(key);
+        ArgumentNullException.ThrowIfNull(key);
+        _entries.Remove(key);
     }
 
     public IEnumerator GetEnumerator()
     {
-        return entries.GetEnumerator();
+        return _entries.GetEnumerator();
     }
 
     public PdfObject this[PdfName key]
     {
         get
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
-            return (PdfObject)entries[key];
+            ArgumentNullException.ThrowIfNull(key);
+            return (PdfObject)_entries[key];
         }
         set
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
-            entries[key] = value;
+            ArgumentNullException.ThrowIfNull(key);
+            _entries[key] = value;
         }
     }
 
@@ -82,7 +68,7 @@ public class PdfDictionary : PdfObject, IEnumerable
     {
         get
         {
-            return entries.Keys;
+            return _entries.Keys;
         }
     }
 
@@ -90,7 +76,7 @@ public class PdfDictionary : PdfObject, IEnumerable
     {
         get
         {
-            return entries.Values;
+            return _entries.Values;
         }
     }
 
@@ -98,18 +84,18 @@ public class PdfDictionary : PdfObject, IEnumerable
     {
         get
         {
-            return entries.Count;
+            return _entries.Count;
         }
     }
 
     protected internal override void Write(PdfWriter writer)
     {
         writer.WriteKeywordLine(Keyword.DictionaryBegin);
-        foreach (DictionaryEntry e in entries)
+        foreach (DictionaryEntry e in _entries)
         {
             writer.Write((PdfName)e.Key);
             writer.WriteSpace();
-            writer.WriteLine((PdfObject)e.Value);
+            writer.WriteLine((PdfObject?)e.Value);
         }
         writer.WriteKeyword(Keyword.DictionaryEnd);
     }

@@ -3,12 +3,12 @@ using Genocs.Fonet.Pdf;
 namespace Genocs.Fonet.Pdf
 {
     /// <summary>
-    ///     A Type 0 font is a composite font whose glyphs are obtained from a
-    ///     font like object called a CIDFont (a descendant font).
+    /// A Type 0 font is a composite font whose glyphs are obtained from a
+    /// font like object called a CIDFont (a descendant font).
     /// </summary>
     /// <remarks>
-    ///     All versions of the PDF specification up to and including version 1.4
-    ///     only support a single descendant font.
+    /// All versions of the PDF specification up to and including version 1.4
+    /// only support a single descendant font.
     /// </remarks>
     public class PdfType0Font : PdfFont
     {
@@ -20,8 +20,8 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets the stream containing a CMap that maps character codes to 
-        ///     unicode values.
+        /// Sets the stream containing a CMap that maps character codes to 
+        /// unicode values.
         /// </summary>
         public PdfCMap ToUnicode
         {
@@ -29,7 +29,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets the descendant font.
+        /// Sets the descendant font.
         /// </summary>
         public PdfCIDFont Descendant
         {
@@ -43,7 +43,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Sets a value representing the character encoding.
+        /// Sets a value representing the character encoding.
         /// </summary>
         public PdfName Encoding
         {

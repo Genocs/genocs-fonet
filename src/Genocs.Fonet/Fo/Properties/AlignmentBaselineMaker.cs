@@ -9,22 +9,17 @@ internal class AlignmentBaselineMaker : ToBeImplementedProperty.Maker
         return new AlignmentBaselineMaker(propName);
     }
 
-    protected AlignmentBaselineMaker(string name) : base(name) { }
+    protected AlignmentBaselineMaker(string name)
+        : base(name)
+    {
+    }
 
 
     public override bool IsInherited()
-    {
-        return false;
-    }
+        => false;
 
-    private Property m_defaultProp = null;
+    private Property? _defaultProperty;
 
     public override Property Make(PropertyList propertyList)
-    {
-        if (m_defaultProp == null)
-        {
-            m_defaultProp = Make(propertyList, "auto", propertyList.getParentFObj());
-        }
-        return m_defaultProp;
-    }
+        => _defaultProperty ??= Make(propertyList, "auto", propertyList.GetParentFObj());
 }

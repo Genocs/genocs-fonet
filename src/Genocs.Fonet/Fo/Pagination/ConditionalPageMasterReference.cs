@@ -4,18 +4,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class ConditionalPageMasterReference : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new ConditionalPageMasterReference(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new ConditionalPageMasterReference(parent, props));
 
     private RepeatablePageMasterAlternatives repeatablePageMasterAlternatives;
 
@@ -28,7 +18,7 @@ internal class ConditionalPageMasterReference : FObj
     public ConditionalPageMasterReference(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = GetElementName();
+        Name = GetElementName();
         if (GetProperty("master-reference") != null)
         {
             SetMasterName(GetProperty("master-reference").GetString());
@@ -36,9 +26,9 @@ internal class ConditionalPageMasterReference : FObj
 
         validateParent(parent);
 
-        setPagePosition(this._properties.GetProperty("page-position").GetEnum());
-        setOddOrEven(this._properties.GetProperty("odd-or-even").GetEnum());
-        setBlankOrNotBlank(this._properties.GetProperty("blank-or-not-blank").GetEnum());
+        setPagePosition(this.Properties.GetProperty("page-position").GetEnum());
+        setOddOrEven(this.Properties.GetProperty("odd-or-even").GetEnum());
+        setBlankOrNotBlank(this.Properties.GetProperty("blank-or-not-blank").GetEnum());
     }
 
     protected internal void SetMasterName(string masterName)
@@ -144,14 +134,14 @@ internal class ConditionalPageMasterReference : FObj
 
     protected internal void validateParent(FObj parent)
     {
-        if (parent.GetName().Equals("fo:repeatable-page-master-alternatives"))
+        if (parent.Name.Equals("fo:repeatable-page-master-alternatives"))
         {
             this.repeatablePageMasterAlternatives =
                 (RepeatablePageMasterAlternatives)parent;
 
             if (GetMasterName() == null)
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(
+                FonetDriver.ActiveDriver?.FireFonetWarning(
                     "single-page-master-reference"
                         + "does not have a master-reference and so is being ignored");
             }
@@ -164,7 +154,7 @@ internal class ConditionalPageMasterReference : FObj
         {
             throw new FonetException("fo:conditional-page-master-reference must be child "
                 + "of fo:repeatable-page-master-alternatives, not "
-                + parent.GetName());
+                + parent.Name);
         }
     }
 }

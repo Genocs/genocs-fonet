@@ -11,5 +11,5 @@ internal class ZIndexMaker : LengthProperty.Maker
     public override bool IsInherited() => false;
 
     public override Property Make(PropertyList propertyList) =>
-        Make(propertyList, "auto", propertyList.getParentFObj());
+        Make(propertyList, "auto", propertyList.GetParentFObj());
 }

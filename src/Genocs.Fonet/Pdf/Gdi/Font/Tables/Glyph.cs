@@ -3,32 +3,32 @@ using System.Collections;
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Represents either a simple or composite glyph description from
-///     the 'glyf' table.
+/// Represents either a simple or composite glyph description from
+/// the 'glyf' table.
 /// </summary>
 /// <remarks>
-///     This class is nothing more than a wrapper around 
-///     a byte array.
+/// This class is nothing more than a wrapper around 
+/// a byte array.
 /// </remarks>
 internal class Glyph
 {
     /// <summary>
-    ///     The index of this glyph as obtained from the 'loca' table.
+    /// The index of this glyph as obtained from the 'loca' table.
     /// </summary>
     private int glyphIndex;
 
     /// <summary>
-    ///     Contains glyph description as raw data.
+    /// Contains glyph description as raw data.
     /// </summary>
     private byte[] glyphData;
 
     /// <summary>
-    ///     List of composite glyph indices.
+    /// List of composite glyph indices.
     /// </summary>
     private IList children;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     public Glyph(int glyphIndex)
     {
@@ -37,7 +37,7 @@ internal class Glyph
     }
 
     /// <summary>
-    ///     Sets the glyph data (duh!).
+    /// Sets the glyph data (duh!).
     /// </summary>
     /// <param name="glyphData"></param>
     public void SetGlyphData(byte[] glyphData)
@@ -46,7 +46,7 @@ internal class Glyph
     }
 
     /// <summary>
-    ///     Gets or sets the index of this glyph.
+    /// Gets or sets the index of this glyph.
     /// </summary>
     public int Index
     {
@@ -54,7 +54,7 @@ internal class Glyph
     }
 
     /// <summary>
-    ///     Gets the length of the glyph data buffer.
+    /// Gets the length of the glyph data buffer.
     /// </summary>
     public uint Length
     {
@@ -62,7 +62,7 @@ internal class Glyph
     }
 
     /// <summary>
-    ///     Add the supplied glyph index to list of children.
+    /// Add the supplied glyph index to list of children.
     /// </summary>
     /// <param name="glyphIndex"></param>
     public void AddChild(int glyphIndex)
@@ -71,7 +71,7 @@ internal class Glyph
     }
 
     /// <summary>
-    ///     Gets a ilst of child glyph indices.
+    /// Gets a ilst of child glyph indices.
     /// </summary>
     public IList Children
     {
@@ -79,8 +79,8 @@ internal class Glyph
     }
 
     /// <summary>
-    ///     Gets a value indicating whether or not this glyph represents 
-    ///     a composite glyph.
+    /// Gets a value indicating whether or not this glyph represents 
+    /// a composite glyph.
     /// </summary>
     public bool IsComposite
     {
@@ -88,7 +88,7 @@ internal class Glyph
     }
 
     /// <summary>
-    ///     Writes a glyph description to the supplied stream.
+    /// Writes a glyph description to the supplied stream.
     /// </summary>
     /// <param name="stream"></param>
     public void Write(FontFileStream stream)

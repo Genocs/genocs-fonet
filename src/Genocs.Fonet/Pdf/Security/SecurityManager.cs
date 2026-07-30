@@ -1,10 +1,9 @@
-namespace Genocs.Fonet.Pdf.Security;
-
-using Genocs.Fonet.Pdf;
-using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+
+
+namespace Genocs.Fonet.Pdf.Security;
+
 
 /// <summary>
 /// Implements Adobe's standard security handler.  A security handler is 
@@ -29,14 +28,14 @@ public class SecurityManager
     private int permissions;
 
     /// <summary>
-    ///     Constructs a new standard security manager.
+    /// Constructs a new standard security manager.
     /// </summary>
     /// <param name="options">
-    ///     The user supplied PDF options that provides access to the passwords and 
-    ///     the access permissions.
+    /// The user supplied PDF options that provides access to the passwords and 
+    /// the access permissions.
     /// </param>
     /// <param name="fileId">
-    ///     The PDF document's file identifier (see section 8.3 of PDF specification).
+    /// The PDF document's file identifier (see section 8.3 of PDF specification).
     /// </param>
     public SecurityManager(SecurityOptions options, FileIdentifier fileId)
     {
@@ -65,15 +64,15 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Computes the master key that is used to encrypt string and stream data 
-    ///     in the PDF document.
+    /// Computes the master key that is used to encrypt string and stream data 
+    /// in the PDF document.
     /// </summary>
     /// <param name="options">
-    ///     The user supplied PDF options that provides access to the passwords and
-    ///     the access permissions.
+    /// The user supplied PDF options that provides access to the passwords and
+    /// the access permissions.
     /// </param>
     /// <param name="fileId">
-    ///     The PDF document's file identifier (see section 8.3 of PDF specification).
+    /// The PDF document's file identifier (see section 8.3 of PDF specification).
     /// </param>
     private void CreateMasterKey(SecurityOptions options, FileIdentifier fileId)
     {
@@ -85,13 +84,13 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Computes the O(owner) value in the encryption dictionary.
+    /// Computes the O(owner) value in the encryption dictionary.
     /// </summary>
     /// <remarks>
-    ///     Corresponds to algorithm 3.3 on page 69 of the PDF specficiation.
+    /// Corresponds to algorithm 3.3 on page 69 of the PDF specficiation.
     /// </remarks>
     /// <param name="options">
-    ///     The user supplied PDF options that provides access to the passwords.
+    /// The user supplied PDF options that provides access to the passwords.
     /// </param>
     private void CreateOwnerEntry(SecurityOptions options)
     {
@@ -119,13 +118,13 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Computes the U(user) value in the encryption dictionary.
+    /// Computes the U(user) value in the encryption dictionary.
     /// </summary>
     /// <remarks>
-    ///     Corresponds to algorithm 3.4 on page 70 of the PDF specficiation.
+    /// Corresponds to algorithm 3.4 on page 70 of the PDF specficiation.
     /// </remarks>
     /// <param name="options">
-    ///     The user supplied PDF options that provides access to the passwords.
+    /// The user supplied PDF options that provides access to the passwords.
     /// </param>
     private void CreateUserEntry(SecurityOptions options)
     {
@@ -136,7 +135,7 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Encrypts the passed byte array using the ARC4 cipher.
+    /// Encrypts the passed byte array using the ARC4 cipher.
     /// </summary>
     public byte[] Encrypt(byte[] data, PdfObjectId objectId)
     {
@@ -146,10 +145,10 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Access to the raw user entry byte array.
+    /// Access to the raw user entry byte array.
     /// </summary>
     /// <remarks>
-    ///     Required for testing purposes;
+    /// Required for testing purposes;
     /// </remarks>
     internal byte[] UserEntry
     {
@@ -164,10 +163,10 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Access to the raw owner entry byte array.
+    /// Access to the raw owner entry byte array.
     /// </summary>
     /// <remarks>
-    ///     Required for testing purposes;
+    /// Required for testing purposes;
     /// </remarks>
     internal byte[] OwnerEntry
     {
@@ -182,14 +181,13 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Computes an encryption key that is used to encrypt string and stream data 
-    ///     in the PDF document.
+    /// Computes an encryption key that is used to encrypt string and stream data 
+    /// in the PDF document.
     /// </summary>
     /// <remarks>
-    ///     Corresponds to algorithm 3.1 in section 3.5 of the PDF specficiation.
+    /// Corresponds to algorithm 3.1 in section 3.5 of the PDF specficiation.
     /// </remarks>
-    private static byte[] ComputeEncryptionKey31(
-        byte[] masterKey, PdfObjectId objectId)
+    private static byte[] ComputeEncryptionKey31(byte[] masterKey, PdfObjectId objectId)
     {
         byte[] key = new byte[masterKey.Length + 5];
 
@@ -214,11 +212,11 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Computes an encryption key that is used to encrypt string and stream data 
-    ///     in the PDF document.
+    /// Computes an encryption key that is used to encrypt string and stream data 
+    /// in the PDF document.
     /// </summary>
     /// <remarks>
-    ///     Corresponds to algorithm 3.2 in section 3.5 of the PDF specficiation.
+    /// Corresponds to algorithm 3.2 in section 3.5 of the PDF specficiation.
     /// </remarks>
     private static byte[] ComputeEncryptionKey32(
         byte[] paddedPassword, byte[] ownerEntry, int permissions, byte[] fileId)
@@ -245,16 +243,16 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Pads or truncates a password string to exactly 32-bytes.
+    /// Pads or truncates a password string to exactly 32-bytes.
     /// </summary>
     /// <remarks>
-    ///     Corresponds to step 1 of algorithm 3.2 on page 69 of the PDF 1.3 specficiation.
+    /// Corresponds to step 1 of algorithm 3.2 on page 69 of the PDF 1.3 specficiation.
     /// </remarks>
     /// <param name="password">The password to pad or truncate.</param>
     /// <returns>
-    ///     A byte array of length 32 bytes containing the padded or truncated password.
+    /// A byte array of length 32 bytes containing the padded or truncated password.
     /// </returns>
-    private static byte[] PadPassword(string password)
+    private static byte[] PadPassword(string? password)
     {
         byte[] result = new byte[32];
         if (password != null)
@@ -284,12 +282,12 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Determines if the passed password matches the user password
-    ///     used to initialise this security manager.
+    /// Determines if the passed password matches the user password
+    /// used to initialise this security manager.
     /// </summary>
     /// <remarks>
-    ///     Used for testing purposes only.  Corresponds to algorithm 3.5 in the
-    ///     PDF 1.3 specification.
+    /// Used for testing purposes only.  Corresponds to algorithm 3.5 in the
+    /// PDF 1.3 specification.
     /// </remarks>
     /// <returns>True if the password is correct.</returns>
     internal static bool CheckUserPassword(
@@ -304,14 +302,12 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Performs the actual checking of the user password.
+    /// Performs the actual checking of the user password.
     /// </summary>
-    private static bool CheckUserPassword(
-        byte[] paddedPassword, byte[] userEntry, byte[] ownerEntry, int permissions, byte[] fileId)
+    private static bool CheckUserPassword(byte[] paddedPassword, byte[] userEntry, byte[] ownerEntry, int permissions, byte[] fileId)
     {
         // Compute an encryption key from the supplied information.
-        byte[] key = ComputeEncryptionKey32(
-            paddedPassword, ownerEntry, permissions, fileId);
+        byte[] key = ComputeEncryptionKey32(paddedPassword, ownerEntry, permissions, fileId);
 
         // Decrpt the User entry using the key.
         Arc4 arc4 = new Arc4(key);
@@ -324,10 +320,9 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Checks the owner password.
+    /// Checks the owner password.
     /// </summary>
-    internal static bool CheckOwnerPassword(
-        string password, byte[] userEntry, byte[] ownerEntry, int permissions, byte[] fileId)
+    internal static bool CheckOwnerPassword(string password, byte[] userEntry, byte[] ownerEntry, int permissions, byte[] fileId)
     {
         // Compute an encryption key from the supplied information.
         MD5 md5 = MD5.Create();
@@ -344,7 +339,7 @@ public class SecurityManager
     }
 
     /// <summary>
-    ///     Compares two byte arrays and returns true if they are equal.
+    /// Compares two byte arrays and returns true if they are equal.
     /// </summary>
     private static bool CompareArray(byte[] a1, byte[] a2)
     {

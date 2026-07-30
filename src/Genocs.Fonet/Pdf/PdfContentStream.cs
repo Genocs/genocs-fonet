@@ -1,112 +1,86 @@
-using System.Diagnostics;
 using System.Text;
 
 namespace Genocs.Fonet.Pdf;
 
 public class PdfContentStream : PdfStream
 {
-  private static readonly Encoding ContentStreamEncoding = Encoding.ASCII;
+    private static readonly Encoding ContentStreamEncoding = Encoding.ASCII;
 
-    protected MemoryStream stream;
-    protected PdfWriter streamData;
+    protected readonly MemoryStream _stream;
+    protected readonly PdfWriter _streamData;
 
     public PdfContentStream(PdfObjectId objectId)
         : base(objectId)
     {
-        this.stream = new MemoryStream();
-        this.streamData = new PdfWriter(stream);
+        _stream = new MemoryStream();
+        _streamData = new PdfWriter(_stream);
     }
 
     public void Write(PdfObject obj)
     {
-        Debug.Assert(obj != null);
         if (obj.IsIndirect || obj is PdfObjectReference)
         {
             throw new ArgumentException("Cannot write indirect PdfObject", "obj");
         }
 
-        streamData.Write(obj);
+        _streamData.Write(obj);
     }
 
     public void WriteLine(PdfObject obj)
     {
-        Debug.Assert(obj != null);
         if (obj.IsIndirect || obj is PdfObjectReference)
         {
             throw new ArgumentException("Cannot write indirect PdfObject", "obj");
         }
 
-        streamData.WriteLine(obj);
+        _streamData.WriteLine(obj);
     }
 
     /// <summary>
-    ///     TODO: This method is temporary.  I'm assuming that all string should 
-    ///     be represented as a PdfString object?
+    /// TODO: This method is temporary. I'm assuming that all string should 
+    /// be represented as a PdfString object?
     /// </summary>
     /// <param name="s"></param>
+    [Obsolete("Use Write(PdfString) instead")]
     public void Write(string s)
-    {
-        streamData.Write(ContentStreamEncoding.GetBytes(s));
-    }
+        => _streamData.Write(ContentStreamEncoding.GetBytes(s));
 
     public void WriteLine(string s)
-    {
-        streamData.WriteLine(ContentStreamEncoding.GetBytes(s));
-    }
+        => _streamData.WriteLine(ContentStreamEncoding.GetBytes(s));
 
     public void Write(int val)
-    {
-        streamData.Write(val);
-    }
+        => _streamData.Write(val);
 
     public void WriteLine(int val)
-    {
-        streamData.WriteLine(val);
-    }
+        => _streamData.WriteLine(val);
 
     public void Write(decimal val)
-    {
-        streamData.Write(val);
-    }
+        => _streamData.Write(val);
 
     public void WriteLine(decimal val)
-    {
-        streamData.WriteLine(val);
-    }
+        => _streamData.WriteLine(val);
 
     public void WriteSpace()
-    {
-        streamData.WriteSpace();
-    }
+        => _streamData.WriteSpace();
 
     public void WriteLine()
-    {
-        streamData.WriteLine();
-    }
+        => _streamData.WriteLine();
 
     public void WriteByte(byte value)
-    {
-        streamData.WriteByte(value);
-    }
+        => _streamData.WriteByte(value);
 
     public void Write(byte[] data)
-    {
-        streamData.Write(data);
-    }
+        => _streamData.Write(data);
 
     public void WriteKeyword(Keyword keyword)
-    {
-        streamData.WriteKeyword(keyword);
-    }
+        => _streamData.WriteKeyword(keyword);
 
     public void WriteLine(byte[] data)
-    {
-        streamData.WriteLine(data);
-    }
+        => _streamData.WriteLine(data);
 
     protected internal override void Write(PdfWriter writer)
     {
-        data = stream.ToArray();
+        _data = _stream.ToArray();
         base.Write(writer);
     }
 }

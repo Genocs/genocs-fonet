@@ -1,7 +1,6 @@
 using Genocs.Fonet.Fo.Flow;
 using Genocs.Fonet.Fo.Pagination;
 using Genocs.Fonet.Fo.Properties;
-using System.Collections;
 
 namespace Genocs.Fonet.Fo;
 
@@ -9,83 +8,83 @@ internal class StandardElementMapping
 {
     public const string URI = "http://www.w3.org/1999/XSL/Format";
 
-    private static Hashtable foObjs;
+    private static readonly Dictionary<string, FObj.Maker> foObjs;
 
     static StandardElementMapping()
     {
-        foObjs = new Hashtable
+        foObjs = new Dictionary<string, FObj.Maker>
         {
             // Declarations and Pagination and Layout Formatting Objects
-            { "root", Root.GetMaker() },
-            { "declarations", Declarations.GetMaker() },
-            { "color-profile", ColorProfile.GetMaker() },
-            { "page-sequence", PageSequence.GetMaker() },
-            { "layout-master-set", LayoutMasterSet.GetMaker() },
-            { "page-sequence-master", PageSequenceMaster.GetMaker() },
-            { "single-page-master-reference", SinglePageMasterReference.GetMaker() },
-            { "repeatable-page-master-reference", RepeatablePageMasterReference.GetMaker() },
-            { "repeatable-page-master-alternatives", RepeatablePageMasterAlternatives.GetMaker() },
-            { "conditional-page-master-reference", ConditionalPageMasterReference.GetMaker() },
-            { "simple-page-master", SimplePageMaster.GetMaker() },
-            { "region-body", RegionBody.GetMaker() },
-            { "region-before", RegionBefore.GetMaker() },
-            { "region-after", RegionAfter.GetMaker() },
-            { "region-start", RegionStart.GetMaker() },
-            { "region-end", RegionEnd.GetMaker() },
-            { "flow", Flow.Flow.GetMaker() },
-            { "static-content", StaticContent.GetMaker() },
-            { "title", Title.GetMaker() },
+            { "root", Root.CreateMaker() },
+            { "declarations", Declarations.CreateMaker() },
+            { "color-profile", ColorProfile.CreateMaker() },
+            { "page-sequence", PageSequence.CreateMaker() },
+            { "layout-master-set", LayoutMasterSet.CreateMaker() },
+            { "page-sequence-master", PageSequenceMaster.CreateMaker() },
+            { "single-page-master-reference", SinglePageMasterReference.CreateMaker() },
+            { "repeatable-page-master-reference", RepeatablePageMasterReference.CreateMaker() },
+            { "repeatable-page-master-alternatives", RepeatablePageMasterAlternatives.CreateMaker() },
+            { "conditional-page-master-reference", ConditionalPageMasterReference.CreateMaker() },
+            { "simple-page-master", SimplePageMaster.CreateMaker() },
+            { "region-body", RegionBody.CreateMaker() },
+            { "region-before", RegionBefore.CreateMaker() },
+            { "region-after", RegionAfter.CreateMaker() },
+            { "region-start", RegionStart.CreateMaker() },
+            { "region-end", RegionEnd.CreateMaker() },
+            { "flow", Flow.Flow.CreateMaker() },
+            { "static-content", StaticContent.CreateMaker() },
+            { "title", Title.CreateMaker() },
 
             // Block-level Formatting Objects
-            { "block", Block.GetMaker() },
-            { "block-container", BlockContainer.GetMaker() },
+            { "block", Block.CreateMaker() },
+            { "block-container", BlockContainer.CreateMaker() },
 
             // Inline-level Formatting Objects
-            { "bidi-override", BidiOverride.GetMaker() },
-            { "character", Character.GetMaker() },
-            { "initial-property-set", InitialPropertySet.GetMaker() },
-            { "external-graphic", ExternalGraphic.GetMaker() },
-            { "instream-foreign-object", InstreamForeignObject.GetMaker() },
-            { "inline", Inline.GetMaker() },
-            { "inline-container", InlineContainer.GetMaker() },
-            { "leader", Leader.GetMaker() },
-            { "page-number", PageNumber.GetMaker() },
-            { "page-number-citation", PageNumberCitation.GetMaker() },
+            { "bidi-override", BidiOverride.CreateMaker() },
+            { "character", Character.CreateMaker() },
+            { "initial-property-set", InitialPropertySet.CreateMaker() },
+            { "external-graphic", ExternalGraphic.CreateMaker() },
+            { "instream-foreign-object", InstreamForeignObject.CreateMaker() },
+            { "inline", Inline.CreateMaker() },
+            { "inline-container", InlineContainer.CreateMaker() },
+            { "leader", Leader.CreateMaker() },
+            { "page-number", PageNumber.CreateMaker() },
+            { "page-number-citation", PageNumberCitation.CreateMaker() },
 
             // Formatting Objects for Tables
-            { "table-and-caption", TableAndCaption.GetMaker() },
-            { "table", Table.GetMaker() },
-            { "table-column", TableColumn.GetMaker() },
-            { "table-caption", TableCaption.GetMaker() },
-            { "table-header", TableHeader.GetMaker() },
-            { "table-footer", TableFooter.GetMaker() },
-            { "table-body", TableBody.GetMaker() },
-            { "table-row", TableRow.GetMaker() },
-            { "table-cell", TableCell.GetMaker() },
+            { "table-and-caption", TableAndCaption.CreateMaker() },
+            { "table", Table.CreateMaker() },
+            { "table-column", TableColumn.CreateMaker() },
+            { "table-caption", TableCaption.CreateMaker() },
+            { "table-header", TableHeader.CreateMaker() },
+            { "table-footer", TableFooter.CreateMaker() },
+            { "table-body", TableBody.CreateMaker() },
+            { "table-row", TableRow.CreateMaker() },
+            { "table-cell", TableCell.CreateMaker() },
 
             // Formatting Objects for Lists
-            { "list-block", ListBlock.GetMaker() },
-            { "list-item", ListItem.GetMaker() },
-            { "list-item-body", ListItemBody.GetMaker() },
-            { "list-item-label", ListItemLabel.GetMaker() },
+            { "list-block", ListBlock.CreateMaker() },
+            { "list-item", ListItem.CreateMaker() },
+            { "list-item-body", ListItemBody.CreateMaker() },
+            { "list-item-label", ListItemLabel.CreateMaker() },
 
             // Dynamic Effects: Link and Multi Formatting Objects
-            { "basic-link", BasicLink.GetMaker() },
-            { "multi-switch", MultiSwitch.GetMaker() },
-            { "multi-case", MultiCase.GetMaker() },
-            { "multi-toggle", MultiToggle.GetMaker() },
-            { "multi-properties", MultiProperties.GetMaker() },
-            { "multi-property-set", MultiPropertySet.GetMaker() },
+            { "basic-link", BasicLink.CreateMaker() },
+            { "multi-switch", MultiSwitch.CreateMaker() },
+            { "multi-case", MultiCase.CreateMaker() },
+            { "multi-toggle", MultiToggle.CreateMaker() },
+            { "multi-properties", MultiProperties.CreateMaker() },
+            { "multi-property-set", MultiPropertySet.CreateMaker() },
 
             // Out-of-Line Formatting Objects
-            { "float", Float.GetMaker() },
-            { "footnote", Footnote.GetMaker() },
-            { "footnote-body", FootnoteBody.GetMaker() },
+            { "float", Float.CreateMaker() },
+            { "footnote", Footnote.CreateMaker() },
+            { "footnote-body", FootnoteBody.CreateMaker() },
 
             // Other Formatting Objects
-            { "wrapper", Wrapper.GetMaker() },
-            { "marker", Marker.GetMaker() },
-            { "retrieve-marker", RetrieveMarker.GetMaker() }
+            { "wrapper", Wrapper.CreateMaker() },
+            { "marker", Marker.CreateMaker() },
+            { "retrieve-marker", RetrieveMarker.CreateMaker() }
         };
     }
 

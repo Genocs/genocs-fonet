@@ -1,12 +1,12 @@
 namespace Genocs.Fonet.Image
 {
     /// <summary>
-    ///     Parses a &lt;uri-specification&gt; as defined by 
-    ///     section 5.11 of the XSL specification.
+    /// Parses a &lt;uri-specification&gt; as defined by 
+    /// section 5.11 of the XSL specification.
     /// </summary>
     /// <remarks>
-    ///     This class may be better expressed as a datatype residing in 
-    ///     Fonet.DataTypes.
+    /// This class may be better expressed as a datatype residing in 
+    /// Fonet.DataTypes.
     /// </remarks>
     internal class UriSpecificationParser
     {

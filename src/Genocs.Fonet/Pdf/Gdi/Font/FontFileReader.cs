@@ -1,6 +1,6 @@
-using Genocs.Fonet.Pdf.Gdi.Font.Tables;
 using System.Collections;
 using System.Text;
+using Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 namespace Genocs.Fonet.Pdf.Gdi.Font;
 
@@ -31,12 +31,12 @@ public class FontFileReader
     private IDictionary tableCache = new Hashtable();
 
     /// <summary>
-    ///     Maps a glyph index to a subset index.
+    /// Maps a glyph index to a subset index.
     /// </summary>
     private IndexMappings mappings;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     /// <param name="stream">Font data stream.</param>
     public FontFileReader(MemoryStream stream)
@@ -60,8 +60,8 @@ public class FontFileReader
     }
 
     /// <summary>
-    ///     Gets or sets a dictionary containing glyph index to subset 
-    ///     index mappings.
+    /// Gets or sets a dictionary containing glyph index to subset 
+    /// index mappings.
     /// </summary>
     public IndexMappings IndexMappings
     {
@@ -77,7 +77,7 @@ public class FontFileReader
     }
 
     /// <summary>
-    ///     Gets the underlying <see cref="FontFileStream"/>.
+    /// Gets the underlying <see cref="FontFileStream"/>.
     /// </summary>
     internal FontFileStream Stream
     {
@@ -85,7 +85,7 @@ public class FontFileReader
     }
 
     /// <summary>
-    ///     Gets the number tables.
+    /// Gets the number tables.
     /// </summary>
     public int TableCount
     {
@@ -93,8 +93,8 @@ public class FontFileReader
     }
 
     /// <summary>
-    ///     Gets a value indicating whether or not this font contains the 
-    ///     supplied table.
+    /// Gets a value indicating whether or not this font contains the 
+    /// supplied table.
     /// </summary>
     /// <param name="tableName">A table name.</param>
     /// <returns></returns>
@@ -104,23 +104,23 @@ public class FontFileReader
     }
 
     /// <summary>
-    ///     Gets a reference to the table structure identified by <i>tableName</i>
+    /// Gets a reference to the table structure identified by <i>tableName</i>
     /// </summary>
     /// <remarks>
-    ///     Only the following tables are supported: 
-    ///     <see cref="TableNames.Head"/> - Font header,
-    ///     <see cref="TableNames.Hhea"/> - Horizontal header,
-    ///     <see cref="TableNames.Hmtx"/> - Horizontal metrics,
-    ///     <see cref="TableNames.Maxp"/> - Maximum profile,
-    ///     <see cref="TableNames.Loca"/> - Index to location, 
-    ///     <see cref="TableNames.Glyf"/> - Glyf data,
-    ///     <see cref="TableNames.Cvt"/> - Control value,
-    ///     <see cref="TableNames.Prep"/> - Control value program,
-    ///     <see cref="TableNames.Fpgm"/> - Font program
+    /// Only the following tables are supported: 
+    /// <see cref="TableNames.Head"/> - Font header,
+    /// <see cref="TableNames.Hhea"/> - Horizontal header,
+    /// <see cref="TableNames.Hmtx"/> - Horizontal metrics,
+    /// <see cref="TableNames.Maxp"/> - Maximum profile,
+    /// <see cref="TableNames.Loca"/> - Index to location, 
+    /// <see cref="TableNames.Glyf"/> - Glyf data,
+    /// <see cref="TableNames.Cvt"/> - Control value,
+    /// <see cref="TableNames.Prep"/> - Control value program,
+    /// <see cref="TableNames.Fpgm"/> - Font program
     /// </remarks>
     /// <param name="tableName">A 4-character code identifying a table.</param>
     /// <exception cref="ArgumentException">
-    ///     If <b>tableName</b> does not represent a table in this font.
+    /// If <b>tableName</b> does not represent a table in this font.
     /// </exception>
     internal FontTable GetTable(string tableName)
     {
@@ -202,33 +202,33 @@ public class FontFileReader
     }
 
     /// <summary>
-    ///     Gets a <see cref="DirectoryEntry"/> object for the supplied table.
+    /// Gets a <see cref="DirectoryEntry"/> object for the supplied table.
     /// </summary>
     /// <param name="tableName">A 4-character code identifying a table.</param>
     /// <returns>
-    ///     A <see cref="DirectoryEntry"/> object or null if the table cannot 
-    ///     be located.
+    /// A <see cref="DirectoryEntry"/> object or null if the table cannot 
+    /// be located.
     /// </returns>
     /// <exception cref="ArgumentException">
-    ///     If <b>tag</b> does not represent a table in this font.
+    /// If <b>tag</b> does not represent a table in this font.
     /// </exception>
     internal DirectoryEntry GetDictionaryEntry(string tableName)
     {
         if (!ContainsTable(tableName))
         {
-            throw new ArgumentException("Cannot locate table named " + tableName, "tableName");
+            throw new ArgumentException($"Cannot locate table named", nameof(tableName));
         }
 
         return header[tableName];
     }
 
     /// <summary>
-    ///     Reads the Offset and Directory tables.  If the FontFileStream represents 
-    ///     a TrueType collection, this method will look for the aforementioned 
-    ///     tables belonging to <i>fontName</i>.
+    /// Reads the Offset and Directory tables.  If the FontFileStream represents 
+    /// a TrueType collection, this method will look for the aforementioned 
+    /// tables belonging to <i>fontName</i>.
     /// </summary>
     /// <remarks>
-    ///     This method can handle a TrueType collection.
+    /// This method can handle a TrueType collection.
     /// </remarks>
     protected void ReadTableHeaders()
     {
@@ -317,7 +317,7 @@ public class FontFileReader
         stream.Position = entry.Offset;
         if ((stream.Position + entry.Length) > stream.Length)
         {
-            throw new ArgumentException( $"Error reading table '{entry.TableName}'. Expected {entry.Length} bytes, current position: {stream.Position}, stream length: {stream.Length}");
+            throw new ArgumentException($"Error reading table '{entry.TableName}'. Expected {entry.Length} bytes, current position: {stream.Position}, stream length: {stream.Length}");
         }
     }
 }

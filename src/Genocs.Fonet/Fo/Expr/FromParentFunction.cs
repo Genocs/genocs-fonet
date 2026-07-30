@@ -18,6 +18,6 @@ internal class FromParentFunction : FunctionBase
             throw new PropertyException("Incorrect parameter to from-parent function");
         }
 
-        return pInfo.getPropertyList().GetFromParentProperty(propName);
+        return pInfo.PropertyList.GetFromParentProperty(propName);
     }
 }

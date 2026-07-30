@@ -4,21 +4,13 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class MultiPropertySet : ToBeImplementedElement
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new MultiPropertySet(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-        => new Maker();
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new MultiPropertySet(parent, props));
 
     protected MultiPropertySet(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:multi-property-set";
+        Name = "fo:multi-property-set";
     }
 
     public override Status Layout(Area area)

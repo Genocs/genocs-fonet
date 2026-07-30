@@ -1,11 +1,11 @@
+using System.Text;
 using Genocs.Fonet.Pdf.Gdi.Font;
 using SkiaSharp;
-using System.Text;
 
 namespace Genocs.Fonet.Pdf.Gdi;
 
 /// <summary>
-///     Reads TrueType/OpenType table data from font files without GDI or OpenStream.
+/// Reads TrueType/OpenType table data from font files without GDI or OpenStream.
 /// </summary>
 internal static class FontTableAccess
 {

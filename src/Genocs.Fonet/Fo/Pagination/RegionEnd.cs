@@ -4,18 +4,8 @@ namespace Genocs.Fonet.Fo.Pagination;
 
 internal class RegionEnd : Region
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new RegionEnd(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new RegionEnd(parent, props));
 
     public const string REGION_CLASS = "end";
 
@@ -31,7 +21,7 @@ internal class RegionEnd : Region
                                        bool afterPrecedence, int beforeHeight,
                                        int afterHeight)
     {
-        int extent = this._properties.GetProperty("extent").GetLength().MValue();
+        int extent = this.Properties.GetProperty("extent").GetLength().MValue();
 
         int startY = allocationRectangleYPosition;
         int startH = allocationRectangleHeight;
@@ -63,7 +53,7 @@ internal class RegionEnd : Region
     {
         BorderAndPadding bap = _propertyManager.GetBorderAndPadding();
         BackgroundProps bProps = _propertyManager.GetBackgroundProps();
-        int extent = this._properties.GetProperty("extent").GetLength().MValue();
+        int extent = this.Properties.GetProperty("extent").GetLength().MValue();
         return MakeRegionArea(allocationRectangleXPosition,
                               allocationRectangleYPosition,
                               allocationRectangleWidth, extent, false, false,

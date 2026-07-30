@@ -4,18 +4,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class ListBlock : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new ListBlock(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new ListBlock(parent, props));
 
     private int align;
     private int alignLast;
@@ -28,7 +18,7 @@ internal class ListBlock : FObj
     public ListBlock(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:list-block";
+        Name = "fo:list-block";
     }
 
     public override Status Layout(Area area)
@@ -42,18 +32,13 @@ internal class ListBlock : FObj
             MarginProps mProps = _propertyManager.GetMarginProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            this.align = this._properties.GetProperty("text-align").GetEnum();
-            this.alignLast = this._properties.GetProperty("text-align-last").GetEnum();
-            this.lineHeight =
-                this._properties.GetProperty("line-height").GetLength().MValue();
-            this.startIndent =
-                this._properties.GetProperty("start-indent").GetLength().MValue();
-            this.endIndent =
-                this._properties.GetProperty("end-indent").GetLength().MValue();
-            this.spaceBefore =
-                this._properties.GetProperty("space-before.optimum").GetLength().MValue();
-            this.spaceAfter =
-                this._properties.GetProperty("space-after.optimum").GetLength().MValue();
+            this.align = this.Properties.GetProperty("text-align").GetEnum();
+            this.alignLast = this.Properties.GetProperty("text-align-last").GetEnum();
+            this.lineHeight = this.Properties.GetProperty("line-height").GetLength().MValue();
+            this.startIndent = this.Properties.GetProperty("start-indent").GetLength().MValue();
+            this.endIndent = this.Properties.GetProperty("end-indent").GetLength().MValue();
+            this.spaceBefore = this.Properties.GetProperty("space-before.optimum").GetLength().MValue();
+            this.spaceAfter = this.Properties.GetProperty("space-after.optimum").GetLength().MValue();
 
             this._marker = 0;
 
@@ -64,7 +49,7 @@ internal class ListBlock : FObj
 
             if (spaceBefore != 0)
             {
-                area.addDisplaySpace(spaceBefore);
+                area.AddDisplaySpace(spaceBefore);
             }
 
             if (this._isInTableCell)
@@ -74,39 +59,40 @@ internal class ListBlock : FObj
                     - _forcedStartOffset;
             }
 
-            string id = this._properties.GetProperty("id").GetString();
+            string id = this.Properties.GetProperty("id").GetString();
             area.GetIDReferences().InitializeID(id, area);
         }
 
-        BlockArea blockArea =
-            new BlockArea(_propertyManager.GetFontState(area.getFontInfo()),
+        BlockArea blockArea = new BlockArea(_propertyManager.GetFontState(area.GetFontInfo()),
                           area.getAllocationWidth(), area.spaceLeft(),
                           startIndent, endIndent, 0, align, alignLast,
-                          lineHeight);
+                          lineHeight, area)
+        {
+            GeneratedBy = this
+        };
+
         blockArea.setTableCellXOffset(area.getTableCellXOffset());
-        blockArea.GeneratedBy = this;
-        this._areasGenerated++;
-        if (this._areasGenerated == 1)
+        _areasGenerated++;
+        if (_areasGenerated == 1)
         {
             blockArea.IsFirst = true;
         }
-        blockArea.addLineagePair(this, this._areasGenerated);
 
-        blockArea.setParent(area);
-        blockArea.setPage(area.getPage());
+        blockArea.addLineagePair(this, _areasGenerated);
+
+        blockArea.Page = area.Page;
         blockArea.setBackground(_propertyManager.GetBackgroundProps());
         blockArea.start();
 
         blockArea.setAbsoluteHeight(area.getAbsoluteHeight());
         blockArea.setIDReferences(area.GetIDReferences());
 
-        int numChildren = this._children.Count;
-        for (int i = this._marker; i < numChildren; i++)
+        int numChildren = _children.Count;
+        for (int i = _marker; i < numChildren; i++)
         {
             if (!(_children[i] is ListItem))
             {
-                FonetDriver.ActiveDriver.FireFonetError(
-                    "Children of list-blocks must be list-items");
+                FonetDriver.ActiveDriver.FireFonetError("Children of list-blocks must be list-items");
                 return new Status(Status.OK);
             }
             ListItem listItem = (ListItem)_children[i];
@@ -119,19 +105,19 @@ internal class ListBlock : FObj
                 }
                 this._marker = i;
                 blockArea.end();
-                area.addChild(blockArea);
+                area.AddChild(blockArea);
                 area.increaseHeight(blockArea.GetHeight());
                 return status;
             }
         }
 
         blockArea.end();
-        area.addChild(blockArea);
+        area.AddChild(blockArea);
         area.increaseHeight(blockArea.GetHeight());
 
         if (spaceAfter != 0)
         {
-            area.addDisplaySpace(spaceAfter);
+            area.AddDisplaySpace(spaceAfter);
         }
 
         if (area is BlockArea)

@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 namespace Genocs.Fonet.Pdf.Gdi.Structures;
 
 /// <summary>
-///     The TEXTMETRIC structure contains basic information about a physical 
-///     font.  All sizes are specified in logical units; that is, they depend 
-///     on the current mapping mode of the display context. 
+/// Gets the TEXTMETRIC structure contains basic information about a physical 
+/// font.  All sizes are specified in logical units; that is, they depend 
+/// on the current mapping mode of the display context. 
 /// </summary>
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 internal struct TextMetric

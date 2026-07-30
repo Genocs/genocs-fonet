@@ -10,7 +10,7 @@ namespace Genocs.Fonet.Fo;
 /// </summary>
 internal abstract class FONode
 {
-    protected FObj _parent;
+    public FObj? Parent { get; }
 
     protected string _areaClass = AreaClass.UNASSIGNED;
 
@@ -36,13 +36,13 @@ internal abstract class FONode
 
     public int _areasGenerated = 0;
 
-    protected FONode(FObj parent)
+    protected FONode(FObj? parent)
     {
-        _parent = parent;
+        Parent = parent;
 
-        if (null != parent)
+        if (Parent != null)
         {
-            _areaClass = parent._areaClass;
+            _areaClass = Parent._areaClass;
         }
     }
 
@@ -88,15 +88,15 @@ internal abstract class FONode
     public void SetOrphans(int orph)
         => _orphans = orph;
 
-    public void RemoveAreas()
+    public virtual void RemoveAreas()
     {
     }
 
     protected internal virtual void AddChild(FONode child)
         => _children.Add(child);
 
-    public FObj getParent()
-        => _parent;
+    //public FObj getParent()
+    //    => Parent;
 
     public virtual void SetLinkSet(LinkSet linkSet)
     {
@@ -129,13 +129,13 @@ internal abstract class FONode
         }
         else
         {
-            return ((FONode)_children[this._marker]).GetMarkerSnapshot(snapshot);
+            return ((FONode)_children[_marker]).GetMarkerSnapshot(snapshot);
         }
     }
 
     public virtual void Rollback(ArrayList snapshot)
     {
-        _marker = (Int32)snapshot[0];
+        _marker = (int)snapshot[0];
         snapshot.RemoveAt(0);
 
         if (_marker == MarkerStart)

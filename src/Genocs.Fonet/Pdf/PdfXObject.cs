@@ -34,7 +34,7 @@ namespace Genocs.Fonet.Pdf
 
         protected internal override void Write(PdfWriter writer)
         {
-            data = objectData;
+            _data = objectData;
             base.Write(writer);
         }
 

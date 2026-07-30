@@ -3,11 +3,11 @@ using Genocs.Fonet.Pdf;
 namespace Genocs.Fonet.Pdf
 {
     /// <summary>
-    ///     The pages of a document are accessed through a structure known
-    ///     as the page tree.
+    /// The pages of a document are accessed through a structure known
+    /// as the page tree.
     /// </summary>
     /// <remarks>
-    ///     The page tree is described in section 3.6.2 of the PDF specification.
+    /// The page tree is described in section 3.6.2 of the PDF specification.
     /// </remarks>
     public sealed class PdfPageTree : PdfDictionary
     {

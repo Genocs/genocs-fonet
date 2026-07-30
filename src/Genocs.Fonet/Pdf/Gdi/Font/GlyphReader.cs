@@ -16,7 +16,7 @@ internal class GlyphReader
     }
 
     /// <summary>
-    ///     Reads a glyph description from the specified offset.
+    /// Reads a glyph description from the specified offset.
     /// </summary>
     public Glyph ReadGlyph(int glyphIndex)
     {
@@ -55,12 +55,12 @@ internal class GlyphReader
     }
 
     /// <summary>
-    ///     Populate the <i>composites</i>IList containing all child glyphs 
-    ///     that this glyph uses.
+    /// Populate the <i>composites</i>IList containing all child glyphs 
+    /// that this glyph uses.
     /// </summary>
     /// <remarks>
-    ///     The <i>stream</i> parameter must be positioned 10 bytes from 
-    ///     the beginning of the glyph description, i.e. the flags field.
+    /// The <i>stream</i> parameter must be positioned 10 bytes from 
+    /// the beginning of the glyph description, i.e. the flags field.
     /// </remarks>
     /// <param name="stream"></param>
     private void ReadCompositeGlyph(FontFileStream stream, Glyph glyph)
@@ -126,8 +126,8 @@ internal class GlyphReader
     }
 
     /// <summary>
-    ///     Gets the length of the glyph description in bytes at 
-    ///     index <i>index</i>.
+    /// Gets the length of the glyph description in bytes at 
+    /// index <i>index</i>.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
@@ -146,7 +146,7 @@ internal class GlyphReader
 }
 
 /// <summary>
-///     Bit masks of the flags field in a composite glyph.
+/// Bit masks of the flags field in a composite glyph.
 /// </summary>
 internal struct BitMasks
 {

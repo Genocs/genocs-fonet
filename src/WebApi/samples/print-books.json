@@ -1,0 +1,23 @@
+{
+  "templateId": "books",
+  "model": {
+    "documentName": "Sample catalog",
+    "bookList": [
+      {
+        "title": "Pinocchio",
+        "author": "Carlo Collodi",
+        "description": "A wooden puppet who wants to be a real boy."
+      },
+      {
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "description": "A story of the Jazz Age in Long Island."
+      },
+      {
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "description": "A novel of racial injustice in the American South."
+      }
+    ]
+  }
+}

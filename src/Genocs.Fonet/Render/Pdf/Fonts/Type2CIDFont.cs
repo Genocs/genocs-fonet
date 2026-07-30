@@ -1,61 +1,61 @@
+using System.Collections;
 using Genocs.Fonet.Layout;
 using Genocs.Fonet.Pdf;
 using Genocs.Fonet.Pdf.Gdi;
-using System.Collections;
 
 namespace Genocs.Fonet.Render.Pdf.Fonts;
 
 /// <summary>
-///     A Type 2 CIDFont is a font whose glyph descriptions are based on the 
-///     TrueType font format.
+/// A Type 2 CIDFont is a font whose glyph descriptions are based on the 
+/// TrueType font format.
 /// </summary>
 internal class Type2CIDFont : CIDFont, IFontDescriptor
 {
     public const string IdentityHEncoding = "Identity-H";
 
     /// <summary>
-    ///     Wrapper around a Win32 HDC.
+    /// Wrapper around a Win32 HDC.
     /// </summary>
     protected GdiDeviceContent dc;
 
     /// <summary>
-    ///     Provides font metrics using the Win32 Api.
+    /// Provides font metrics using the Win32 Api.
     /// </summary>
     protected GdiFontMetrics metrics;
 
     /// <summary>
-    ///     List of kerning pairs.
+    /// List of kerning pairs.
     /// </summary>
     protected GdiKerningPairs kerning;
 
     /// <summary>
-    ///     Maps a glyph index to a PDF width
+    /// Maps a glyph index to a PDF width
     /// </summary>
     protected int[] widths;
 
     /// <summary>
-    ///     Windows font name, e.g. 'Arial Bold'
+    /// Windows font name, e.g. 'Arial Bold'
     /// </summary>
     protected string baseFontName;
 
     /// <summary>
-    ///     
+    /// 
     /// </summary>
     protected FontProperties properties;
 
     /// <summary>
-    ///     Maps a glyph index to a character code.
+    /// Maps a glyph index to a character code.
     /// </summary>
     protected SortedList usedGlyphs;
 
     /// <summary>
-    ///     Maps character code to glyph index.  The array is based on the 
-    ///     value of <see cref="FirstChar"/>.
+    /// Maps character code to glyph index.  The array is based on the 
+    /// value of <see cref="FirstChar"/>.
     /// </summary>
     protected GdiUnicodeRanges unicodeRanges;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     /// <param name="properties"></param>
     public Type2CIDFont(FontProperties properties)
@@ -68,19 +68,18 @@ internal class Type2CIDFont : CIDFont, IFontDescriptor
     }
 
     /// <summary>
-    ///     Creates a <see cref="GdiFontMetrics"/> object from <b>baseFontName</b>
+    /// Creates a <see cref="GdiFontMetrics"/> object from <b>baseFontName</b>
     /// </summary>
     private void ObtainFontMetrics()
     {
         dc = new GdiDeviceContent();
-        GdiFont font = GdiFont.CreateDesignFont(
-            properties.FaceName, properties.IsBold, properties.IsItalic, dc);
+        GdiFont font = GdiFont.CreateDesignFont(properties.FaceName, properties.IsBold, properties.IsItalic, dc);
         unicodeRanges = new GdiUnicodeRanges(dc);
         metrics = font.GetMetrics(dc);
     }
 
     /// <summary>
-    ///     Class destructor.
+    /// Class destructor.
     /// </summary>
     ~Type2CIDFont()
     {
@@ -144,7 +143,7 @@ internal class Type2CIDFont : CIDFont, IFontDescriptor
     #region Implementation of Font members
 
     /// <summary>
-    ///     Returns <see cref="PdfFontSubTypeEnum.CIDFontType2"/>.
+    /// Returns <see cref="PdfFontSubTypeEnum.CIDFontType2"/>.
     /// </summary>
     public override PdfFontSubTypeEnum SubType
     {
@@ -234,10 +233,7 @@ internal class Type2CIDFont : CIDFont, IFontDescriptor
 
     protected void EnsureWidthsArray()
     {
-        if (widths == null)
-        {
-            widths = metrics.GetWidths();
-        }
+        widths ??= metrics.GetWidths();
     }
 
     #endregion
@@ -268,10 +264,7 @@ internal class Type2CIDFont : CIDFont, IFontDescriptor
     {
         get
         {
-            if (kerning == null)
-            {
-                kerning = metrics.KerningPairs;
-            }
+            kerning ??= metrics.KerningPairs;
             return (kerning.Count != 0);
         }
     }
@@ -295,10 +288,7 @@ internal class Type2CIDFont : CIDFont, IFontDescriptor
     {
         get
         {
-            if (kerning == null)
-            {
-                kerning = metrics.KerningPairs;
-            }
+            kerning ??= metrics.KerningPairs;
             return kerning;
         }
     }

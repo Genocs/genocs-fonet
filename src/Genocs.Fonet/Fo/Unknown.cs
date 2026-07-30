@@ -4,19 +4,13 @@ namespace Genocs.Fonet.Fo;
 
 internal class Unknown : FObj
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-            => new Unknown(parent, propertyList);
-    }
-
-    new public static FObj.Maker GetMaker()
-        => new Maker();
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Unknown(parent, props));
 
     protected Unknown(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        _name = "unknown";
+        Name = "unknown";
     }
 
     public override Status Layout(Area area)

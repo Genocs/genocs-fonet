@@ -4,40 +4,55 @@ using System.Collections;
 
 namespace Genocs.Fonet.Fo;
 
+/// <summary>
+/// The FObj class is the base class for all formatting objects (FOs) in the Fonet library. 
+/// It provides common functionality and properties for all FOs, including property management, layout handling, and marker management. 
+/// Each specific FO type (e.g., TableBody, MultiProperties, MultiCase, Unknown) inherits from this class and implements its own behavior as needed.
+/// </summary>
 internal class FObj : FONode
 {
     internal class Maker
     {
-        public virtual FObj Make(FObj parent, PropertyList propertyList)
+        private readonly Func<FObj?, PropertyList, FObj>? _factory;
+
+        public Maker() { }
+
+        private Maker(Func<FObj?, PropertyList, FObj> factory)
         {
+            _factory = factory;
+        }
+
+        public virtual FObj Make(FObj? parent, PropertyList propertyList)
+        {
+            if (_factory != null)
+                return _factory(parent, propertyList);
             return new FObj(parent, propertyList);
         }
-    }
 
-    public static Maker GetMaker()
-    {
-        return new Maker();
+        public static Maker For(Func<FObj?, PropertyList, FObj> factory) => new(factory);
     }
-
-    public PropertyList _properties;
 
     protected PropertyManager _propertyManager;
+    private Hashtable? _markerClassNames;
 
-    protected string _name;
+    public string Name { get; init; }
+    public PropertyList Properties { get; }
 
-    private Hashtable markerClassNames;
+    public static Maker CreateMaker()
+        => new();
+
 
     protected FObj(FObj parent, PropertyList propertyList)
         : base(parent)
     {
         propertyList.FObj = this;
-        _properties = propertyList;
+        Properties = propertyList;
         _propertyManager = MakePropertyManager(propertyList);
-        _name = "default FO";
+        Name = "default FO";
         SetWritingMode();
     }
 
-    protected PropertyManager MakePropertyManager(PropertyList propertyList)
+    protected static PropertyManager MakePropertyManager(PropertyList propertyList)
         => new(propertyList);
 
     protected internal virtual void AddCharacters(char[] data, int start, int length)
@@ -50,11 +65,6 @@ internal class FObj : FONode
         return new Status(Status.OK);
     }
 
-    public string GetName()
-    {
-        return _name;
-    }
-
     protected internal virtual void Start()
     {
         // do nothing by default
@@ -65,24 +75,20 @@ internal class FObj : FONode
         // do nothing by default
     }
 
-    public override Property GetProperty(string name)
-    {
-        return (_properties.GetProperty(name));
-    }
+    public override Property? GetProperty(string name)
+        => (Properties.GetProperty(name));
 
     public virtual int GetContentWidth()
-    {
-        return 0;
-    }
+        => 0;
 
     public virtual void RemoveID(IDReferences idReferences)
     {
-        if (((FObj)this)._properties.GetProperty("id") == null
-            || ((FObj)this)._properties.GetProperty("id").GetString() == null)
+        if (((FObj)this).Properties.GetProperty("id") == null
+            || ((FObj)this).Properties.GetProperty("id").GetString() == null)
         {
             return;
         }
-        idReferences.RemoveID(((FObj)this)._properties.GetProperty("id").GetString());
+        idReferences.RemoveID(((FObj)this).Properties.GetProperty("id").GetString());
         int numChildren = this._children.Count;
         for (int i = 0; i < numChildren; i++)
         {
@@ -95,21 +101,17 @@ internal class FObj : FONode
     }
 
     public virtual bool GeneratesReferenceAreas()
-    {
-        return false;
-    }
+        => false;
 
     protected virtual void SetWritingMode()
     {
         FObj p;
-        FObj parent;
-        for (p = this;
-            !p.GeneratesReferenceAreas() && (parent = p.getParent()) != null;
-            p = parent)
+        FObj? parent;
+        for (p = this; !p.GeneratesReferenceAreas() && (parent = p.Parent) != null; p = parent)
         {
             ;
         }
-        _properties.SetWritingMode(p.GetProperty("writing-mode").GetEnum());
+        Properties.SetWritingMode(p.GetProperty("writing-mode").GetEnum());
     }
 
     public void AddMarker(string markerClassName)
@@ -121,22 +123,22 @@ internal class FObj : FONode
                 FONode child = (FONode)_children[i];
                 if (!child.MayPrecedeMarker())
                 {
-                    throw new FonetException($"A fo:marker must be an initial child of '{GetName()}'");
+                    throw new FonetException($"A fo:marker must be an initial child of '{Name}'");
                 }
             }
         }
 
-        if (markerClassNames == null)
+        if (_markerClassNames == null)
         {
-            markerClassNames = new Hashtable
+            _markerClassNames = new Hashtable
             {
-                { markerClassName, String.Empty }
+                { markerClassName, string.Empty }
             };
         }
 
-        else if (!markerClassNames.ContainsKey(markerClassName))
+        else if (!_markerClassNames.ContainsKey(markerClassName))
         {
-            markerClassNames.Add(markerClassName, String.Empty);
+            _markerClassNames.Add(markerClassName, string.Empty);
         }
         else
         {

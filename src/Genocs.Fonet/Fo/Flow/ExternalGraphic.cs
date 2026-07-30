@@ -7,6 +7,9 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class ExternalGraphic : FObj
 {
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new ExternalGraphic(parent, props));
+
     private int breakAfter = 0;
     private int breakBefore = 0;
     private int _align;
@@ -22,7 +25,7 @@ internal class ExternalGraphic : FObj
 
     public ExternalGraphic(FObj parent, PropertyList propertyList) : base(parent, propertyList)
     {
-        _name = "fo:external-graphic";
+        Name = "fo:external-graphic";
     }
 
     public override Status Layout(Area area)
@@ -36,18 +39,18 @@ internal class ExternalGraphic : FObj
             MarginInlineProps mProps = _propertyManager.GetMarginInlineProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            _align = _properties.GetProperty("text-align").GetEnum();
-            startIndent = _properties.GetProperty("start-indent").GetLength().MValue();
-            endIndent = _properties.GetProperty("end-indent").GetLength().MValue();
+            _align = Properties.GetProperty("text-align").GetEnum();
+            startIndent = Properties.GetProperty("start-indent").GetLength().MValue();
+            endIndent = Properties.GetProperty("end-indent").GetLength().MValue();
 
-            spaceBefore = _properties.GetProperty("space-before.optimum").GetLength().MValue();
-            spaceAfter = _properties.GetProperty("space-after.optimum").GetLength().MValue();
+            spaceBefore = Properties.GetProperty("space-before.optimum").GetLength().MValue();
+            spaceAfter = Properties.GetProperty("space-after.optimum").GetLength().MValue();
 
-            width = _properties.GetProperty("width").GetLength().MValue();
-            height = _properties.GetProperty("height").GetLength().MValue();
+            width = Properties.GetProperty("width").GetLength().MValue();
+            height = Properties.GetProperty("height").GetLength().MValue();
 
-            src = _properties.GetProperty("src").GetString();
-            id = _properties.GetProperty("id").GetString();
+            src = Properties.GetProperty("src").GetString();
+            id = Properties.GetProperty("id").GetString();
 
             area.GetIDReferences().CreateID(id);
             _marker = 0;
@@ -78,8 +81,8 @@ internal class ExternalGraphic : FObj
 
             double ratio = (double)width / (double)height;
 
-            Length maxWidth = this._properties.GetProperty("max-width").GetLength();
-            Length maxHeight = this._properties.GetProperty("max-height").GetLength();
+            Length maxWidth = this.Properties.GetProperty("max-width").GetLength();
+            Length maxHeight = this.Properties.GetProperty("max-height").GetLength();
 
             if (maxWidth != null && width > maxWidth.MValue())
             {
@@ -93,7 +96,7 @@ internal class ExternalGraphic : FObj
             }
 
             int areaWidth = area.getAllocationWidth() - startIndent - endIndent;
-            int pageHeight = area.getPage().getBody().getMaxHeight() - spaceBefore;
+            int pageHeight = area.Page?.getBody().getMaxHeight() - spaceBefore ?? 0;
 
             if (height > pageHeight)
             {
@@ -112,13 +115,13 @@ internal class ExternalGraphic : FObj
             }
 
             this.imageArea =
-                new ImageArea(_propertyManager.GetFontState(area.getFontInfo()), img,
+                new ImageArea(_propertyManager.GetFontState(area.GetFontInfo()), img,
                               area.getAllocationWidth(), width, height,
                               startIndent, endIndent, _align);
 
             if ((spaceBefore != 0) && (this._marker == 0))
             {
-                area.addDisplaySpace(spaceBefore);
+                area.AddDisplaySpace(spaceBefore);
             }
 
             if (_marker == 0)
@@ -131,7 +134,7 @@ internal class ExternalGraphic : FObj
 
             if (spaceAfter != 0)
             {
-                area.addDisplaySpace(spaceAfter);
+                area.AddDisplaySpace(spaceAfter);
             }
             if (breakBefore == BreakBefore.PAGE
                 || ((spaceBefore + imageArea.GetHeight())
@@ -171,10 +174,10 @@ internal class ExternalGraphic : FObj
             }
             else
             {
-                area.addChild(imageArea);
+                area.AddChild(imageArea);
                 area.increaseHeight(imageArea.getContentHeight());
             }
-            imageArea.setPage(area.getPage());
+            imageArea.Page = area.Page;
 
             if (breakAfter == BreakAfter.PAGE)
             {
@@ -203,16 +206,5 @@ internal class ExternalGraphic : FObj
         return new Status(Status.OK);
     }
 
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
 
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new ExternalGraphic(parent, propertyList);
-        }
-    }
 }

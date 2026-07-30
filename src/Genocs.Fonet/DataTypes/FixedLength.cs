@@ -25,26 +25,26 @@ internal class FixedLength : Length
 
         if (unit.Equals("in"))
         {
-            dvalue = dvalue * 72;
+            dvalue *= 72;
         }
         else if (unit.Equals("cm"))
         {
-            dvalue = dvalue * 28.3464567;
+            dvalue *= 28.3464567;
         }
         else if (unit.Equals("mm"))
         {
-            dvalue = dvalue * 2.83464567;
+            dvalue *= 2.83464567;
         }
         else if (unit.Equals("pt"))
         {
         }
         else if (unit.Equals("pc"))
         {
-            dvalue = dvalue * 12;
+            dvalue *= 12;
         }
         else if (unit.Equals("px"))
         {
-            dvalue = dvalue * assumed_resolution;
+            dvalue *= assumed_resolution;
         }
         else
         {
@@ -56,7 +56,5 @@ internal class FixedLength : Length
     }
 
     public override Numeric AsNumeric()
-    {
-        return new Numeric(this);
-    }
+        => new(this);
 }

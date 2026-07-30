@@ -4,18 +4,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class Block : FObjMixed
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new Block(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new Block(parent, props));
 
     private int align;
     private int alignLast;
@@ -37,9 +27,9 @@ internal class Block : FObjMixed
 
     public Block(FObj parent, PropertyList propertyList) : base(parent, propertyList)
     {
-        this._name = "fo:block";
+        Name = "fo:block";
 
-        switch (parent.GetName())
+        switch (parent.Name)
         {
             case "fo:basic-link":
             case "fo:block":
@@ -62,9 +52,9 @@ internal class Block : FObjMixed
                 throw new FonetException(
                     "fo:block must be child of " +
                         "fo:basic-link, fo:block, fo:block-container, fo:float, fo:flow, fo:footnote-body, fo:inline, fo:inline-container, fo:list-item-body, fo:list-item-label, fo:marker, fo:multi-case, fo:static-content, fo:table-caption, fo:table-cell or fo:wrapper " +
-                        "not " + parent.GetName());
+                        "not " + parent.Name);
         }
-        this.span = this._properties.GetProperty("span").GetEnum();
+        this.span = this.Properties.GetProperty("span").GetEnum();
         _textState = _propertyManager.getTextDecoration(parent);
     }
 
@@ -93,29 +83,29 @@ internal class Block : FObjMixed
             MarginProps mProps = _propertyManager.GetMarginProps();
             RelativePositionProps mRelProps = _propertyManager.GetRelativePositionProps();
 
-            this.align = this._properties.GetProperty("text-align").GetEnum();
-            this.alignLast = this._properties.GetProperty("text-align-last").GetEnum();
-            this.breakAfter = this._properties.GetProperty("break-after").GetEnum();
+            this.align = this.Properties.GetProperty("text-align").GetEnum();
+            this.alignLast = this.Properties.GetProperty("text-align-last").GetEnum();
+            this.breakAfter = this.Properties.GetProperty("break-after").GetEnum();
             this.lineHeight =
-                this._properties.GetProperty("line-height").GetLength().MValue();
+                this.Properties.GetProperty("line-height").GetLength().MValue();
             this.startIndent =
-                this._properties.GetProperty("start-indent").GetLength().MValue();
+                this.Properties.GetProperty("start-indent").GetLength().MValue();
             this.endIndent =
-                this._properties.GetProperty("end-indent").GetLength().MValue();
+                this.Properties.GetProperty("end-indent").GetLength().MValue();
             this.spaceBefore =
-                this._properties.GetProperty("space-before.optimum").GetLength().MValue();
+                this.Properties.GetProperty("space-before.optimum").GetLength().MValue();
             this.spaceAfter =
-                this._properties.GetProperty("space-after.optimum").GetLength().MValue();
+                this.Properties.GetProperty("space-after.optimum").GetLength().MValue();
             this.textIndent =
-                this._properties.GetProperty("text-indent").GetLength().MValue();
+                this.Properties.GetProperty("text-indent").GetLength().MValue();
             this.keepWithNext =
-                this._properties.GetProperty("keep-with-next").GetEnum();
+                this.Properties.GetProperty("keep-with-next").GetEnum();
 
             this.blockWidows =
-                this._properties.GetProperty("widows").GetNumber().IntValue();
+                this.Properties.GetProperty("widows").GetNumber().IntValue();
             this.blockOrphans = (int)
-                this._properties.GetProperty("orphans").GetNumber().IntValue();
-            this.id = this._properties.GetProperty("id").GetString();
+                this.Properties.GetProperty("orphans").GetNumber().IntValue();
+            this.id = this.Properties.GetProperty("id").GetString();
 
             if (area is BlockArea)
             {
@@ -179,9 +169,18 @@ internal class Block : FObjMixed
             }
         }
 
+        if (_areasGenerated == 0 && _marker == 0 && area is ColumnArea column)
+        {
+            int clearOffset = column.GetClearOffset(column.getContentHeight(), _propertyManager.GetClear());
+            if (clearOffset > 0)
+            {
+                column.AddDisplaySpace(clearOffset);
+            }
+        }
+
         if ((spaceBefore != 0) && (this._marker == 0))
         {
-            area.addDisplaySpace(spaceBefore);
+            area.AddDisplaySpace(spaceBefore);
         }
 
         if (anythingLaidOut)
@@ -195,13 +194,14 @@ internal class Block : FObjMixed
         }
 
         int spaceLeft = area.spaceLeft();
-        blockArea =
-            new BlockArea(_propertyManager.GetFontState(area.getFontInfo()),
+        blockArea = new BlockArea(_propertyManager.GetFontState(area.GetFontInfo()),
                           area.getAllocationWidth(), area.spaceLeft(),
                           startIndent, endIndent, textIndent, align,
-                          alignLast, lineHeight);
-
-        blockArea.GeneratedBy = this;
+                          alignLast, lineHeight, area)
+        {
+            GeneratedBy = this,
+            ZIndex = _propertyManager.GetZIndex(),
+        };
 
         this._areasGenerated++;
         if (this._areasGenerated == 1)
@@ -210,8 +210,7 @@ internal class Block : FObjMixed
         }
 
         blockArea.addLineagePair(this, this._areasGenerated);
-        blockArea.setParent(area);
-        blockArea.setPage(area.getPage());
+        blockArea.Page = area.Page;
         blockArea.setBackground(_propertyManager.GetBackgroundProps());
         blockArea.setBorderAndPadding(_propertyManager.GetBorderAndPadding());
         blockArea.setHyphenation(_propertyManager.GetHyphenationProps());
@@ -234,7 +233,7 @@ internal class Block : FObjMixed
                     if ((i != 0))
                     {
                         status = new Status(Status.AREA_FULL_SOME);
-                        area.addChild(blockArea);
+                        area.AddChild(blockArea);
                         area.setMaxHeight(area.getMaxHeight() - spaceLeft
                             + blockArea.getMaxHeight());
                         area.increaseHeight(blockArea.GetHeight());
@@ -248,7 +247,7 @@ internal class Block : FObjMixed
                         return status;
                     }
                 }
-                area.addChild(blockArea);
+                area.AddChild(blockArea);
                 area.setMaxHeight(area.getMaxHeight() - spaceLeft
                     + blockArea.getMaxHeight());
                 area.increaseHeight(blockArea.GetHeight());
@@ -263,13 +262,13 @@ internal class Block : FObjMixed
         area.setMaxHeight(area.getMaxHeight() - spaceLeft
             + blockArea.getMaxHeight());
 
-        area.addChild(blockArea);
+        area.AddChild(blockArea);
 
         area.increaseHeight(blockArea.GetHeight());
 
         if (spaceAfter != 0)
         {
-            area.addDisplaySpace(spaceAfter);
+            area.AddDisplaySpace(spaceAfter);
         }
 
         if (area is BlockArea)

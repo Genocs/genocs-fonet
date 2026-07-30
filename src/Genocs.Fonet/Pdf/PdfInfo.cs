@@ -3,11 +3,11 @@ using Genocs.Fonet.Pdf;
 namespace Genocs.Fonet.Pdf
 {
     /// <summary>
-    ///     Class representing a document information dictionary.
+    /// Class representing a document information dictionary.
     /// </summary>
     /// <remarks>
-    ///     Document information dictionaries are described in section 9.2.1 of the
-    ///     PDF specification.
+    /// Document information dictionaries are described in section 9.2.1 of the
+    /// PDF specification.
     /// </remarks>
     public class PdfInfo : PdfDictionary
     {

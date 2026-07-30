@@ -13,14 +13,14 @@ internal abstract class Font : IFontMetric
     /// </summary>
     /// <remarks>
     /// A font encoding defines a mapping between a character code 
-    /// and a code point.  
+    /// and a code point.
     /// </remarks>
-    public abstract string Encoding { get; }
+    public abstract string? Encoding { get; }
 
     /// <summary>
     /// Gets the base font name.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The font name</returns>
     public abstract string FontName { get; }
 
     /// <summary>
@@ -42,7 +42,7 @@ internal abstract class Font : IFontMetric
 
     /// <summary>
     /// Gets a boolean value indicating whether this font supports 
-    /// multi-byte _characters
+    /// multi-byte characters.
     /// </summary>
     public abstract bool MultiByteFont { get; }
 

@@ -2,77 +2,81 @@ using Genocs.Fonet.DataTypes;
 using Genocs.Fonet.Fo;
 using Genocs.Fonet.Fo.Flow;
 using Genocs.Fonet.Layout.Inline;
+using Genocs.Fonet.Render.Pdf;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Genocs.Fonet.Layout;
 
 internal abstract class Area : Box
 {
-    public FontState? FontState { get; set; }
+    protected BorderAndPadding? bp;
 
-    protected BorderAndPadding bp = null;
-    protected ArrayList _children = [];
     protected int maxHeight;
     protected int currentHeight = 0;
     protected int tableCellXOffset = 0;
     private int absoluteYTop = 0;
     protected int contentRectangleWidth;
     protected int allocationWidth;
-    protected Page? page;
     protected BackgroundProps background;
     private IDReferences idReferences;
-    protected ArrayList markers;
-    public FObj GeneratedBy { get; set; }
-    protected Hashtable returnedBy;
-    protected string areaClass = null;
+    protected Hashtable returnedBy = new();
+    protected string? areaClass;
+    public FObj foCreator;
+    public virtual Page? Page { get; set; }
 
+
+    /// <summary>
+    /// Gets the list of child areas contained within this area.
+    /// </summary>
+    public ArrayList Children { get; } = [];
+
+    /// <summary>
+    /// Gets the list of markers associated with this area.
+    /// </summary>
+    protected ArrayList Markers { get; } = [];
+
+    public FontState? FontState { get; set; }
+    public FObj GeneratedBy { get; init; }
     public bool IsFirst { get; set; }
     public bool IsLast { get; set; }
+    public int ZIndex { get; set; }
 
-    public FObj foCreator;
-
-    public Area(FontState? fontState)
+    protected Area(FontState? fontState, Area? parent) : base(parent)
     {
         FontState = fontState;
-        this.markers = new ArrayList();
-        this.returnedBy = new Hashtable();
     }
 
-    public Area(FontState? fontState, int allocationWidth, int maxHeight)
+    protected Area(FontState? fontState, int allocationWidth, int maxHeight, Area? parent) : this(fontState, parent)
     {
-        FontState = fontState;
         this.allocationWidth = allocationWidth;
         this.contentRectangleWidth = allocationWidth;
         this.maxHeight = maxHeight;
-        this.markers = new ArrayList();
-        this.returnedBy = new Hashtable();
     }
 
-    public void addChild(Box child)
+    public void AddChild(Box child)
     {
-        this._children.Add(child);
-        child.parent = this;
+        Children.Add(child);
+        //child.ForceParent(this);
     }
 
-    public void addChildAtStart(Box child)
+    public void AddChildAtStart(Box child)
     {
-        this._children.Insert(0, child);
-        child.parent = this;
+        Children.Insert(0, child);
+        child.ForceParent(this);
     }
 
-    public void addDisplaySpace(int size)
+    public void AddDisplaySpace(int size)
     {
-        this.addChild(new DisplaySpace(size));
+        AddChild(new DisplaySpace(size));
         this.currentHeight += size;
     }
 
-    public void addInlineSpace(int size)
-    {
-        this.addChild(new InlineSpace(size));
-    }
+    public void AddInlineSpace(int size)
+        => AddChild(new InlineSpace(size));
 
-    public FontInfo? getFontInfo()
-        => page?.GetFontInfo();
+    public FontInfo? GetFontInfo()
+        => Page?.GetFontInfo();
 
     public virtual void end()
     {
@@ -89,19 +93,16 @@ internal abstract class Area : Box
         this.contentRectangleWidth = this.allocationWidth;
     }
 
-    public ArrayList getChildren()
-        => _children;
-
     public bool hasChildren()
     {
-        return (_children.Count != 0);
+        return (Children.Count != 0);
     }
 
     public bool HasNonSpaceChildren()
     {
-        if (_children.Count > 0)
+        if (Children.Count > 0)
         {
-            foreach (object child in _children)
+            foreach (object child in Children)
             {
                 if (child is not DisplaySpace)
                 {
@@ -131,11 +132,6 @@ internal abstract class Area : Box
     public int getMaxHeight()
     {
         return this.maxHeight;
-    }
-
-    public Page getPage()
-    {
-        return this.page;
     }
 
     public BackgroundProps getBackground()
@@ -211,24 +207,17 @@ internal abstract class Area : Box
     public void removeChild(Area area)
     {
         this.currentHeight -= area.GetHeight();
-        this._children.Remove(area);
+        this.Children.Remove(area);
     }
 
     public void removeChild(DisplaySpace spacer)
     {
         this.currentHeight -= spacer.getSize();
-        this._children.Remove(spacer);
+        this.Children.Remove(spacer);
     }
 
     public void remove()
-    {
-        this.parent.removeChild(this);
-    }
-
-    public virtual void setPage(Page page)
-    {
-        this.page = page;
-    }
+        => Parent?.removeChild(this);
 
     public void setBackground(BackgroundProps bg)
     {
@@ -268,16 +257,6 @@ internal abstract class Area : Box
         this.maxHeight = height;
     }
 
-    public Area getParent()
-    {
-        return this.parent;
-    }
-
-    public void setParent(Area parent)
-    {
-        this.parent = parent;
-    }
-
     public virtual void setIDReferences(IDReferences idReferences)
     {
         this.idReferences = idReferences;
@@ -293,14 +272,15 @@ internal abstract class Area : Box
         return this.foCreator;
     }
 
-    public AreaContainer getNearestAncestorAreaContainer()
+    public AreaContainer? getNearestAncestorAreaContainer()
     {
-        Area area = this.getParent();
-        while (area != null && !(area is AreaContainer))
+        Area? area = Parent;
+        while (area != null && area is not AreaContainer)
         {
-            area = area.getParent();
+            area = area.Parent;
         }
-        return (AreaContainer)area;
+
+        return (AreaContainer?)area;
     }
 
     public BorderAndPadding GetBorderAndPadding()
@@ -310,14 +290,14 @@ internal abstract class Area : Box
 
     public void addMarker(Marker marker)
     {
-        markers.Add(marker);
+        Markers.Add(marker);
     }
 
     public void addMarkers(ArrayList markers)
     {
         foreach (object o in markers)
         {
-            this.markers.Add(o);
+            this.Markers.Add(o);
         }
     }
 
@@ -326,8 +306,52 @@ internal abstract class Area : Box
         returnedBy.Add(fo, areaPosition);
     }
 
-    public ArrayList getMarkers()
+    public ArrayList GetMarkers()
     {
-        return markers;
-    } 
+        return Markers;
+    }
+
+    internal static void RenderChildrenInZOrder(ArrayList children, PdfRenderer renderer)
+    {
+        foreach (Box child in GetChildrenInZOrder(children))
+        {
+            child.Render(renderer);
+        }
+    }
+
+    internal static List<Box> GetChildrenInZOrder(ArrayList children)
+    {
+        if (children.Count <= 1)
+        {
+            var single = new List<Box>(children.Count);
+            foreach (Box child in children)
+            {
+                single.Add(child);
+            }
+
+            return single;
+        }
+
+        var indexed = new List<(int Index, Box Box, int ZIndex)>(children.Count);
+        for (int i = 0; i < children.Count; i++)
+        {
+            Box box = (Box)children[i]!;
+            int zIndex = box is Area area ? area.ZIndex : 0;
+            indexed.Add((i, box, zIndex));
+        }
+
+        indexed.Sort(static (left, right) =>
+        {
+            int byZIndex = left.ZIndex.CompareTo(right.ZIndex);
+            return byZIndex != 0 ? byZIndex : left.Index.CompareTo(right.Index);
+        });
+
+        var ordered = new List<Box>(indexed.Count);
+        foreach (var entry in indexed)
+        {
+            ordered.Add(entry.Box);
+        }
+
+        return ordered;
+    }
 }

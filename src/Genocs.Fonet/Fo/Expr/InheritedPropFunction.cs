@@ -17,6 +17,6 @@ internal class InheritedPropFunction : FunctionBase
         {
             throw new PropertyException("Incorrect parameter to inherited-property-value function");
         }
-        return pInfo.getPropertyList().GetInheritedProperty(propName);
+        return pInfo.PropertyList.GetInheritedProperty(propName);
     }
 }

@@ -1,7 +1,5 @@
 namespace Genocs.Fonet.Layout
 {
-    using Genocs.Fonet.Fo.Properties;
-    using Genocs.Fonet.Layout;
     using Genocs.Fonet.Render.Pdf;
 
     internal class SpanArea : AreaContainer
@@ -14,8 +12,7 @@ namespace Genocs.Fonet.Layout
         public SpanArea(FontState fontState, int xPosition, int yPosition,
                         int allocationWidth, int maxHeight, int columnCount,
                         int columnGap) :
-            base(fontState, xPosition, yPosition, allocationWidth, maxHeight,
-                                 Position.ABSOLUTE)
+            base(fontState, xPosition, yPosition, allocationWidth, maxHeight, Fo.Properties.Position.ABSOLUTE, null)
         {
             this.contentRectangleWidth = allocationWidth;
             this.columnCount = columnCount;
@@ -31,7 +28,7 @@ namespace Genocs.Fonet.Layout
                 ColumnArea colArea = new ColumnArea(fontState, colXPosition,
                                                     colYPosition, columnWidth,
                                                     maxHeight, columnCount);
-                addChild(colArea);
+                AddChild(colArea);
                 colArea.setColumnIndex(columnIndex + 1);
             }
         }
@@ -78,7 +75,7 @@ namespace Genocs.Fonet.Layout
 
         public AreaContainer getCurrentColumnArea()
         {
-            return (AreaContainer)getChildren()[currentColumn - 1];
+            return (AreaContainer)Children[currentColumn - 1];
         }
 
         public bool isBalanced()
@@ -94,7 +91,7 @@ namespace Genocs.Fonet.Layout
         public int getTotalContentHeight()
         {
             int totalContentHeight = 0;
-            foreach (AreaContainer ac in getChildren())
+            foreach (AreaContainer ac in Children)
             {
                 totalContentHeight += ac.getContentHeight();
             }
@@ -104,7 +101,7 @@ namespace Genocs.Fonet.Layout
         public int getMaxContentHeight()
         {
             int maxContentHeight = 0;
-            foreach (AreaContainer nextElm in getChildren())
+            foreach (AreaContainer nextElm in Children)
             {
                 if (nextElm.getContentHeight() > maxContentHeight)
                 {
@@ -113,13 +110,20 @@ namespace Genocs.Fonet.Layout
             }
             return maxContentHeight;
         }
-
-        public override void setPage(Page page)
+        public override Page? Page
         {
-            this.page = page;
-            foreach (AreaContainer ac in getChildren())
+            get
             {
-                ac.setPage(page);
+                return base.Page;
+            }
+
+            set
+            {
+                base.Page = value;
+                foreach (AreaContainer ac in Children)
+                {
+                    ac.Page = value;
+                }
             }
         }
 

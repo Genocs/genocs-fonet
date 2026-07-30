@@ -41,7 +41,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = Make(propertyList, "before", propertyList.getParentFObj());
+                m_defaultProp = Make(propertyList, "before", propertyList.GetParentFObj());
             }
             return m_defaultProp;
 

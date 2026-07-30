@@ -1,24 +1,16 @@
-namespace Genocs.Fonet.Pdf
+namespace Genocs.Fonet.Pdf;
+
+public sealed class PdfNumeric : PdfObject
 {
-    public sealed class PdfNumeric : PdfObject
-    {
-        private decimal val;
+    private readonly decimal _val;
 
-        public PdfNumeric(decimal val)
-        {
-            this.val = val;
-        }
+    public PdfNumeric(decimal val)
+        => _val = val;
 
-        public PdfNumeric(decimal val, PdfObjectId objectId)
-            : base(objectId)
-        {
-            this.val = val;
-        }
+    public PdfNumeric(decimal val, PdfObjectId objectId)
+        : base(objectId)
+        => _val = val;
 
-        protected internal override void Write(PdfWriter writer)
-        {
-            writer.Write(val);
-        }
-
-    }
+    protected internal override void Write(PdfWriter writer)
+        => writer.Write(_val);
 }

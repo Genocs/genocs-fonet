@@ -1,12 +1,10 @@
 using Genocs.Fonet.Layout;
 using Genocs.Fonet.Pdf;
-using Genocs.Fonet.Render.Pdf;
-using Genocs.Fonet.Render.Pdf.Fonts;
 
 namespace Genocs.Fonet.Render.Pdf.Fonts;
 
 /// <summary>
-///     Base class for the standard 14 fonts as defined in the PDF spec.
+/// Base class for the standard 14 fonts as defined in the PDF spec.
 /// </summary>
 internal abstract class Base14Font : Font
 {
@@ -36,10 +34,10 @@ internal abstract class Base14Font : Font
     private int firstChar;
     private int lastChar;
     private int[] widths;
-    private CodePointMapping mapping;
+    private CodePointMapping? mapping;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     public Base14Font(
         string fontName,
@@ -50,7 +48,7 @@ internal abstract class Base14Font : Font
         int firstChar,
         int lastChar,
         int[] widths,
-        CodePointMapping mapping)
+        CodePointMapping? mapping)
     {
         this.fontName = fontName;
         this.encoding = encoding;
@@ -63,9 +61,9 @@ internal abstract class Base14Font : Font
         this.mapping = mapping;
     }
 
-    public override string Encoding
+    public override string? Encoding
     {
-        get { return mapping.Name; }
+        get { return mapping?.Name; }
     }
 
     public override string FontName
@@ -84,12 +82,12 @@ internal abstract class Base14Font : Font
     }
 
     /// <summary>
-    ///     Will always return null since the standard 14 fonts do not 
-    ///     have a FontDescriptor.
+    /// Will always return null since the standard 14 fonts do not 
+    /// have a FontDescriptor.
     /// </summary>
     /// <remarks>
-    ///     It is possible to override the default metrics, but the 
-    ///     current version of FO.NET does not support this feature.
+    /// It is possible to override the default metrics, but the 
+    /// current version of FO.NET does not support this feature.
     /// </remarks>
     public override IFontDescriptor? Descriptor
     {
@@ -144,7 +142,7 @@ internal abstract class Base14Font : Font
 
     public override ushort MapCharacter(char c)
     {
-        ushort charIndex = mapping.MapCharacter(c);
+        ushort charIndex = mapping?.MapCharacter(c) ?? 0;
         if (charIndex != 0)
         {
             return charIndex;

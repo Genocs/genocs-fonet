@@ -3,8 +3,7 @@ using System.Runtime.InteropServices;
 namespace Genocs.Fonet.Pdf.Gdi.Structures;
 
 /// <summary>
-///     The OUTLINETEXTMETRIC structure contains metrics describing 
-///     a TrueType font. 
+/// Gets the metrics describing a TrueType font.
 /// </summary>
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 internal struct OutlineTextMetric

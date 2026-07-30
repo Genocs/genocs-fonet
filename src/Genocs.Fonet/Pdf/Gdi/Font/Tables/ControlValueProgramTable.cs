@@ -1,26 +1,26 @@
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Class that represents the Control Value Program table ('prep').
+/// Class that represents the Control Value Program table ('prep').
 /// </summary>
 internal class ControlValueProgramTable : FontTable
 {
     /// <summary>
-    ///     Set of instructions executed whenever point size or font 
-    ///     or transformation change.
+    /// Set of instructions executed whenever point size or font 
+    /// or transformation change.
     /// </summary>
     private byte[] instructions;
 
     /// <summary>
-    ///     Creates an instance of the <see cref="ControlValueProgramTable"/> class.
+    /// Creates an instance of the <see cref="ControlValueProgramTable"/> class.
     /// </summary>
     /// <param name="entry"></param>
     public ControlValueProgramTable(DirectoryEntry entry)
         : base(TableNames.Prep, entry) { }
 
     /// <summary>
-    ///     Reads the contents of the "prep" table from the current position 
-    ///     in the supplied stream.
+    /// Reads the contents of the "prep" table from the current position 
+    /// in the supplied stream.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)
@@ -30,7 +30,7 @@ internal class ControlValueProgramTable : FontTable
     }
 
     /// <summary>
-    ///     Writes out the array of instructions to the supplied stream.
+    /// Writes out the array of instructions to the supplied stream.
     /// </summary>
     /// <param name="writer"></param>
     protected internal override void Write(FontFileWriter writer)

@@ -4,23 +4,13 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class MultiToggle : ToBeImplementedElement
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new MultiToggle(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new MultiToggle(parent, props));
 
     protected MultiToggle(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:multi-toggle";
+        Name = "fo:multi-toggle";
     }
 
     public override Status Layout(Area area)

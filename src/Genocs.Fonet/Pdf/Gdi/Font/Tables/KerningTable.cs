@@ -1,10 +1,10 @@
 namespace Genocs.Fonet.Pdf.Gdi.Font.Tables;
 
 /// <summary>
-///     Class that represents the Kerning table.
+/// Class that represents the Kerning table.
 /// </summary>
 /// <remarks>
-///     http://www.microsoft.com/typography/otspec/kern.htm
+/// http://www.microsoft.com/typography/otspec/kern.htm
 /// </remarks>
 internal class KerningTable : FontTable
 {
@@ -16,15 +16,15 @@ internal class KerningTable : FontTable
     private KerningPairs? _pairs;
 
     /// <summary>
-    ///     Class constructor.
+    /// Class constructor.
     /// </summary>
     /// <param name="entry"></param>
     public KerningTable(DirectoryEntry entry)
         : base(TableNames.Kern, entry) { }
 
     /// <summary>
-    ///     Gets a boolean value that indicates this font contains format 0
-    ///     kerning information.
+    /// Gets a boolean value that indicates this font contains format 0
+    /// kerning information.
     /// </summary>
     public bool HasKerningInfo
     {
@@ -32,11 +32,11 @@ internal class KerningTable : FontTable
     }
 
     /// <summary>
-    ///     Returns a collection of kerning pairs.
+    /// Returns a collection of kerning pairs.
     /// </summary>
     /// <remarks>
-    ///     If <i>HasKerningInfo</i> returns <b>false</b>, this method will 
-    ///     always return null.
+    /// If <i>HasKerningInfo</i> returns <b>false</b>, this method will 
+    /// always return null.
     /// </remarks>
     public KerningPairs? KerningPairs
     {
@@ -44,8 +44,8 @@ internal class KerningTable : FontTable
     }
 
     /// <summary>
-    ///     Reads the contents of the "kern" table from the current position 
-    ///     in the supplied stream.
+    /// Reads the contents of the "kern" table from the current position 
+    /// in the supplied stream.
     /// </summary>
     /// <param name="reader"></param>
     protected internal override void Read(FontFileReader reader)
@@ -100,7 +100,7 @@ internal class KerningTable : FontTable
     }
 
     /// <summary>
-    ///     No supported.
+    /// No supported.
     /// </summary>
     /// <param name="writer"></param>
     protected internal override void Write(FontFileWriter writer)

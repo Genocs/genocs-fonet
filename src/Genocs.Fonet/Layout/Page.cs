@@ -1,9 +1,8 @@
-using System.Collections;
-using Genocs.Fonet.Fo.Flow;
-using Genocs.Fonet.Layout;
 using Genocs.Fonet.DataTypes;
+using Genocs.Fonet.Fo.Flow;
 using Genocs.Fonet.Fo.Pagination;
 using Genocs.Fonet.Render.Pdf;
+using System.Collections;
 
 namespace Genocs.Fonet.Layout;
 
@@ -17,35 +16,25 @@ internal class Page
     private AreaContainer start;
     private AreaContainer end;
     private AreaTree areaTree;
-    private PageSequence pageSequence;
     protected int pageNumber = 0;
     protected string formattedPageNumber;
     protected ArrayList linkSets = new ArrayList();
     private ArrayList idList = new ArrayList();
-    private ArrayList footnotes = null;
-    private ArrayList markers = null;
+    private ArrayList? footnotes = null;
+    private readonly ArrayList markers = [];
+
+    public PageSequence PageSequence { get; set; }
 
     internal Page(AreaTree areaTree, int height, int width)
     {
         this.areaTree = areaTree;
         this.height = height;
         this.width = width;
-        markers = new ArrayList();
     }
 
     public IDReferences getIDReferences()
     {
         return areaTree.getIDReferences();
-    }
-
-    public void setPageSequence(PageSequence pageSequence)
-    {
-        this.pageSequence = pageSequence;
-    }
-
-    public PageSequence getPageSequence()
-    {
-        return pageSequence;
     }
 
     public AreaTree getAreaTree()
@@ -76,34 +65,34 @@ internal class Page
     internal void addAfter(AreaContainer area)
     {
         after = area;
-        area.setPage(this);
+        area.Page = this;
     }
 
     internal void addBefore(AreaContainer area)
     {
         before = area;
-        area.setPage(this);
+        area.Page = this;
     }
 
     public void addBody(BodyAreaContainer area)
     {
         body = area;
-        area.setPage(this);
-        ((BodyAreaContainer)area).getMainReferenceArea().setPage(this);
-        ((BodyAreaContainer)area).getBeforeFloatReferenceArea().setPage(this);
-        ((BodyAreaContainer)area).getFootnoteReferenceArea().setPage(this);
+        area.Page = this;
+        area.getMainReferenceArea().Page = this;
+        area.getBeforeFloatReferenceArea().Page = this;
+        area.getFootnoteReferenceArea().Page = this;
     }
 
     internal void addEnd(AreaContainer area)
     {
         end = area;
-        area.setPage(this);
+        area.Page = this;
     }
 
     internal void addStart(AreaContainer area)
     {
         start = area;
-        area.setPage(this);
+        area.Page = this;
     }
 
     public void render(PdfRenderer renderer)

@@ -2,57 +2,49 @@
 
 Technical, operational, and architectural risks for the Genocs.Fonet migration.
 
+**Last updated:** August 2026
+
 ## Risk Matrix
 
-| ID | Risk | Likelihood | Impact | Severity | Mitigation |
-|----|------|------------|--------|----------|------------|
-| R-01 | Font pipeline produces silently wrong PDFs | High | Critical | **Critical** | Phase 1 font work; glyph mapping tests |
-| R-02 | SkiaSharp native crashes on bad font data | Medium | High | **High** | Validate before OpenStream; graceful fallback |
-| R-03 | Incomplete FO coverage breaks consumer templates | High | High | **High** | Template-driven triage (Phase 3) |
-| R-04 | No CI → regressions go undetected | High | Medium | **High** | Phase 0 CI setup |
-| R-05 | Performance unacceptable for production | Medium | Medium | **Medium** | Benchmarks; image/font optimization |
-| R-06 | Namespace split causes maintenance errors | Medium | Low | **Medium** | Phase 2 consolidation |
-| R-07 | Legacy RC4 encryption inadequate | Low | Medium | **Low** | Document limitations; AES in Phase 4 |
-| R-08 | SkiaSharp version lock-in / breaking changes | Low | Medium | **Low** | Pin version; test on upgrades |
-| R-09 | Original Fonet behavior unknown for edge cases | Medium | Medium | **Medium** | Reference Apache FOP; add regression tests |
-| R-10 | Single maintainer / bus factor | Medium | High | **High** | Documentation (this folder); clear architecture |
+| ID | Risk | Likelihood | Impact | Severity | Status |
+|----|------|------------|--------|----------|--------|
+| R-01 | Font pipeline produces silently wrong PDFs | Low | Critical | **Medium** | ✅ Mitigated — Phase 1 complete; glyph mapping tests pass |
+| R-02 | SkiaSharp native crashes on bad font data | Low | High | **Medium** | ✅ Mitigated — file-based reads; crash fixed in Phase 0 |
+| R-03 | Incomplete FO coverage breaks consumer templates | High | High | **High** | 🔄 Open — Phase 3 in progress (~87 properties stubbed) |
+| R-04 | No CI → regressions go undetected | Low | Medium | **Low** | ✅ Mitigated — GitHub Actions CI in place |
+| R-05 | Performance unacceptable for production | Medium | Medium | **Medium** | 🔄 Open — not benchmarked |
+| R-06 | Namespace split causes maintenance errors | Low | Low | **Low** | ✅ Resolved — consolidated to `Genocs.Fonet.*` |
+| R-07 | Legacy RC4 encryption inadequate | Low | Medium | **Low** | 🔄 Open — document limitations; AES in Phase 4 |
+| R-08 | SkiaSharp version lock-in / breaking changes | Low | Medium | **Low** | 🔄 Open — pin version; test on upgrades |
+| R-09 | Original Fonet behavior unknown for edge cases | Medium | Medium | **Medium** | 🔄 Open — 22 tests; needs deeper regression |
+| R-10 | Single maintainer / bus factor | Medium | High | **High** | 🔄 Open — documentation helps |
 
 ---
 
 ## Critical Concerns
 
-### 1. Silent Correctness Failures
+### 1. Incomplete FO Coverage (Active)
 
-The most dangerous aspect of the current migration is that **stubbed GDI methods fail silently**. Unlike a crash or exception, returning glyph index 0 for every character produces a PDF that looks "almost right" for ASCII text (glyph 0 is often `.notdef` or space) but is completely wrong for any non-trivial font embedding.
+~87 XSL-FO properties and 11 elements remain stubbed. Documents using these features will log warnings and produce incomplete layout. Phase 3 Tier 1 batch is done; side-float layout and Tier 2 i18n are next.
 
-**Concern:** Consumers may deploy the library thinking it works because simple Latin documents appear fine, then encounter garbled text in production.
+**Recommendation:** Continue template-driven triage per [Migration Plan](./migration-plan.md).
 
-**Recommendation:**
-- Add diagnostic mode that warns when stub code paths are hit
-- Fail fast on glyph index 0 for printable characters
-- Document known limitations prominently in NuGet package description
+### 2. GDI Shim Naming Debt (Active)
 
-### 2. GDI Shim Technical Debt
+54 files under `Pdf/Gdi/` retain Win32-shaped type names (`GdiFont`, `GdiFontMetrics`) despite SkiaSharp-backed implementations. `LibWrapper` is now a thin device-context registry, but the naming still confuses contributors.
 
-Retaining 54 files under `Pdf/Gdi/` with Win32-shaped structs (`LogFont`, `TextMetric`, `GlyphSet`) creates ongoing confusion:
+**Recommendation:** Rename `Gdi*` types in Phase 4 (deferred from Phase 1).
 
-- New contributors assume GDI is still used
-- Dual code paths (FontManager vs LibWrapper) diverge
-- Refactoring is harder because of indirection through dummy handles
+### 3. Test Coverage Gap (Active)
 
-**Recommendation:** Treat GDI shim removal as a hard milestone (M1), not optional cleanup.
+22 tests with PDF structure validation provide baseline confidence but cannot detect:
 
-### 3. Test Coverage Gap
+- Wrong rendered text content
+- Incorrect layout calculations for stubbed properties
+- Cross-platform font rendering differences
+- Visual layout regressions
 
-Five smoke tests with file-existence assertions provide **near-zero confidence** in correctness. The test suite cannot detect:
-
-- Wrong glyph mapping
-- Incorrect layout calculations
-- Missing FO property effects
-- Cross-platform font differences
-- PDF structural errors
-
-**Recommendation:** No production release until Layer 2+ tests exist (see [Testing Strategy](./testing-strategy.md)).
+**Recommendation:** Add text extraction validation and visual regression before production release (see [Testing Strategy](./testing-strategy.md)).
 
 ---
 
@@ -76,24 +68,14 @@ The library implements its own PDF 1.3 writer (~100 files in `Pdf/`). Benefits: 
 
 **Recommendation:** Keep custom writer for Phase 1–3; evaluate PdfSharp for Phase 4 if PDF spec compliance becomes a requirement.
 
-### 5. Namespace Fragmentation
-
-Three namespace families (`Genocs.Fonet`, `Fonet.Fo`, `Fonet.Pdf`) reflect incomplete migration. This causes:
-
-- `FonetDriver` resolution issues across namespaces
-- Confusion about public vs. internal API
-- Harder NuGet packaging (what namespace do consumers import?)
-
-**Recommendation:** Consolidate to `Genocs.Fonet.*` in Phase 2; use `[Obsolete]` attributes on old namespaces if needed.
-
-### 6. No Complex Text Shaping
+### 5. No Complex Text Shaping
 
 The library lacks HarfBuzz or equivalent text shaping. This means:
 
 - No ligatures (fi, fl, etc.) unless font handles them automatically
 - No correct Arabic/Hebrew joining behavior
 - No Indic script reordering
-- Kerning is limited to font table pairs (with O(n²) lookup)
+- Kerning is limited to font table pairs
 
 **Impact:** Documents requiring non-Latin scripts or typographic quality will render incorrectly even after font pipeline fixes.
 
@@ -103,18 +85,7 @@ The library lacks HarfBuzz or equivalent text shaping. This means:
 
 ## Operational Concerns
 
-### 7. No CI/CD Pipeline
-
-Without automated builds:
-
-- Cross-platform regressions go undetected
-- PRs can merge broken code
-- No test coverage tracking over time
-- No automated NuGet publishing
-
-**Recommendation:** Phase 0 priority — GitHub Actions with Windows/Linux/macOS matrix.
-
-### 8. Font Discovery Brittleness
+### 7. Font Discovery Brittleness
 
 `FontManager.LocateSystemFont` scans filesystem directories with filename substring matching. On Linux:
 
@@ -124,15 +95,11 @@ Without automated builds:
 
 **Recommendation:** Use `SKFontManager.MatchFamily` as primary; filesystem scan as last resort with PostScript name validation.
 
-### 9. Nullable Reference Warnings (~3,000+)
+### 8. Nullable Reference Warnings (~326)
 
-While not runtime bugs, the volume of nullable warnings indicates:
+Reduced from ~3,000 via `.editorconfig` triage in legacy `Fo/**` and `Layout/**` trees. Remaining warnings are concentrated in `Pdf/**` and `Render/**`.
 
-- Incomplete migration to nullable reference types
-- Potential `NullReferenceException` at runtime in unexercised paths
-- Noise makes it hard to spot new warnings
-
-**Recommendation:** Fix warnings in hot paths (font, layout, render) first; batch-fix DataTypes/Fo in Phase 2.
+**Recommendation:** Fix warnings in hot paths incrementally; avoid re-enabling nullable diagnostics in legacy trees until ready.
 
 ---
 
@@ -152,10 +119,9 @@ While not runtime bugs, the volume of nullable warnings indicates:
 `ApocImageFactory` can load images from URIs (HTTP). Risks:
 
 - SSRF if FO templates are user-controlled
-- No timeout on `WebRequest` (obsolete API)
 - No size limits on downloaded images
 
-**Recommendation:** Add configurable URI allowlist; migrate to `HttpClient` with timeout; limit download size.
+**Recommendation:** Add configurable URI allowlist; limit download size. (`HttpClient` with timeout migrated in Phase 2.)
 
 ### 12. Unsafe Code Blocks
 
@@ -201,8 +167,8 @@ Track decisions needed before or during migration:
 | D-01 | Keep or replace custom PDF writer | Keep / PdfSharp / Hybrid | Phase 4 | TBD |
 | D-02 | HarfBuzz integration for complex scripts | Yes / No / Later | Phase 4 | TBD |
 | D-03 | Target FO spec version | 1.0 / 1.1 / subset | Phase 3 | TBD |
-| D-04 | Public API namespace | `Genocs.Fonet` / `Fonet` | Phase 2 | TBD |
-| D-05 | Minimum supported .NET version | net8.0 / net9.0 | Phase 0 | TBD |
+| D-04 | Public API namespace | `Genocs.Fonet` / `Fonet` | Phase 2 | ✅ `Genocs.Fonet.*` |
+| D-05 | Minimum supported .NET version | net8.0 / net9.0 | Phase 0 | ✅ net8.0 |
 | D-06 | Apache FOP compatibility target | Full / Best-effort / None | Phase 3 | TBD |
 | D-07 | NuGet package publishing | Public / Private feed | Phase 4 | TBD |
 
@@ -212,11 +178,13 @@ Track decisions needed before or during migration:
 
 | Concern | Status | Resolution | Date |
 |---------|--------|------------|------|
-| Build failures (README claim) | ✅ Resolved | Solution compiles on net8/9/10 | 2026-06 |
-| GDI P/Invoke removal | ✅ Resolved | Replaced with LibWrapper/SkiaSharp | — |
-| Font glyph mapping | ❌ Open | Phase 1 | — |
-| Test coverage | ❌ Open | Phase 0–2 | — |
-| FO feature stubs | ❌ Open | Phase 3 | — |
-| CI pipeline | ❌ Open | Phase 0 | — |
+| Build failures | ✅ Resolved | Solution compiles on net8/9/10 | 2026-06 |
+| GDI P/Invoke removal | ✅ Resolved | Replaced with SkiaSharp + file-based font access | 2026-06 |
+| Font glyph mapping | ✅ Resolved | `CmapReader` + `FontManager.GetGlyphIndices` | 2026-06 |
+| Namespace fragmentation | ✅ Resolved | Consolidated to `Genocs.Fonet.*` | 2026-06 |
+| CI pipeline | ✅ Resolved | GitHub Actions workflows | 2026-06 |
+| Test coverage | ⚠️ Partial | 22 tests with PDF structure validation | 2026-08 |
+| FO feature stubs | 🔄 In progress | Phase 3 Tier 1 done; ~87 properties remain | 2026-08 |
+| CJK validation | ❌ Open | No CJK font fixture test | — |
 
 Update this table as concerns are addressed.

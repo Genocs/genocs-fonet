@@ -36,14 +36,14 @@ internal class FObjMixed : FObj
 
     public override Status Layout(Area area)
     {
-        if (_properties != null && !_propertyManager.IsVisible())
+        if (Properties != null && !_propertyManager.IsVisible())
         {
             return new Status(Status.OK);
         }
 
-        if (_properties != null)
+        if (Properties != null)
         {
-            Property prop = _properties.GetProperty("id");
+            Property prop = Properties.GetProperty("id");
             if (prop != null)
             {
                 string id = prop.GetString();

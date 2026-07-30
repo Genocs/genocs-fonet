@@ -2,22 +2,22 @@ namespace Genocs.Fonet.Pdf;
 
 public sealed class PdfBoolean : PdfObject
 {
-    private bool val;
+    private readonly bool _val;
 
     public PdfBoolean(bool val)
     {
-        this.val = val;
+        _val = val;
     }
 
     public PdfBoolean(bool val, PdfObjectId objectId)
         : base(objectId)
     {
-        this.val = val;
+        _val = val;
     }
 
     protected internal override void Write(PdfWriter writer)
     {
-        writer.Write(val ? KeywordEntries.GetKeyword(Keyword.True)
+        writer.Write(_val ? KeywordEntries.GetKeyword(Keyword.True)
             : KeywordEntries.GetKeyword(Keyword.False));
     }
 }

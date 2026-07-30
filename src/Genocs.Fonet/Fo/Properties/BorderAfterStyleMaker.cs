@@ -18,7 +18,7 @@ internal class BorderAfterStyleMaker : GenericBorderStyle
 
         sbExpr.Length = 0;
         sbExpr.Append("border-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.AFTER));
         sbExpr.Append("-style");
         if (propertyList.GetExplicitProperty(sbExpr.ToString()) != null)
         {
@@ -31,11 +31,11 @@ internal class BorderAfterStyleMaker : GenericBorderStyle
 
     public override Property Compute(PropertyList propertyList)
     {
-        FObj parentFO = propertyList.getParentFObj();
+        FObj parentFO = propertyList.GetParentFObj();
         StringBuilder sbExpr = new StringBuilder();
         Property p = null;
         sbExpr.Append("border-");
-        sbExpr.Append(propertyList.wmRelToAbs(PropertyList.AFTER));
+        sbExpr.Append(propertyList.RelativeToAbsolute(PropertyList.AFTER));
         sbExpr.Append("-style");
         p = propertyList.GetExplicitOrShorthandProperty(sbExpr.ToString());
 

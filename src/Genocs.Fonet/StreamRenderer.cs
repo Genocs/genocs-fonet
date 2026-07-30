@@ -1,10 +1,10 @@
+using System.Collections;
 using Genocs.Fonet.Apps;
 using Genocs.Fonet.DataTypes;
 using Genocs.Fonet.Fo.Flow;
 using Genocs.Fonet.Fo.Pagination;
 using Genocs.Fonet.Layout;
 using Genocs.Fonet.Render.Pdf;
-using System.Collections;
 
 namespace Genocs.Fonet;
 
@@ -31,7 +31,7 @@ internal class StreamRenderer(PdfRenderer renderer)
     /// <summary>
     /// The formatting results to be handed back to the caller.
     /// </summary>
-    private FormattingResults results = new FormattingResults();
+    private FormattingResults results = new();
 
     /// <summary>
     /// The FontInfo for this renderer.
@@ -85,12 +85,12 @@ internal class StreamRenderer(PdfRenderer renderer)
     }
 
     /// <summary>
-    ///     Format the PageSequence. The PageSequence formats Pages and adds 
-    ///     them to the AreaTree, which subsequently calls the StreamRenderer
-    ///     instance (this) again to Render the page.  At this time the page 
-    ///     might be printed or it might be queued. A page might not be 
-    ///     renderable immediately if the IDReferences are not all valid. In 
-    ///     this case we defer the rendering until they are all valid.
+    /// Format the PageSequence. The PageSequence formats Pages and adds 
+    /// them to the AreaTree, which subsequently calls the StreamRenderer
+    /// instance (this) again to Render the page.  At this time the page 
+    /// might be printed or it might be queued. A page might not be 
+    /// renderable immediately if the IDReferences are not all valid. In 
+    /// this case we defer the rendering until they are all valid.
     /// </summary>
     /// <param name="pageSequence"></param>
     public void Render(PageSequence pageSequence)
@@ -114,7 +114,7 @@ internal class StreamRenderer(PdfRenderer renderer)
     public void QueuePage(Page page)
     {
         // Process markers
-        PageSequence pageSequence = page.getPageSequence();
+        PageSequence pageSequence = page.PageSequence;
         if (pageSequence != currentPageSequence)
         {
             currentPageSequence = pageSequence;
@@ -162,9 +162,9 @@ internal class StreamRenderer(PdfRenderer renderer)
     }
 
     /// <summary>
-    ///     Try to process the queue from the first entry forward.  If an 
-    ///     entry can't be processed, then the queue can't move forward, 
-    ///     so return.
+    /// Try to process the queue from the first entry forward.  If an 
+    /// entry can't be processed, then the queue can't move forward, 
+    /// so return.
     /// </summary>
     /// <param name="force"></param>
     private void ProcessQueue(bool force)
@@ -183,9 +183,9 @@ internal class StreamRenderer(PdfRenderer renderer)
     }
 
     /// <summary>
-    ///     A RenderQueueEntry consists of the Page to be queued, plus a list 
-    ///     of outstanding ID references that need to be resolved before the 
-    ///     Page can be renderered.
+    /// A RenderQueueEntry consists of the Page to be queued, plus a list 
+    /// of outstanding ID references that need to be resolved before the 
+    /// Page can be renderered.
     /// </summary>
     private class RenderQueueEntry
     {
@@ -206,7 +206,7 @@ internal class StreamRenderer(PdfRenderer renderer)
             this.outer = outer;
             this.page = page;
 
-            foreach (object o in outer.idReferences.getInvalidElements())
+            foreach (object o in outer.idReferences.GetInvalidElements())
             {
                 unresolvedIdReferences.Add(o);
             }
@@ -218,8 +218,8 @@ internal class StreamRenderer(PdfRenderer renderer)
         }
 
         /// <summary>
-        ///     See if the outstanding references are resolved in the current 
-        ///     copy of IDReferences.
+        /// See if the outstanding references are resolved in the current 
+        /// copy of IDReferences.
         /// </summary>
         /// <returns></returns>
         public bool isResolved()

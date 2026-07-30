@@ -3,26 +3,26 @@ using System.Collections.Specialized;
 namespace Genocs.Fonet.Render.Pdf.Fonts
 {
     /// <summary>
-    ///     Represents a collection of font descriptor flags specifying 
-    ///     various characterisitics of a font.
+    /// Represents a collection of font descriptor flags specifying 
+    /// various characterisitics of a font.
     /// </summary>
     /// <remarks>
-    ///     The following lists the bit positions and associated flags:
-    ///     1  - FixedPitch
-    ///     2  - Serif
-    ///     3  - Symbolic
-    ///     4  - Script
-    ///     6  - Nonsymbolic
-    ///     7  - Italic
-    ///     17 - AllCap
-    ///     18 - SmallCap
-    ///     19 - ForceBold
+    /// The following lists the bit positions and associated flags:
+    /// 1  - FixedPitch
+    /// 2  - Serif
+    /// 3  - Symbolic
+    /// 4  - Script
+    /// 6  - Nonsymbolic
+    /// 7  - Italic
+    /// 17 - AllCap
+    /// 18 - SmallCap
+    /// 19 - ForceBold
     /// </remarks>
     internal sealed class FontDescriptorFlags
     {
         /// <summary>
-        ///     Handy enumeration used to reference individual bit positions
-        ///     in the BitVector32.
+        /// Handy enumeration used to reference individual bit positions
+        /// in the BitVector32.
         /// </summary>
         internal enum FontDescriptorFlagsEnum
         {
@@ -40,7 +40,7 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         private BitVector32 flags;
 
         /// <summary>
-        ///     Default class constructor.
+        /// Default class constructor.
         /// </summary>
         public FontDescriptorFlags()
         {
@@ -48,8 +48,8 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         }
 
         /// <summary>
-        ///     Class constructor.  Initialises the flags BitVector with the 
-        ///     supplied integer.
+        /// Class constructor.  Initialises the flags BitVector with the 
+        /// supplied integer.
         /// </summary>
         public FontDescriptorFlags(int flags)
         {
@@ -57,7 +57,7 @@ namespace Genocs.Fonet.Render.Pdf.Fonts
         }
 
         /// <summary>
-        ///     Gets the font descriptor flags as a 32-bit signed integer.
+        /// Gets the font descriptor flags as a 32-bit signed integer.
         /// </summary>
         public int Flags
         {

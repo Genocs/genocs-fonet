@@ -1,168 +1,149 @@
-using System;
 using Genocs.Fonet.DataTypes;
-using Genocs.Fonet.Fo;
 
-namespace Genocs.Fonet.Fo.Properties
+namespace Genocs.Fonet.Fo.Properties;
+
+internal class GenericCondLength : CondLengthProperty.Maker
 {
-    internal class GenericCondLength : CondLengthProperty.Maker
+    internal class Enums
     {
-        internal class Enums
+        internal class Conditionality
         {
-            internal class Conditionality
+            public const int DISCARD = Constants.DISCARD;
+            public const int RETAIN = Constants.RETAIN;
+        }
+    }
+
+    private static readonly PropertyMaker _lengthMaker = new LengthProperty.Maker("conditional-length-template.length");
+
+    private class SP_ConditionalityMaker : EnumProperty.Maker
+    {
+        protected internal SP_ConditionalityMaker(string sPropName)
+            : base(sPropName)
+        {
+        }
+
+        protected internal static readonly EnumProperty _propDISCARD = new EnumProperty(Enums.Conditionality.DISCARD);
+
+        protected internal static readonly EnumProperty _propRETAIN = new EnumProperty(Enums.Conditionality.RETAIN);
+
+        public override Property? CheckEnumValues(string value)
+        {
+            if (value.Equals("discard"))
             {
-                public const int DISCARD = Constants.DISCARD;
-
-                public const int RETAIN = Constants.RETAIN;
-
+                return _propDISCARD;
             }
 
-        }
-
-        private static readonly PropertyMaker s_LengthMaker = new LengthProperty.Maker("conditional-length-template.length");
-
-        private class SP_ConditionalityMaker : EnumProperty.Maker
-        {
-            protected internal SP_ConditionalityMaker(string sPropName) : base(sPropName) { }
-
-            protected internal static readonly EnumProperty s_propDISCARD = new EnumProperty(Enums.Conditionality.DISCARD);
-
-            protected internal static readonly EnumProperty s_propRETAIN = new EnumProperty(Enums.Conditionality.RETAIN);
-
-            public override Property CheckEnumValues(string value)
+            if (value.Equals("retain"))
             {
-                if (value.Equals("discard"))
-                {
-                    return s_propDISCARD;
-                }
-
-                if (value.Equals("retain"))
-                {
-                    return s_propRETAIN;
-                }
-
-                return base.CheckEnumValues(value);
+                return _propRETAIN;
             }
 
+            return base.CheckEnumValues(value);
         }
 
-        private static readonly PropertyMaker s_ConditionalityMaker =
-            new SP_ConditionalityMaker("conditional-length-template.conditionality");
+    }
 
+    private static readonly PropertyMaker _conditionalityMaker = new SP_ConditionalityMaker("conditional-length-template.conditionality");
 
-        new public static PropertyMaker Maker(string propName)
+    new public static PropertyMaker Maker(string propName)
+    {
+        return new GenericCondLength(propName);
+    }
+
+    protected GenericCondLength(string name)
+        : base(name)
+    {
+        _shorthandMaker = GetSubpropMaker("length");
+
+    }
+
+    private PropertyMaker _shorthandMaker;
+
+    public override Property? CheckEnumValues(string value)
+        => _shorthandMaker?.CheckEnumValues(value);
+
+    protected override bool IsCompoundMaker()
+        => true;
+
+    protected override PropertyMaker GetSubpropMaker(string subprop)
+    {
+        if (subprop.Equals("length"))
         {
-            return new GenericCondLength(propName);
+            return _lengthMaker;
         }
 
-        protected GenericCondLength(string name)
-            : base(name)
+        if (subprop.Equals("conditionality"))
         {
-            m_shorthandMaker = GetSubpropMaker("length");
-
+            return _conditionalityMaker;
         }
 
-        private PropertyMaker m_shorthandMaker;
+        return base.GetSubpropMaker(subprop);
+    }
 
-        public override Property CheckEnumValues(string value)
+    protected override Property SetSubprop(Property baseProp, string subpropName, Property subProp)
+    {
+        CondLength? val = baseProp.GetCondLength();
+        val?.SetComponent(subpropName, subProp, false);
+        return baseProp;
+    }
+
+    public override Property? GetSubpropValue(Property baseProp, string subpropName)
+    {
+        CondLength? val = baseProp.GetCondLength();
+        return val?.GetComponent(subpropName);
+    }
+
+    private Property? _defaultProp;
+
+    public override Property Make(PropertyList propertyList)
+    {
+        _defaultProp ??= MakeCompound(propertyList, propertyList.GetParentFObj());
+        return _defaultProp;
+    }
+
+    protected override Property MakeCompound(PropertyList pList, FObj? fo)
+    {
+        CondLength p = new CondLength();
+        Property subProp;
+
+        subProp = GetSubpropMaker("length").Make(pList, getDefaultForLength(), fo);
+        p.SetComponent("length", subProp, true);
+
+        subProp = GetSubpropMaker("conditionality").Make(pList, getDefaultForConditionality(), fo);
+        p.SetComponent("conditionality", subProp, true);
+
+        return new CondLengthProperty(p);
+    }
+
+    protected virtual string getDefaultForLength()
+        => string.Empty;
+
+    protected virtual string getDefaultForConditionality()
+        => string.Empty;
+
+    public override Property? ConvertProperty(Property? p, PropertyList pList, FObj? fo)
+    {
+        if (p is CondLengthProperty)
         {
-            return m_shorthandMaker.CheckEnumValues(value);
+            return p;
         }
 
-        protected override bool IsCompoundMaker()
+        if (p is not EnumProperty)
         {
-            return true;
+            p = _shorthandMaker.ConvertProperty(p, pList, fo);
         }
 
-        protected override PropertyMaker GetSubpropMaker(string subprop)
+        if (p != null)
         {
-            if (subprop.Equals("length"))
-            {
-                return s_LengthMaker;
-            }
+            Property prop = MakeCompound(pList, fo);
+            CondLength? pval = prop.GetCondLength();
 
-            if (subprop.Equals("conditionality"))
-            {
-                return s_ConditionalityMaker;
-            }
-
-            return base.GetSubpropMaker(subprop);
+            pval?.SetComponent("length", p, false);
+            return prop;
         }
-
-        protected override Property SetSubprop(Property baseProp, string subpropName, Property subProp)
+        else
         {
-            CondLength val = baseProp.GetCondLength();
-            val.SetComponent(subpropName, subProp, false);
-            return baseProp;
+            return null;
         }
-
-        public override Property GetSubpropValue(Property baseProp, string subpropName)
-        {
-            CondLength val = baseProp.GetCondLength();
-            return val.GetComponent(subpropName);
-        }
-
-        private Property m_defaultProp = null;
-
-        public override Property Make(PropertyList propertyList)
-        {
-            if (m_defaultProp == null)
-            {
-                m_defaultProp = MakeCompound(propertyList, propertyList.getParentFObj());
-            }
-            return m_defaultProp;
-        }
-
-        protected override Property MakeCompound(PropertyList pList, FObj fo)
-        {
-            CondLength p = new CondLength();
-            Property subProp;
-
-            subProp = GetSubpropMaker("length").Make(pList,
-                                                     getDefaultForLength(), fo);
-            p.SetComponent("length", subProp, true);
-
-            subProp = GetSubpropMaker("conditionality").Make(pList,
-                                                             getDefaultForConditionality(), fo);
-            p.SetComponent("conditionality", subProp, true);
-
-            return new CondLengthProperty(p);
-        }
-
-        protected virtual String getDefaultForLength()
-        {
-            return "";
-
-        }
-
-        protected virtual String getDefaultForConditionality()
-        {
-            return "";
-
-        }
-
-        public override Property ConvertProperty(Property p, PropertyList pList, FObj fo)
-        {
-            if (p is CondLengthProperty)
-            {
-                return p;
-            }
-            if (!(p is EnumProperty))
-            {
-                p = m_shorthandMaker.ConvertProperty(p, pList, fo);
-            }
-            if (p != null)
-            {
-                Property prop = MakeCompound(pList, fo);
-                CondLength pval = prop.GetCondLength();
-
-                pval.SetComponent("length", p, false);
-                return prop;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
     }
 }

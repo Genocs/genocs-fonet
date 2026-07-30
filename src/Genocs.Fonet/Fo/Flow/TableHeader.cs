@@ -2,22 +2,12 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class TableHeader : AbstractTableBody
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new TableHeader(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new TableHeader.Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new TableHeader(parent, props));
 
     public TableHeader(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = "fo:table-header";
+        Name = "fo:table-header";
     }
 }

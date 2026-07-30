@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Genocs.Fonet.Fo
 {
-    internal class GenericShorthandParser : IShorthandParser
+    internal class GenericShorthandParser : IShortHandParser
     {
         protected ArrayList list;
 

@@ -1,179 +1,144 @@
+using Genocs.Fonet.Pdf.Security;
 using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
-using Genocs.Fonet.Pdf.Security;
 
-namespace Genocs.Fonet.Pdf
+namespace Genocs.Fonet.Pdf;
+
+public class PdfWriter
 {
-    public class PdfWriter
+    public static readonly byte[] DefaultNewLine = [0x0d, 0x0a];
+
+    public static readonly byte[] DefaultSpace = [0x20];
+
+    public static readonly byte[] DefaultBinaryComment = [0x25, 0xe2, 0xe3, 0xcf, 0xd3];
+
+    private readonly Stream _stream;
+
+    private readonly Stack _indirectObjects = new();
+
+    private readonly byte[] _space = DefaultSpace;
+    public  byte[] NewLine { get; private set; } = DefaultNewLine;
+    private byte[] BinaryComment { get; set; } = DefaultBinaryComment;
+    public long Position { get; private set; }
+    public SecurityManager SecurityManager { get; set; }
+
+    public PdfWriter(Stream stream)
     {
-        public static readonly byte[] DefaultNewLine = { 0x0d, 0x0a };
+        Debug.Assert(stream.CanWrite);
+        _stream = stream;
+    }
 
-        public static readonly byte[] DefaultSpace = { 0x20 };
-
-        public static readonly byte[] DefaultBinaryComment = { 0x25, 0xe2, 0xe3, 0xcf, 0xd3 };
-
-        private Stream stream;
-
-        private long position;
-
-        private SecurityManager securityManager;
-
-        private Stack indirectObjects = new Stack();
-
-        private byte[] newLine = DefaultNewLine;
-
-        private byte[] space = DefaultSpace;
-
-        private byte[] binaryComment = DefaultBinaryComment;
-
-        public PdfWriter(Stream stream)
+    internal PdfObject EnclosingIndirect
+    {
+        get
         {
-            Debug.Assert(stream != null);
-            Debug.Assert(stream.CanWrite);
-            this.stream = stream;
+            Debug.Assert(_indirectObjects.Count > 0);
+            return (PdfObject)_indirectObjects.Peek();
         }
+    }
 
-        public SecurityManager SecurityManager
+    public void Close()
+        => _stream.Close();
+
+    public void WriteHeader(PdfVersion version)
+        => WriteLine(version.Header);
+
+    public void WriteBinaryComment()
+        => WriteLine(BinaryComment);
+
+    public void Write(PdfObject? obj)
+    {
+        Debug.Assert(obj != null);
+        if (obj.IsIndirect)
         {
-            get { return securityManager; }
-            set { securityManager = value; }
+            _indirectObjects.Push(obj);
+            obj.WriteIndirect(this);
+            _indirectObjects.Pop();
         }
-
-        internal PdfObject EnclosingIndirect
+        else
         {
-            get
-            {
-                Debug.Assert(indirectObjects.Count > 0);
-                return (PdfObject)indirectObjects.Peek();
-            }
+            obj.Write(this);
         }
+    }
 
-        public void Close()
+    public void WriteLine(PdfObject? obj)
+    {
+        Debug.Assert(obj != null);
+        Write(obj);
+        WriteLine();
+    }
+
+    public void Write(int val)
+    {
+        byte[] data = Encoding.ASCII.GetBytes(val.ToString());
+        Write(data);
+    }
+
+    public void WriteLine(int val)
+    {
+        Write(val);
+        WriteLine();
+    }
+
+    public void Write(decimal val)
+    {
+        // TODO: This conversion could produce a number expressed
+        // in scientific format which is not supported by PDF.
+        Debug.Assert(val.ToString().IndexOfAny(['e', 'E']) == -1);
+
+        // The invariant culture will ensure a dot ('.') is used as the 
+        // decimal point. The French culture, for example, uses a comma.
+        byte[] data = Encoding.ASCII.GetBytes(val.ToString(CultureInfo.InvariantCulture));
+        Write(data);
+    }
+
+    public void WriteLine(decimal val)
+    {
+        Write(val);
+        WriteLine();
+    }
+
+    public void WriteSpace()
+    {
+        _stream.Write(_space, 0, _space.Length);
+        Position += _space.Length;
+    }
+
+    public void WriteLine()
+    {
+        _stream.Write(NewLine, 0, NewLine.Length);
+        Position += NewLine.Length;
+    }
+
+    public void WriteByte(byte value)
+    {
+        _stream.WriteByte(value);
+        Position++;
+    }
+
+    public void Write(byte[]? data)
+    {
+        if (data != null)
         {
-            stream.Close();
+            _stream.Write(data, 0, data.Length);
+            Position += data.Length;
         }
+    }
 
-        public void WriteHeader(PdfVersion version)
-        {
-            WriteLine(version.Header);
-        }
+    public void WriteLine(byte[]? data)
+    {
+        Write(data);
+        WriteLine();
+    }
 
-        public void WriteBinaryComment()
-        {
-            WriteLine(binaryComment);
-        }
+    public void WriteKeyword(Keyword keyword)
+        => Write(KeywordEntries.GetKeyword(keyword));
 
-        public void Write(PdfObject obj)
-        {
-            Debug.Assert(obj != null);
-            if (obj.IsIndirect)
-            {
-                indirectObjects.Push(obj);
-                obj.WriteIndirect(this);
-                indirectObjects.Pop();
-            }
-            else
-            {
-                obj.Write(this);
-            }
-        }
-
-        public void WriteLine(PdfObject obj)
-        {
-            Debug.Assert(obj != null);
-            Write(obj);
-            WriteLine();
-        }
-
-        public void Write(int val)
-        {
-            byte[] data = Encoding.ASCII.GetBytes(val.ToString());
-            Write(data);
-        }
-
-        public void WriteLine(int val)
-        {
-            Write(val);
-            WriteLine();
-        }
-
-        public void Write(decimal val)
-        {
-            // TODO: This conversion could produce a number expressed
-            // in scientific format which is not supported by PDF.
-            Debug.Assert(val.ToString().IndexOfAny(new char[] { 'e', 'E' }) == -1);
-
-            // The invariant culture will ensure a dot ('.') is used as the 
-            // decimal point.  The French culture, for example, uses a comma.
-            byte[] data = Encoding.ASCII.GetBytes(val.ToString(CultureInfo.InvariantCulture));
-            Write(data);
-        }
-
-        public void WriteLine(decimal val)
-        {
-            Write(val);
-            WriteLine();
-        }
-
-        public void WriteSpace()
-        {
-            stream.Write(space, 0, space.Length);
-            position += space.Length;
-        }
-
-        public void WriteLine()
-        {
-            stream.Write(newLine, 0, newLine.Length);
-            position += newLine.Length;
-        }
-
-        public void WriteByte(byte value)
-        {
-            stream.WriteByte(value);
-            position++;
-        }
-
-        public void Write(byte[] data)
-        {
-            stream.Write(data, 0, data.Length);
-            position += data.Length;
-        }
-
-        public void WriteLine(byte[] data)
-        {
-            Write(data);
-            WriteLine();
-        }
-
-        public void WriteKeyword(Keyword keyword)
-        {
-            Write(KeywordEntries.GetKeyword(keyword));
-        }
-
-        public void WriteKeywordLine(Keyword keyword)
-        {
-            WriteKeyword(keyword);
-            WriteLine();
-        }
-
-        public long Position
-        {
-            get { return position; }
-        }
-
-        public byte[] NewLine
-        {
-            get { return newLine; }
-            set { newLine = value; }
-        }
-
-        public byte[] BinaryComment
-        {
-            get { return binaryComment; }
-            set { binaryComment = value; }
-        }
+    public void WriteKeywordLine(Keyword keyword)
+    {
+        WriteKeyword(keyword);
+        WriteLine();
     }
 }

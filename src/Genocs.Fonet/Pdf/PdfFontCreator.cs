@@ -5,18 +5,18 @@ using Genocs.Fonet.Render.Pdf.Fonts;
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     Creates all the necessary PDF objects required to represent 
-///     a font object in a PDF document.
+/// Creates all the necessary PDF objects required to represent 
+/// a font object in a PDF document.
 /// </summary>
 internal sealed class PdfFontCreator
 {
     /// <summary>
-    ///     Generates object id's.
+    /// Generates object id's.
     /// </summary>
     private PdfCreator creator;
 
     /// <summary>
-    ///     
+    /// 
     /// </summary>
     /// <param name="creator"></param>
     public PdfFontCreator(PdfCreator creator)
@@ -25,10 +25,10 @@ internal sealed class PdfFontCreator
     }
 
     /// <summary>
-    ///     Returns a subclass of the PdfFont class that may be one of
-    ///     PdfType0Font, PdfType1Font or PdfTrueTypeFont.  The type of 
-    ///     subclass returned is determined by the type of the <i>font</i>
-    ///     parameter.
+    /// Returns a subclass of the PdfFont class that may be one of
+    /// PdfType0Font, PdfType1Font or PdfTrueTypeFont.  The type of 
+    /// subclass returned is determined by the type of the <i>font</i>
+    /// parameter.
     /// </summary>
     /// <param name="pdfFontID">The PDF font identifier, e.g. F15</param>
     /// <param name="font">Underlying font object.</param>
@@ -84,12 +84,12 @@ internal sealed class PdfFontCreator
     }
 
     /// <summary>
-    ///     Creates a character indexed font from <i>cidFont</i>
+    /// Creates a character indexed font from <i>cidFont</i>
     /// </summary>
     /// <remarks>
-    ///     The <i>font</i> and <i>cidFont</i> will be different object 
-    ///     references since the <i>font</i> parameter will most likely 
-    ///     be a <see cref="ProxyFont"/>.
+    /// The <i>font</i> and <i>cidFont</i> will be different object 
+    /// references since the <i>font</i> parameter will most likely 
+    /// be a <see cref="ProxyFont"/>.
     /// </remarks>
     /// <param name="pdfFontID">The Pdf font identifier, e.g. F15</param>
     /// <param name="font">Required to access the font descriptor.</param>
@@ -146,7 +146,7 @@ internal sealed class PdfFontCreator
     }
 
     /// <summary>
-    ///     Returns the next available Pdf object identifier.
+    /// Returns the next available Pdf object identifier.
     /// </summary>
     /// <returns></returns>
     private PdfObjectId NextObjectId()
@@ -155,7 +155,7 @@ internal sealed class PdfFontCreator
     }
 
     /// <summary>
-    ///     Creates an instance of the <see cref="PdfType1Font"/> class
+    /// Creates an instance of the <see cref="PdfType1Font"/> class
     /// </summary>
     /// <param name="pdfFontID">The Pdf font identifier, e.g. F15</param>
     /// <param name="base14"></param>
@@ -170,8 +170,8 @@ internal sealed class PdfFontCreator
     }
 
     /// <summary>
-    ///     Creates an instance of the <see cref="PdfTrueTypeFont"/> class
-    ///     that defaults the font encoding to WinAnsiEncoding.
+    /// Creates an instance of the <see cref="PdfTrueTypeFont"/> class
+    /// that defaults the font encoding to WinAnsiEncoding.
     /// </summary>
     /// <param name="pdfFontID"></param>
     /// <param name="font"></param>
@@ -196,8 +196,8 @@ internal sealed class PdfFontCreator
     }
 
     /// <remarks>
-    ///     A ProxyFont must first be resolved before getting the 
-    ///     IFontMetircs implementation of the underlying font.
+    /// A ProxyFont must first be resolved before getting the 
+    /// IFontMetircs implementation of the underlying font.
     /// </remarks>
     /// <param name="font"></param>
     private IFontMetric GetFontMetrics(Font font)

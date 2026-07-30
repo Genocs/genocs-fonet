@@ -1,30 +1,21 @@
-using Genocs.Fonet.Pdf;
 using System.Text;
 
 namespace Genocs.Fonet.Pdf;
 
 public sealed class PdfName : PdfObject
 {
-    private readonly string name;
-
     private byte[]? bytes;
+    public string Name { get; }
 
     public PdfName(string name)
     {
-        ArgumentNullException.ThrowIfNull(name);
-        this.name = name;
+        Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 
     public PdfName(string name, PdfObjectId objectId)
         : base(objectId)
     {
-        ArgumentNullException.ThrowIfNull(name);
-        this.name = name;
-    }
-
-    public string Name
-    {
-        get { return name; }
+        Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 
     protected internal override void Write(PdfWriter writer)
@@ -46,13 +37,13 @@ public sealed class PdfName : PdfObject
                 // Create a memory stream to hold the results.
                 // We guess the size, based on the most likely outcome
                 // (i.e. all ASCII _characters with no escapes.
-                MemoryStream ms = new(name.Length + 1);
+                MemoryStream ms = new(Name.Length + 1);
 
                 // The forward slash introduces a name.
                 ms.WriteByte((byte)'/');
 
                 // The PDF specification recommends encoding name objects using UTF8.
-                byte[] data = Encoding.UTF8.GetBytes(name);
+                byte[] data = Encoding.UTF8.GetBytes(Name);
                 for (int x = 0; x < data.Length; x++)
                 {
                     byte b = data[x];
@@ -80,7 +71,7 @@ public sealed class PdfName : PdfObject
 
     public override int GetHashCode()
     {
-        return name.GetHashCode();
+        return Name.GetHashCode();
     }
 
     public override bool Equals(object? obj)
@@ -96,7 +87,7 @@ public sealed class PdfName : PdfObject
             return false;
         }
 
-        return name.Equals(pobj.Name);
+        return Name.Equals(pobj.Name);
     }
 
     //        public static bool operator ==(PdfName o1, PdfName o2) {
@@ -108,162 +99,162 @@ public sealed class PdfName : PdfObject
     //        }
 
     /// <summary>
-    ///     Well-known PDF name objects.
+    /// Well-known PDF name objects.
     /// </summary>
     public class Names
     {
-        public static readonly PdfName Catalog = new PdfName("Catalog");
-        public static readonly PdfName Type = new PdfName("Type");
-        public static readonly PdfName Subtype = new PdfName("Subtype");
-        public static readonly PdfName Pages = new PdfName("Pages");
-        public static readonly PdfName Outlines = new PdfName("Outlines");
-        public static readonly PdfName Kids = new PdfName("Kids");
-        public static readonly PdfName Count = new PdfName("Count");
+        public static readonly PdfName Catalog = new("Catalog");
+        public static readonly PdfName Type = new("Type");
+        public static readonly PdfName Subtype = new("Subtype");
+        public static readonly PdfName Pages = new("Pages");
+        public static readonly PdfName Outlines = new("Outlines");
+        public static readonly PdfName Kids = new("Kids");
+        public static readonly PdfName Count = new("Count");
 
-        public static readonly PdfName Title = new PdfName("Title");
-        public static readonly PdfName Author = new PdfName("Author");
-        public static readonly PdfName Subject = new PdfName("Subject");
-        public static readonly PdfName Keywords = new PdfName("Keywords");
-        public static readonly PdfName Creator = new PdfName("Creator");
-        public static readonly PdfName Producer = new PdfName("Producer");
-        public static readonly PdfName CreationDate = new PdfName("CreationDate");
-        public static readonly PdfName ModDate = new PdfName("ModDate");
+        public static readonly PdfName Title = new("Title");
+        public static readonly PdfName Author = new("Author");
+        public static readonly PdfName Subject = new("Subject");
+        public static readonly PdfName Keywords = new("Keywords");
+        public static readonly PdfName Creator = new("Creator");
+        public static readonly PdfName Producer = new("Producer");
+        public static readonly PdfName CreationDate = new("CreationDate");
+        public static readonly PdfName ModDate = new("ModDate");
 
-        public static readonly PdfName Size = new PdfName("Size");
-        public static readonly PdfName Prev = new PdfName("Prev");
-        public static readonly PdfName Root = new PdfName("Root");
-        public static readonly PdfName Encrypt = new PdfName("Encrypt");
-        public static readonly PdfName Info = new PdfName("Info");
-        public static readonly PdfName Id = new PdfName("ID");
+        public static readonly PdfName Size = new("Size");
+        public static readonly PdfName Prev = new("Prev");
+        public static readonly PdfName Root = new("Root");
+        public static readonly PdfName Encrypt = new("Encrypt");
+        public static readonly PdfName Info = new("Info");
+        public static readonly PdfName Id = new("ID");
 
-        public static readonly PdfName Encoding = new PdfName("Encoding");
-        public static readonly PdfName BaseEncoding = new PdfName("BaseEncoding");
-        public static readonly PdfName MacRomanEncoding = new PdfName("MacRomanEncoding");
-        public static readonly PdfName MacExpertEncoding = new PdfName("MacExpertEncoding");
-        public static readonly PdfName WinAnsiEncoding = new PdfName("WinAnsiEncoding");
+        public static readonly PdfName Encoding = new("Encoding");
+        public static readonly PdfName BaseEncoding = new("BaseEncoding");
+        public static readonly PdfName MacRomanEncoding = new("MacRomanEncoding");
+        public static readonly PdfName MacExpertEncoding = new("MacExpertEncoding");
+        public static readonly PdfName WinAnsiEncoding = new("WinAnsiEncoding");
 
-        public static readonly PdfName FileSpec = new PdfName("FileSpec");
+        public static readonly PdfName FileSpec = new("FileSpec");
         public static readonly PdfName F = new("F");
 
-        public static readonly PdfName Annot = new PdfName("Annot");
-        public static readonly PdfName Action = new PdfName("Action");
-        public static readonly PdfName Link = new PdfName("Link");
-        public static readonly PdfName H = new PdfName("H");
-        public static readonly PdfName I = new PdfName("I");
-        public static readonly PdfName A = new PdfName("A");
-        public static readonly PdfName Border = new PdfName("Border");
-        public static readonly PdfName Rect = new PdfName("Rect");
-        public static readonly PdfName C = new PdfName("C");
-        public static readonly PdfName S = new PdfName("S");
-        public static readonly PdfName GoTo = new PdfName("GoTo");
-        public static readonly PdfName GoToR = new PdfName("GoToR");
-        public static readonly PdfName D = new PdfName("D");
-        public static readonly PdfName XYZ = new PdfName("XYZ");
-        public static readonly PdfName URI = new PdfName("URI");
+        public static readonly PdfName Annot = new("Annot");
+        public static readonly PdfName Action = new("Action");
+        public static readonly PdfName Link = new("Link");
+        public static readonly PdfName H = new("H");
+        public static readonly PdfName I = new("I");
+        public static readonly PdfName A = new("A");
+        public static readonly PdfName Border = new("Border");
+        public static readonly PdfName Rect = new("Rect");
+        public static readonly PdfName C = new("C");
+        public static readonly PdfName S = new("S");
+        public static readonly PdfName GoTo = new("GoTo");
+        public static readonly PdfName GoToR = new("GoToR");
+        public static readonly PdfName D = new("D");
+        public static readonly PdfName XYZ = new("XYZ");
+        public static readonly PdfName URI = new("URI");
 
-        public static readonly PdfName Font = new PdfName("Font");
-        public static readonly PdfName FontName = new PdfName("FontName");
-        public static readonly PdfName FontDescriptor = new PdfName("FontDescriptor");
-        public static readonly PdfName Flags = new PdfName("Flags");
-        public static readonly PdfName FontBBox = new PdfName("FontBBox");
-        public static readonly PdfName ItalicAngle = new PdfName("ItalicAngle");
-        public static readonly PdfName Ascent = new PdfName("Ascent");
-        public static readonly PdfName Descent = new PdfName("Descent");
-        public static readonly PdfName Leading = new PdfName("Leading");
-        public static readonly PdfName CapHeight = new PdfName("CapHeight");
-        public static readonly PdfName XHeight = new PdfName("XHeight");
-        public static readonly PdfName StemV = new PdfName("StemV");
-        public static readonly PdfName StemH = new PdfName("StemH");
-        public static readonly PdfName AvgWidth = new PdfName("AvgWidth");
-        public static readonly PdfName MaxWidth = new PdfName("MaxWidth");
-        public static readonly PdfName MissingWidth = new PdfName("MissingWidth");
-        public static readonly PdfName FontFile = new PdfName("FontFile");
-        public static readonly PdfName FontFile2 = new PdfName("FontFile2");
-        public static readonly PdfName FontFile3 = new PdfName("FontFile3");
-        public static readonly PdfName CharSet = new PdfName("CharSet");
-        public static readonly PdfName CIDToGIDMap = new PdfName("CIDToGIDMap");
-        public static readonly PdfName Identity = new PdfName("Identity");
+        public static readonly PdfName Font = new("Font");
+        public static readonly PdfName FontName = new("FontName");
+        public static readonly PdfName FontDescriptor = new("FontDescriptor");
+        public static readonly PdfName Flags = new("Flags");
+        public static readonly PdfName FontBBox = new("FontBBox");
+        public static readonly PdfName ItalicAngle = new("ItalicAngle");
+        public static readonly PdfName Ascent = new("Ascent");
+        public static readonly PdfName Descent = new("Descent");
+        public static readonly PdfName Leading = new("Leading");
+        public static readonly PdfName CapHeight = new("CapHeight");
+        public static readonly PdfName XHeight = new("XHeight");
+        public static readonly PdfName StemV = new("StemV");
+        public static readonly PdfName StemH = new("StemH");
+        public static readonly PdfName AvgWidth = new("AvgWidth");
+        public static readonly PdfName MaxWidth = new("MaxWidth");
+        public static readonly PdfName MissingWidth = new("MissingWidth");
+        public static readonly PdfName FontFile = new("FontFile");
+        public static readonly PdfName FontFile2 = new("FontFile2");
+        public static readonly PdfName FontFile3 = new("FontFile3");
+        public static readonly PdfName CharSet = new("CharSet");
+        public static readonly PdfName CIDToGIDMap = new("CIDToGIDMap");
+        public static readonly PdfName Identity = new("Identity");
 
-        public static readonly PdfName Length1 = new PdfName("Length1");
-        public static readonly PdfName Length2 = new PdfName("Length2");
-        public static readonly PdfName Length3 = new PdfName("Length3");
+        public static readonly PdfName Length1 = new("Length1");
+        public static readonly PdfName Length2 = new("Length2");
+        public static readonly PdfName Length3 = new("Length3");
 
-        public static readonly PdfName ToUnicode = new PdfName("ToUnicode");
-        public static readonly PdfName CMap = new PdfName("CMap");
-        public static readonly PdfName CMapName = new PdfName("CMapName");
-        public static readonly PdfName WMode = new PdfName("WMode");
+        public static readonly PdfName ToUnicode = new("ToUnicode");
+        public static readonly PdfName CMap = new("CMap");
+        public static readonly PdfName CMapName = new("CMapName");
+        public static readonly PdfName WMode = new("WMode");
 
-        public static readonly PdfName Type0 = new PdfName("Type0");
-        public static readonly PdfName Type1 = new PdfName("Type1");
-        public static readonly PdfName TrueType = new PdfName("TrueType");
-        public static readonly PdfName Name = new PdfName("Name");
-        public static readonly PdfName BaseFont = new PdfName("BaseFont");
-        public static readonly PdfName XObject = new PdfName("XObject");
+        public static readonly PdfName Type0 = new("Type0");
+        public static readonly PdfName Type1 = new("Type1");
+        public static readonly PdfName TrueType = new("TrueType");
+        public static readonly PdfName Name = new("Name");
+        public static readonly PdfName BaseFont = new("BaseFont");
+        public static readonly PdfName XObject = new("XObject");
 
-        public static readonly PdfName CIDFontType0 = new PdfName("CIDFontType0");
-        public static readonly PdfName CIDFontType2 = new PdfName("CIDFontType2");
-        public static readonly PdfName CIDSystemInfo = new PdfName("CIDSystemInfo");
-        public static readonly PdfName DescendantFonts = new PdfName("DescendantFonts");
+        public static readonly PdfName CIDFontType0 = new("CIDFontType0");
+        public static readonly PdfName CIDFontType2 = new("CIDFontType2");
+        public static readonly PdfName CIDSystemInfo = new("CIDSystemInfo");
+        public static readonly PdfName DescendantFonts = new("DescendantFonts");
 
-        public static readonly PdfName Registry = new PdfName("Registry");
-        public static readonly PdfName Ordering = new PdfName("Ordering");
-        public static readonly PdfName Supplement = new PdfName("Supplement");
+        public static readonly PdfName Registry = new("Registry");
+        public static readonly PdfName Ordering = new("Ordering");
+        public static readonly PdfName Supplement = new("Supplement");
 
-        public static readonly PdfName DW = new PdfName("DW");
-        public static readonly PdfName W = new PdfName("W");
+        public static readonly PdfName DW = new("DW");
+        public static readonly PdfName W = new("W");
 
-        public static readonly PdfName Page = new PdfName("Page");
-        public static readonly PdfName PageMode = new PdfName("PageMode");
-        public static readonly PdfName UseOutlines = new PdfName("UseOutlines");
-        public static readonly PdfName Resources = new PdfName("Resources");
-        public static readonly PdfName Contents = new PdfName("Contents");
-        public static readonly PdfName MediaBox = new PdfName("MediaBox");
-        public static readonly PdfName Parent = new PdfName("Parent");
-        public static readonly PdfName Annots = new PdfName("Annots");
+        public static readonly PdfName Page = new("Page");
+        public static readonly PdfName PageMode = new("PageMode");
+        public static readonly PdfName UseOutlines = new("UseOutlines");
+        public static readonly PdfName Resources = new("Resources");
+        public static readonly PdfName Contents = new("Contents");
+        public static readonly PdfName MediaBox = new("MediaBox");
+        public static readonly PdfName Parent = new("Parent");
+        public static readonly PdfName Annots = new("Annots");
 
-        public static readonly PdfName Image = new PdfName("Image");
-        public static readonly PdfName Width = new PdfName("Width");
-        public static readonly PdfName Height = new PdfName("Height");
-        public static readonly PdfName BitsPerComponent = new PdfName("BitsPerComponent");
-        public static readonly PdfName ColorSpace = new PdfName("ColorSpace");
+        public static readonly PdfName Image = new("Image");
+        public static readonly PdfName Width = new("Width");
+        public static readonly PdfName Height = new("Height");
+        public static readonly PdfName BitsPerComponent = new("BitsPerComponent");
+        public static readonly PdfName ColorSpace = new("ColorSpace");
 
-        public static readonly PdfName ProcSet = new PdfName("ProcSet");
-        public static readonly PdfName PDF = new PdfName("PDF");
-        public static readonly PdfName Text = new PdfName("Text");
-        public static readonly PdfName ImageB = new PdfName("ImageB");
-        public static readonly PdfName ImageC = new PdfName("ImageC");
-        public static readonly PdfName ImageI = new PdfName("ImageI");
+        public static readonly PdfName ProcSet = new("ProcSet");
+        public static readonly PdfName PDF = new("PDF");
+        public static readonly PdfName Text = new("Text");
+        public static readonly PdfName ImageB = new("ImageB");
+        public static readonly PdfName ImageC = new("ImageC");
+        public static readonly PdfName ImageI = new("ImageI");
 
-        public static readonly PdfName Length = new PdfName("Length");
-        public static readonly PdfName Filter = new PdfName("Filter");
-        public static readonly PdfName DecodeParams = new PdfName("DecodeParams");
+        public static readonly PdfName Length = new("Length");
+        public static readonly PdfName Filter = new("Filter");
+        public static readonly PdfName DecodeParams = new("DecodeParams");
 
-        public static readonly PdfName ASCII85Decode = new PdfName("ASCII85Decode");
-        public static readonly PdfName ASCIIHexDecode = new PdfName("ASCIIHexDecode");
-        public static readonly PdfName CCITTFaxDecode = new PdfName("CCITTFaxDecode");
-        public static readonly PdfName DCTDecode = new PdfName("DCTDecode");
-        public static readonly PdfName FlateDecode = new PdfName("FlateDecode");
-        public static readonly PdfName JBIG2Decode = new PdfName("JBIG2Decode");
-        public static readonly PdfName LZWDecode = new PdfName("LZWDecode");
-        public static readonly PdfName RunLengthDecode = new PdfName("RunLengthDecode");
+        public static readonly PdfName ASCII85Decode = new("ASCII85Decode");
+        public static readonly PdfName ASCIIHexDecode = new("ASCIIHexDecode");
+        public static readonly PdfName CCITTFaxDecode = new("CCITTFaxDecode");
+        public static readonly PdfName DCTDecode = new("DCTDecode");
+        public static readonly PdfName FlateDecode = new("FlateDecode");
+        public static readonly PdfName JBIG2Decode = new("JBIG2Decode");
+        public static readonly PdfName LZWDecode = new("LZWDecode");
+        public static readonly PdfName RunLengthDecode = new("RunLengthDecode");
 
-        public static readonly PdfName Standard = new PdfName("Standard");
-        public static readonly PdfName V = new PdfName("V");
-        public static readonly PdfName R = new PdfName("R");
-        public static readonly PdfName O = new PdfName("O");
-        public static readonly PdfName U = new PdfName("U");
-        public static readonly PdfName P = new PdfName("P");
+        public static readonly PdfName Standard = new("Standard");
+        public static readonly PdfName V = new("V");
+        public static readonly PdfName R = new("R");
+        public static readonly PdfName O = new("O");
+        public static readonly PdfName U = new("U");
+        public static readonly PdfName P = new("P");
 
-        public static readonly PdfName FirstChar = new PdfName("FirstChar");
-        public static readonly PdfName LastChar = new PdfName("LastChar");
-        public static readonly PdfName Widths = new PdfName("Widths");
+        public static readonly PdfName FirstChar = new("FirstChar");
+        public static readonly PdfName LastChar = new("LastChar");
+        public static readonly PdfName Widths = new("Widths");
 
         public static readonly PdfName First = new("First");
-        public static readonly PdfName Last = new PdfName("Last");
-        public static readonly PdfName Next = new PdfName("Next");
+        public static readonly PdfName Last = new("Last");
+        public static readonly PdfName Next = new("Next");
 
-        public static readonly PdfName Alternate = new PdfName("Alternate");
-        public static readonly PdfName ICCBased = new PdfName("ICCBased");
-        public static readonly PdfName N = new PdfName("N");
+        public static readonly PdfName Alternate = new("Alternate");
+        public static readonly PdfName ICCBased = new("ICCBased");
+        public static readonly PdfName N = new("N");
     }
 }

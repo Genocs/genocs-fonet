@@ -4,21 +4,21 @@ using System.Text;
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     A sub-section in a PDF file's cross-reference table.
+/// A sub-section in a PDF file's cross-reference table.
 /// </summary>
 /// <remarks>
-///     The cross-reference table is described in section 3.4.3 of
-///     the PDF specification.
+/// The cross-reference table is described in section 3.4.3 of
+/// the PDF specification.
 /// </remarks>
 internal class XRefSubSection
 {
     /// <summary>
-    ///     This entries contained in this subsection.
+    /// This entries contained in this subsection.
     /// </summary>
     private readonly ArrayList entries;
 
     /// <summary>
-    ///     Creates a new blank sub-section, that initially contains no entries.
+    /// Creates a new blank sub-section, that initially contains no entries.
     /// </summary>
     internal XRefSubSection()
     {
@@ -26,7 +26,7 @@ internal class XRefSubSection
     }
 
     /// <summary>
-    ///     Structure representing a single cross-reference entry.
+    /// Structure representing a single cross-reference entry.
     /// </summary>
     private struct Entry : IComparable
     {
@@ -37,13 +37,13 @@ internal class XRefSubSection
         }
 
         /// <summary>
-        ///     The object number and generation number.
+        /// The object number and generation number.
         /// </summary>
         internal PdfObjectId objectId;
 
         /// <summary>
-        ///     The number of bytes from the beginning of the file to
-        ///     the beginning of the object.
+        /// The number of bytes from the beginning of the file to
+        /// the beginning of the object.
         /// </summary>
         internal long offset;
 
@@ -59,7 +59,7 @@ internal class XRefSubSection
     }
 
     /// <summary>
-    ///     Adds an entry to the sub-section.
+    /// Adds an entry to the sub-section.
     /// </summary>
     internal void Add(PdfObjectId objectId, long offset)
     {
@@ -67,7 +67,7 @@ internal class XRefSubSection
     }
 
     /// <summary>
-    ///     Writes the cross reference sub-section to the passed PDF writer.
+    /// Writes the cross reference sub-section to the passed PDF writer.
     /// </summary>
     internal void Write(PdfWriter writer)
     {

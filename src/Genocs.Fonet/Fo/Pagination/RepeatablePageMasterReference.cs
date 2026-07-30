@@ -3,20 +3,12 @@ namespace Genocs.Fonet.Fo.Pagination;
 internal class RepeatablePageMasterReference :
     PageMasterReference, ISubSequenceSpecifier
 {
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new RepeatablePageMasterReference(parent, props));
+
     private const int INFINITE = -1;
 
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new RepeatablePageMasterReference(parent, propertyList);
-        }
-    }
 
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
 
     private int maximumRepeats;
 
@@ -25,8 +17,8 @@ internal class RepeatablePageMasterReference :
     public RepeatablePageMasterReference(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        string mr = GetProperty("maximum-repeats").GetString();
-        if (mr.Equals("no-limit"))
+        string? mr = GetProperty("maximum-repeats")?.GetString();
+        if (mr?.Equals("no-limit") == true)
         {
             setMaximumRepeats(INFINITE);
         }
@@ -43,10 +35,9 @@ internal class RepeatablePageMasterReference :
         }
     }
 
-    public override string GetNextPageMaster(
-        int currentPageNumber, bool thisIsFirstPage, bool isEmptyPage)
+    public override string? GetNextPageMaster(int currentPageNumber, bool thisIsFirstPage, bool isEmptyPage)
     {
-        string pm = MasterName;
+        string? pm = MasterName;
         if (getMaximumRepeats() != INFINITE)
         {
             if (numberConsumed < getMaximumRepeats())
@@ -58,6 +49,7 @@ internal class RepeatablePageMasterReference :
                 pm = null;
             }
         }
+
         return pm;
     }
 

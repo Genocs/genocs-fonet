@@ -1,19 +1,16 @@
-using Genocs.Fonet.Pdf;
-
 namespace Genocs.Fonet.Pdf;
 
 /// <summary>
-///     A dictionary that contains information about a CIDFont program.
+/// A dictionary that contains information about a CIDFont program.
 /// </summary>
 /// <remarks>
-///     A Type 0 CIDFont contains glyph descriptions based on Adobe's Type 
-///     1 font format, whereas those in a Type 2 CIDFont are based on the 
-///     TrueType font format.
+/// A Type 0 CIDFont contains glyph descriptions based on Adobe's Type 
+/// 1 font format, whereas those in a Type 2 CIDFont are based on the 
+/// TrueType font format.
 /// </remarks>
 public class PdfCIDFont : PdfDictionary
 {
-    public PdfCIDFont(
-        PdfObjectId objectId, PdfFontSubTypeEnum subType, string baseFont)
+    public PdfCIDFont(PdfObjectId objectId, PdfFontSubTypeEnum subType, string baseFont)
         : base(objectId)
     {
         this[PdfName.Names.Type] = PdfName.Names.Font;

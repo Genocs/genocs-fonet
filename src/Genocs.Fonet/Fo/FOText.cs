@@ -54,7 +54,7 @@ internal class FOText : FONode
     public bool willCreateArea()
     {
         this.whiteSpaceCollapse =
-            this._parent._properties.GetProperty("white-space-collapse").GetEnum();
+            this.Parent.Properties.GetProperty("white-space-collapse").GetEnum();
         if (this.whiteSpaceCollapse == WhiteSpaceCollapse.FALSE
             && length > 0)
         {
@@ -96,36 +96,30 @@ internal class FOText : FONode
         }
         if (this._marker == MarkerStart)
         {
-            string fontFamily =
-                this._parent._properties.GetProperty("font-family").GetString();
-            string fontStyle =
-                this._parent._properties.GetProperty("font-style").GetString();
-            string fontWeight =
-                this._parent._properties.GetProperty("font-weight").GetString();
-            int fontSize =
-                this._parent._properties.GetProperty("font-size").GetLength().MValue();
-            int fontVariant =
-                this._parent._properties.GetProperty("font-variant").GetEnum();
+            string fontFamily = this.Parent.Properties.GetProperty("font-family").GetString();
+            string fontStyle = this.Parent.Properties.GetProperty("font-style").GetString();
+            string fontWeight = this.Parent.Properties.GetProperty("font-weight").GetString();
+            int fontSize = this.Parent.Properties.GetProperty("font-size").GetLength().MValue();
+            int fontVariant = this.Parent.Properties.GetProperty("font-variant").GetEnum();
 
-            int letterSpacing =
-                this._parent._properties.GetProperty("letter-spacing").GetLength().MValue();
-            int wordSpacing = GetWordSpacing(this._parent._properties);
-            this.fs = new FontState(area.getFontInfo(), fontFamily,
+            int letterSpacing = this.Parent.Properties.GetProperty("letter-spacing").GetLength().MValue();
+            int wordSpacing = GetWordSpacing(this.Parent.Properties);
+            this.fs = new FontState(area.GetFontInfo(), fontFamily,
                                     fontStyle, fontWeight, fontSize,
                                     fontVariant, letterSpacing, wordSpacing);
 
-            ColorType c = this._parent._properties.GetProperty("color").GetColorType();
+            ColorType c = this.Parent.Properties.GetProperty("color").GetColorType();
             this.red = c.Red;
             this.green = c.Green;
             this.blue = c.Blue;
 
             this.verticalAlign =
-                this._parent._properties.GetProperty("vertical-align").GetEnum();
+                this.Parent.Properties.GetProperty("vertical-align").GetEnum();
 
             this.wrapOption =
-                this._parent._properties.GetProperty("wrap-option").GetEnum();
+                this.Parent.Properties.GetProperty("wrap-option").GetEnum();
             this.whiteSpaceCollapse =
-                this._parent._properties.GetProperty("white-space-collapse").GetEnum();
+                this.Parent.Properties.GetProperty("white-space-collapse").GetEnum();
             this.ts = new TextState();
             ts.setUnderlined(underlined);
             ts.setOverlined(overlined);
@@ -175,8 +169,7 @@ internal class FOText : FONode
             catch (FonetException ex)
             {
                 smallCapsFontState = fontState;
-                FonetDriver.ActiveDriver.FireFonetError(
-                    "Error creating small-caps FontState: " + ex.Message);
+                FonetDriver.ActiveDriver?.FireFonetError($"Error creating small-caps FontState: {ex.Message}");
             }
 
             char c;
@@ -276,6 +269,7 @@ internal class FOText : FONode
 
     private static int GetWordSpacing(PropertyList properties)
     {
-        return properties.GetProperty("word-spacing").GetLength().MValue();
+        // Check if the "word-spacing" property is set and return its length value, otherwise return 0
+        return properties.GetProperty("word-spacing")?.GetLength()?.MValue() ?? 0;
     }
 }

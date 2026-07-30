@@ -9,7 +9,7 @@ internal abstract class PageMasterReference : FObj, ISubSequenceSpecifier
     public PageMasterReference(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
-        this._name = GetElementName();
+        Name = GetElementName();
         if (GetProperty("master-reference") != null)
         {
             SetMasterName(GetProperty("master-reference").GetString());
@@ -33,22 +33,19 @@ internal abstract class PageMasterReference : FObj, ISubSequenceSpecifier
         set { _pageSequenceMaster = value; }
     }
 
-    public abstract string GetNextPageMaster(int currentPageNumber,
-                                             bool thisIsFirstPage,
-                                             bool isEmptyPage);
+    public abstract string? GetNextPageMaster(int currentPageNumber, bool thisIsFirstPage, bool isEmptyPage);
 
     protected abstract string GetElementName();
 
     protected void validateParent(FObj parent)
     {
-        if (parent.GetName().Equals("fo:page-sequence-master"))
+        if (parent.Name.Equals("fo:page-sequence-master"))
         {
             _pageSequenceMaster = (PageSequenceMaster)parent;
 
             if (MasterName == null)
             {
-                FonetDriver.ActiveDriver.FireFonetWarning(
-                    GetElementName() + " does not have a master-reference and so is being ignored");
+                FonetDriver.ActiveDriver?.FireFonetWarning($"{GetElementName()} does not have a master-reference and so is being ignored");
             }
             else
             {
@@ -59,7 +56,7 @@ internal abstract class PageMasterReference : FObj, ISubSequenceSpecifier
         {
             throw new FonetException(GetElementName() + " must be"
                 + "child of fo:page-sequence-master, not "
-                + parent.GetName());
+                + parent.Name);
         }
     }
 

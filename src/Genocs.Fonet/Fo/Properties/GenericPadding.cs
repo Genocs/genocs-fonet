@@ -27,8 +27,8 @@ namespace Genocs.Fonet.Fo.Properties
                 listprop = (ListProperty)propertyList.GetExplicitProperty("padding");
                 if (listprop != null)
                 {
-                    IShorthandParser shparser = new BoxPropShorthandParser(listprop);
-                    p = shparser.GetValueForProperty(PropName, this, propertyList);
+                    IShortHandParser shparser = new BoxPropShorthandParser(listprop);
+                    p = shparser.GetValueForProperty(PropertyName, this, propertyList);
                 }
             }
 
@@ -41,7 +41,7 @@ namespace Genocs.Fonet.Fo.Properties
         {
             if (m_defaultProp == null)
             {
-                m_defaultProp = Make(propertyList, "0pt", propertyList.getParentFObj());
+                m_defaultProp = Make(propertyList, "0pt", propertyList.GetParentFObj());
             }
             return m_defaultProp;
 

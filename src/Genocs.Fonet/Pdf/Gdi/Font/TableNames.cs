@@ -3,7 +3,7 @@ using System;
 namespace Genocs.Fonet.Pdf.Gdi.Font
 {
     /// <summary>
-    ///     List of all TrueType and OpenType tables
+    /// List of all TrueType and OpenType tables
     /// </summary>
     internal abstract class TableNames
     {
@@ -50,7 +50,7 @@ namespace Genocs.Fonet.Pdf.Gdi.Font
         public const string Vmtx = "vmtx";
 
         /// <summary>
-        ///     Converts one of the predefined table names to an unsigned integer.
+        /// Converts one of the predefined table names to an unsigned integer.
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>

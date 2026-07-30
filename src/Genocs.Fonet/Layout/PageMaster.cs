@@ -62,19 +62,19 @@ namespace Genocs.Fonet.Layout
             }
             if (this.before != null)
             {
-                p.addBefore(before.makeAreaContainer());
+                p.addBefore(before.MakeAreaContainer());
             }
             if (this.after != null)
             {
-                p.addAfter(after.makeAreaContainer());
+                p.addAfter(after.MakeAreaContainer());
             }
             if (this.start != null)
             {
-                p.addStart(start.makeAreaContainer());
+                p.addStart(start.MakeAreaContainer());
             }
             if (this.end != null)
             {
-                p.addEnd(end.makeAreaContainer());
+                p.addEnd(end.MakeAreaContainer());
             }
 
             return p;

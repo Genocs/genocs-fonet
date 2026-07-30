@@ -11,7 +11,7 @@ internal class WordSpacingMaker : LengthProperty.Maker
     public override bool IsInherited() => true;
 
     public override Property Make(PropertyList propertyList) =>
-        Make(propertyList, "normal", propertyList.getParentFObj());
+        Make(propertyList, "normal", propertyList.GetParentFObj());
 
     private static Hashtable? s_htKeywords;
 

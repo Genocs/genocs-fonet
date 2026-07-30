@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 namespace Genocs.Fonet.Pdf.Gdi.Structures;
 
 /// <summary>
-///     The PANOSE structure describes the PANOSE font-classification values 
-///     for a TrueType font. These characteristics are then used to associate 
-///     the font with other fonts of similar appearance but different names. 
+/// Gets the PANOSE structure describes the PANOSE font-classification values 
+/// for a TrueType font. These characteristics are then used to associate 
+/// the font with other fonts of similar appearance but different names. 
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 internal struct Panose

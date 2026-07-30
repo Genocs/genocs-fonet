@@ -5,11 +5,11 @@ using Genocs.Fonet.Pdf.Gdi;
 namespace Genocs.Fonet.Pdf
 {
     /// <summary>
-    ///     Represents a Identity-H character encoding
+    /// Represents a Identity-H character encoding
     /// </summary>
     /// <remarks>
-    ///     Maps 2-byte character codes ranging from 0 to 65,535 to 
-    ///     the same 2-byte CID value, interpreted high-order byte first
+    /// Maps 2-byte character codes ranging from 0 to 65,535 to 
+    /// the same 2-byte CID value, interpreted high-order byte first
     /// </remarks>
     public class PdfIdentityHEncoding : Encoding
     {
@@ -88,7 +88,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Do not call this method directly
+        /// Do not call this method directly
         /// </summary>
         public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex)
         {
@@ -96,7 +96,7 @@ namespace Genocs.Fonet.Pdf
         }
 
         /// <summary>
-        ///     Do not call this method directly
+        /// Do not call this method directly
         /// </summary>
         public override int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)
         {

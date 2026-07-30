@@ -5,18 +5,8 @@ namespace Genocs.Fonet.Fo.Flow;
 
 internal class StaticContent : Flow
 {
-    new internal class Maker : FObj.Maker
-    {
-        public override FObj Make(FObj parent, PropertyList propertyList)
-        {
-            return new StaticContent(parent, propertyList);
-        }
-    }
-
-    new public static FObj.Maker GetMaker()
-    {
-        return new Maker();
-    }
+    public static FObj.Maker CreateMaker()
+        => FObj.Maker.For((parent, props) => new StaticContent(parent, props));
 
     protected StaticContent(FObj parent, PropertyList propertyList)
         : base(parent, propertyList)

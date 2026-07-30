@@ -1,13 +1,8 @@
-namespace Genocs.Fonet.Layout
+namespace Genocs.Fonet.Layout;
+
+internal class AccessibilityProps
 {
-    internal class AccessibilityProps
-    {
-        public string sourceDoc = null;
+    public string? SourceDoc { get; set; }
 
-        public string role = null;
-
-        public AccessibilityProps()
-        {
-        }
-    }
+    public string? Role { get; set; }
 }
