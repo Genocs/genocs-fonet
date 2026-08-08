@@ -19,6 +19,8 @@
 
     <ItemGroup>
         <PackageReference Include="SkiaSharp" Version="4.150.1" />
+        <!-- Required for Docker/Linux: SkiaSharp does not ship libSkiaSharp.so unless this is referenced -->
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.150.1" />
         <PackageReference Include="Svg.Skia" Version="3.1.0" />
     </ItemGroup>
 

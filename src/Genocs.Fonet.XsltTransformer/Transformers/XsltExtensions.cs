@@ -5,27 +5,22 @@ using Genocs.Fonet.XsltTransformer.Options;
 namespace Genocs.Fonet.XsltTransformer.Transformers;
 
 /// <summary>
-/// XsltExtensionService is a container of helper methods used to extend the functionality of style sheets.   
+/// XsltExtensionService is a container of helper methods used to extend the functionality of style sheets.
 /// </summary>
-/// <remarks>
-/// Author:
-/// </remarks>
 public class XsltExtensions
 {
     /// <summary>
     /// Returns the physical file path that corresponds to the specified virtual path on the Web server.
     /// </summary>
-    /// <param name="filePath">The virtual path</param>
-    [Obsolete("This method is obsolete. Use GetExecutingFolder instead.")]
+    /// <param name="filePath">The virtual path.</param>
     public static string MapPath(string filePath)
     {
         if (filePath.StartsWith('.'))
         {
-            var uri = new UriBuilder(Assembly.GetExecutingAssembly().Location);
-
-            var dir = Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
-
-            return string.Concat(dir, filePath.AsSpan(1));
+            // Resolve assets relative to the executable so the app works from any working directory.
+            string baseDirectory = AppContext.BaseDirectory;
+            Console.WriteLine($"XsltExtensions.MapPath: baseDirectory={baseDirectory}, filePath={filePath}");
+            return Path.Combine(baseDirectory, filePath);
         }
 
         if (!Path.IsPathRooted(filePath))
@@ -61,23 +56,25 @@ public class XsltExtensions
 
     /// <summary>
     /// Inserts a white space after every 'breakLen' number of chars.
-    /// 
+    /// <paragraph>
+    ///
     /// Example:
     /// longWord: 'supercalifragilistichespiralitoso'
     /// breakLen: 8
-    /// 
-    /// returns: 'supercal ifragili stichesp iralitos o'
+    ///
+    /// returns: 'supercal ifragili stichesp iralitos o'.
+    /// </paragraph>
     /// </summary>
     /// <param name="longWord">The word to break</param>
-    /// <param name="breakLen">The maximum length of each sub-word within the 'longWord'</param>        
+    /// <param name="breakLen">The maximum length of each sub-word within the 'longWord'.</param>
     private static string BreakWords(string longWord, int breakLen)
     {
-        var words = longWord.Split(' ');
+        string[] words = longWord.Split(' ');
 
         var breakedWords = new List<string>();
 
-        foreach (var w in words)
-            BreakWord(w, breakLen, breakedWords);
+        foreach (string word in words)
+            BreakWord(word, breakLen, breakedWords);
 
         return string.Join(" ", breakedWords.ToArray());
     }
@@ -168,7 +165,7 @@ public class XsltExtensions
     /// </summary>
     private static string FormatDecimal(string decimalValue, string culture)
     {
-        var formattedAmount = decimalValue;
+        string formattedAmount = decimalValue;
 
         if (ParseDecimalString(decimalValue, out decimal y))
         {
@@ -194,7 +191,7 @@ public class XsltExtensions
     /// </summary>
     private static string FormatInteger(string intValue, string culture)
     {
-        var formattedAmount = intValue;
+        string formattedAmount = intValue;
 
         if (ParseIntString(intValue, out int x))
         {

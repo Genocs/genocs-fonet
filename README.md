@@ -62,17 +62,17 @@ The test project carries Nunito font files and FO templates under `src/tests/Gen
 ## Build / test
 
 ```powershell
-dotnet build Fonet.slnx -c Release
-dotnet test Fonet.slnx -c Release
+dotnet build fonet.slnx -c Release
+dotnet test fonet.slnx -c Release
 ```
 
 ## PDF Web API
 
-`src/Genocs.Fonet.WebApi` is a Genocs minimal API that builds PDFs via the same `XslFoPdfService` pipeline as the Host console sample. Templates, fonts, and assets are loaded from configurable paths (Docker volumes in compose).
+`src/WebApi` is a Genocs minimal API that builds PDFs via the same `XslFoPdfService` pipeline as the Host console sample. Templates, fonts, and assets are loaded from configurable paths (Docker volumes in compose).
 
-```powershell
-docker compose up --build
-# POST http://localhost:8080/api/pdf  (see src/Genocs.Fonet.WebApi/README.md)
+```bash
+./scripts/build-images-docker-compose.sh
+# POST http://localhost:8080/api/pdf  (see src/WebApi/README.md)
 ```
 
 ## Known limitations
