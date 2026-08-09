@@ -5,7 +5,7 @@ namespace Genocs.Fonet.DataTypes;
 internal class TableColLength(double tableUnits) : Length
 {
     public override double GetTableUnits()
-        =>  tableUnits;
+        => tableUnits;
 
     public override void ResolveTableUnit(double milliPointsPerUnit)
         => SetComputedValue((int)(tableUnits * milliPointsPerUnit));

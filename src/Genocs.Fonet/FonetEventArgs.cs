@@ -10,16 +10,14 @@ namespace Genocs.Fonet;
 /// <param name="message">The text of the event message.</param>
 public class FonetEventArgs(string message) : EventArgs
 {
-    private string message = message;
+    private readonly string _message = message;
 
     /// <summary>
     /// Retrieves the event message.
     /// </summary>
     /// <returns>A string which may be null.</returns>
     public string GetMessage()
-    {
-        return message;
-    }
+        => _message;
 
     /// <summary>
     /// Converts this <i>FonetEventArgs</i> to a string.
@@ -29,7 +27,5 @@ public class FonetEventArgs(string message) : EventArgs
     /// to <see cref="GetMessage"/>.
     /// </returns>
     public override string ToString()
-    {
-        return GetMessage();
-    }
+        => GetMessage();
 }

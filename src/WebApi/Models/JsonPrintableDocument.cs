@@ -34,7 +34,7 @@ public sealed class JsonPrintableDocument : IPrintableDocument
 
     private static XElement ToXElement(JsonElement element, string name)
     {
-        var safeName = SanitizeName(name);
+        string safeName = SanitizeName(name);
 
         return element.ValueKind switch
         {
@@ -63,7 +63,7 @@ public sealed class JsonPrintableDocument : IPrintableDocument
     private static XElement BuildArray(JsonElement element, string name)
     {
         var node = new XElement(name);
-        var itemName = name.EndsWith('s') && name.Length > 1
+        string itemName = name.EndsWith('s') && name.Length > 1
             ? name[..^1]
             : "Item";
 
@@ -87,7 +87,7 @@ public sealed class JsonPrintableDocument : IPrintableDocument
 
     private static string SanitizeName(string name)
     {
-        var cleaned = new string(name.Where(c => char.IsLetterOrDigit(c) || c == '_').ToArray());
+        string cleaned = new([.. name.Where(c => char.IsLetterOrDigit(c) || c == '_')]);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return "Value";

@@ -1,6 +1,5 @@
 ﻿namespace Genocs.Fonet.XsltTransformer.Transformers;
 
-
 /// <summary>
 /// IPdfWriterService defines a contract for a service that generates a PDF stream from a document, template, and resources.
 /// </summary>

@@ -50,7 +50,7 @@ Swagger: http://localhost:5080/swagger
 
 From the repository root:
 
-```powershell
+```bash
 docker compose up --build
 ```
 
@@ -62,4 +62,4 @@ Volumes:
 | `docker/data/fonts` | `/app/data/fonts` |
 | `docker/data/assets` | `/app/data/assets` |
 
-API: http://localhost:8080 — health: `/health`, docs: `/swagger`.
+API: http://localhost:5080 — health: `/health`, docs: `/swagger`.

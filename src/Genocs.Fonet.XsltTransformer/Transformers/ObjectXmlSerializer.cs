@@ -3,12 +3,11 @@ using System.Xml.Serialization;
 
 namespace Genocs.Fonet.XsltTransformer.Transformers;
 
-
 /// <summary>
 /// ObjectXmlSerializer is a serialization helper class.
 /// </summary>
 /// <remarks>
-/// Author:
+/// Author: <a href="mailto: giovanni.nocco@gmail.com">Giovanni Nocco</a>.
 /// </remarks>
 public class ObjectXmlSerializer
 {

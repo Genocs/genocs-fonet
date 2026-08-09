@@ -14,11 +14,12 @@ internal abstract class AbstractTableBody : FObj
     protected RowSpanMgr rowSpanMgr;
     protected AreaContainer areaContainer;
 
-    public AbstractTableBody(FObj parent, PropertyList propertyList) : base(parent, propertyList)
+    public AbstractTableBody(FObj parent, PropertyList propertyList)
+        : base(parent, propertyList)
     {
-        if (!(parent is Table))
+        if (parent is not Table)
         {
-            FonetDriver.ActiveDriver?.FireFonetError("A table body must be child of fo:table, not " + parent.Name);
+            FonetDriver.ActiveDriver?.FireFonetError($"A table body must be child of fo:table, not {parent.Name}");
         }
     }
 
@@ -59,18 +60,14 @@ internal abstract class AbstractTableBody : FObj
 
             area.GetIDReferences().CreateID(id);
 
-
             if (area is BlockArea)
             {
                 area.end();
             }
 
-            if (rowSpanMgr == null)
-            {
-                rowSpanMgr = new RowSpanMgr(columns.Count);
-            }
+            rowSpanMgr ??= new RowSpanMgr(columns.Count);
 
-            this._marker = 0;
+            _marker = 0;
         }
 
         if ((spaceBefore != 0) && (this._marker == 0))
@@ -91,7 +88,6 @@ internal abstract class AbstractTableBody : FObj
                               area.spaceLeft(),
                               Position.RELATIVE, area);
 
-
         areaContainer.foCreator = this;
         areaContainer.Page = area.Page;
         areaContainer.setBackground(_propertyManager.GetBackgroundProps());
@@ -102,21 +98,23 @@ internal abstract class AbstractTableBody : FObj
         areaContainer.setIDReferences(area.GetIDReferences());
 
         Hashtable keepWith = new Hashtable();
-        int numChildren = this._children.Count;
-        TableRow lastRow = null;
+        int numChildren = _children.Count;
+        TableRow? lastRow = null;
         bool endKeepGroup = true;
         for (int i = this._marker; i < numChildren; i++)
         {
-            Object child = _children[i];
+            object child = _children[i];
             if (child is Marker)
             {
                 ((Marker)child).Layout(area);
                 continue;
             }
+
             if (!(child is TableRow))
             {
                 throw new FonetException("Currently only Table Rows are supported in table body, header and footer");
             }
+
             TableRow row = (TableRow)child;
 
             row.SetRowSpanMgr(rowSpanMgr);
@@ -135,27 +133,26 @@ internal abstract class AbstractTableBody : FObj
                 {
                     keepWith = new Hashtable();
                 }
+
                 if (endKeepGroup && i > this._marker)
                 {
                     rowSpanMgr.SetIgnoreKeeps(false);
                 }
             }
 
-            bool bRowStartsArea = (i == this._marker);
-            if (bRowStartsArea == false && keepWith.Count > 0)
+            bool rowStartsArea = i == _marker;
+            if (!rowStartsArea && keepWith.Count > 0 && _children.IndexOf(keepWith[0]) == _marker)
             {
-                if (_children.IndexOf(keepWith[0]) == this._marker)
-                {
-                    bRowStartsArea = true;
-                }
+                rowStartsArea = true;
             }
-            row.setIgnoreKeepTogether(bRowStartsArea && startsAC(area));
+
+            row.setIgnoreKeepTogether(rowStartsArea && StartsAC(area));
             Status status = row.Layout(areaContainer);
             if (status.IsIncomplete())
             {
                 if (status.IsPageBreak())
                 {
-                    this._marker = i;
+                    _marker = i;
                     area.AddChild(areaContainer);
 
                     area.increaseHeight(areaContainer.GetHeight());
@@ -167,8 +164,10 @@ internal abstract class AbstractTableBody : FObj
                             area.increaseHeight(spaceAfter);
                         }
                     }
+
                     return status;
                 }
+
                 if ((keepWith.Count > 0)
                     && (!rowSpanMgr.IgnoreKeeps()))
                 {
@@ -178,6 +177,7 @@ internal abstract class AbstractTableBody : FObj
                         tr.RemoveLayout(areaContainer);
                         i--;
                     }
+
                     if (i == 0)
                     {
                         ResetMarker();
@@ -187,11 +187,13 @@ internal abstract class AbstractTableBody : FObj
                         return new Status(Status.AREA_FULL_NONE);
                     }
                 }
-                this._marker = i;
+
+                _marker = i;
                 if ((i != 0) && (status.GetCode() == Status.AREA_FULL_NONE))
                 {
                     status = new Status(Status.AREA_FULL_SOME);
                 }
+
                 if (!((i == 0) && (areaContainer.getContentHeight() <= 0)))
                 {
                     area.AddChild(areaContainer);
@@ -213,11 +215,12 @@ internal abstract class AbstractTableBody : FObj
             {
                 endKeepGroup = true;
             }
+
             lastRow = row;
-            area.setMaxHeight(area.getMaxHeight() - spaceLeft
-                + this.areaContainer.getMaxHeight());
+            area.setMaxHeight(area.getMaxHeight() - spaceLeft + this.areaContainer.getMaxHeight());
             spaceLeft = area.spaceLeft();
         }
+
         area.AddChild(areaContainer);
         areaContainer.end();
 
@@ -243,19 +246,22 @@ internal abstract class AbstractTableBody : FObj
         {
             area.removeChild(areaContainer);
         }
+
         if (spaceBefore != 0)
         {
             area.increaseHeight(-spaceBefore);
         }
+
         if (spaceAfter != 0)
         {
             area.increaseHeight(-spaceAfter);
         }
-        this.ResetMarker();
-        this.RemoveID(area.GetIDReferences());
+
+        ResetMarker();
+        RemoveID(area.GetIDReferences());
     }
 
-    private bool startsAC(Area area)
+    private bool StartsAC(Area area)
     {
         Area? parent;
 
@@ -265,8 +271,10 @@ internal abstract class AbstractTableBody : FObj
             {
                 return true;
             }
+
             area = parent;
         }
+
         return false;
     }
 }

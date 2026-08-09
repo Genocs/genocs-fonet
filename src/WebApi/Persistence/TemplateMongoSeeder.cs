@@ -14,7 +14,7 @@ public sealed class TemplateMongoSeeder : IMongoSeeder
     {
         var templates = database.GetCollection<TemplateDocument>("templates");
 
-        var existing = await templates
+        bool existing = await templates
             .Find(t => t.TemplateId == "books")
             .AnyAsync(cancellationToken);
 
@@ -27,7 +27,7 @@ public sealed class TemplateMongoSeeder : IMongoSeeder
             new TemplateDocument
             {
                 TemplateId = "books",
-                FileName = "books.xslt",
+                FileName = "books.fo",
                 ModelType = "Books",
                 Description = "Host sample books catalog template",
                 Active = true,

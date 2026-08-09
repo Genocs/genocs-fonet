@@ -12,7 +12,7 @@ internal abstract class FONode
 {
     public FObj? Parent { get; }
 
-    protected string _areaClass = AreaClass.UNASSIGNED;
+    protected string AreaClass { get; set; } = Fonet.Layout.AreaClass.UNASSIGNED;
 
     protected ArrayList _children = [];
 
@@ -42,7 +42,7 @@ internal abstract class FONode
 
         if (Parent != null)
         {
-            _areaClass = Parent._areaClass;
+            AreaClass = Parent.AreaClass;
         }
     }
 
@@ -159,6 +159,7 @@ internal abstract class FONode
             FONode fo = (FONode)_children[i];
             fo.ResetMarker();
         }
+
         ((FONode)_children[_marker]).Rollback(snapshot);
     }
 

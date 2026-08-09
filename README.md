@@ -1,15 +1,155 @@
 # Genocs.Fonet (genocs-fonet)
 
-## Purpose
-
-Genocs.Fonet is a .NET port of **Fonet**, an XSL-FO (Extensible Stylesheet Language Formatting Objects) formatter that produces PDF output. The original implementation relied on **Windows GDI** for font enumeration, metrics, glyph mapping, and image decoding. This port aims to run on **modern .NET without Windows graphics dependencies**.
-
+Genocs.Fonet is a .NET port of **Fonet**, an XSL-FO formatter that produces PDF. The original library depended on **Windows GDI** for fonts, metrics, glyph mapping, and image decoding. This port targets **modern .NET without Windows graphics dependencies**, using SkiaSharp for cross-platform font and image handling.
 
 ![Genocs.Fonet](./assets/banner.png)
 
-Genocs.Fonet is an XSL-FO → PDF library (a fork/derivative of “Fonet”) with a work-in-progress focus on **cross-platform** font and image handling.
+> **Status:** Work in progress. Suitable for experimentation and evaluation; not recommended for production yet (FO coverage gaps remain). See [Status](#status) and [docs/](./docs/).
 
-For migration status, known issues, and the phased roadmap see the [docs/](./docs/) folder.
+## Solution layout
+
+| Project | Role |
+|---------|------|
+| `src/Genocs.Fonet` | Core engine: XSL-FO → PDF |
+| `src/Genocs.Fonet.XsltTransformer` | Application layer: XML + XSLT → XSL-FO → PDF |
+| `src/tests/Genocs.Fonet.Tests` | Unit and FO fixture tests |
+| `src/WebApi` | Sample minimal API that builds PDFs via `XslFoPdfService` |
+
+Targets: **.NET 8 / 9 / 10**.
+
+---
+
+## Package roles
+
+### `Genocs.Fonet` — XSL-FO → PDF
+
+Use this when you already have (or can produce) XSL-FO and only need rendering:
+
+- Parses FO input (`FonetDriver`)
+- Lays out and renders PDF (`PdfRenderer`)
+- Resolves fonts (system + private) and embeds images
+
+```csharp
+using Genocs.Fonet;
+using Genocs.Fonet.Render.Pdf;
+
+var driver = FonetDriver.Make();
+driver.Options = new PdfRendererOptions();
+driver.Options.AddPrivateFont(new FileInfo("fonts/Nunito-Regular.ttf"));
+driver.Render(foXmlDocument, outputStream);
+```
+
+### `Genocs.Fonet.XsltTransformer` — XML → XSLT → FO → PDF
+
+Use this when PDF generation is driven by **document models**, **XSLT templates**, and optional **localization XML**. It sits on top of `Genocs.Fonet` and owns the end-to-end print pipeline used by the WebApi sample.
+
+**Responsibilities**
+
+| Concern | What it does |
+|---------|----------------|
+| Document contract | `IPrintableDocument` / `IPayload` — models expose XML via `ToXml()` |
+| Template loading | `ResourceManager` loads `.fo` XSLT stylesheets (and culture variants) |
+| Localization | Optional resources XML merged into the transform input |
+| XSLT transform | `XmlTransformationManager` wraps `XslCompiledTransform` (XML + resources → XSL-FO) |
+| PDF rendering | `PdfPrinterDriver` configures `FonetDriver`, registers private fonts, writes PDF streams/files |
+| Orchestration | `XslFoPdfService` (`IPdfWriterService`) runs the full pipeline in one call |
+| Extras | Base64 `data:image/...` handling for `fo:external-graphic`; XSLT extension helpers |
+
+**Not responsible for**
+
+- FO layout or PDF internals (delegated to `Genocs.Fonet`)
+- Hosting, HTTP, or template storage (WebApi / your app)
+
+**Pipeline**
+
+```text
+IPrintableDocument.ToXml()
+        + optional localization XML
+        ↓
+   XSLT template (*.fo)
+        ↓
+   XSL-FO XmlDocument
+        ↓
+   Genocs.Fonet (PdfPrinterDriver)
+        ↓
+   PDF stream / file
+```
+
+**Example**
+
+```csharp
+using Genocs.Fonet.XsltTransformer.Transformers;
+using Microsoft.Extensions.Logging.Abstractions;
+
+IPrintableDocument document = /* your model */;
+var pdfService = new XslFoPdfService(NullLogger<XslFoPdfService>.Instance);
+
+using Stream pdf = pdfService.Print(
+    document,
+    templateName: "invoice.fo",
+    resourcesName: "resources.xml",
+    fontsDirectory: "fonts",
+    countryId: "IT");
+```
+
+If you already have an XSL-FO `XmlDocument`, skip XSLT and call `PdfPrinterDriver` directly:
+
+```csharp
+PdfPrinterDriver.MakePdf(xslFoDocument, "output.pdf", fontDir: "fonts");
+// or
+using Stream pdf = PdfPrinterDriver.MakePdfStream(xslFoDocument, fontDir: "fonts");
+```
+
+**When to choose which package**
+
+| You have… | Use |
+|-----------|-----|
+| Ready XSL-FO | `Genocs.Fonet` alone |
+| Models + XSLT templates (+ optional localization) | `Genocs.Fonet.XsltTransformer` |
+
+More detail: [`src/Genocs.Fonet.XsltTransformer/README_NUGET.md`](./src/Genocs.Fonet.XsltTransformer/README_NUGET.md).
+
+---
+
+## Cross-platform font & image stack
+
+Windows GDI dependencies are replaced with **SkiaSharp**:
+
+- **Images** — format detection and pixels via `SKCodec` / `SKBitmap` (`src/Genocs.Fonet/Image/ApocImage.cs`)
+- **Fonts** — enumeration and typefaces via `SKFontManager` / `SKTypeface` (GDI-compatible layer under `src/Genocs.Fonet/Pdf/Gdi/`)
+- **Private fonts** — `PdfRendererOptions.AddPrivateFont(...)` registers files into the Skia-backed font manager
+
+Then reference the family in FO:
+
+```xml
+<fo:block font-family="Nunito" font-size="16pt">
+  Hello Nunito
+</fo:block>
+```
+
+Sample fonts and FO templates live under `src/tests/Genocs.Fonet.Tests/fonts` and `.../templates`.
+
+On Linux/Docker, reference `SkiaSharp.NativeAssets.Linux` on the executable project if `libSkiaSharp.so` is missing at runtime.
+
+---
+
+## Build / test
+
+```powershell
+dotnet build fonet.slnx -c Debug
+dotnet test fonet.slnx -c Debug
+```
+
+## PDF Web API
+
+`src/WebApi` is a minimal API that builds PDFs through `XslFoPdfService` (same pipeline as above). Templates, fonts, and assets load from configurable paths (Docker volumes in compose).
+
+```bash
+./scripts/run-on-docker.sh
+# POST http://localhost:5080/api/pdf  — see src/WebApi/README.md
+```
+
+---
 
 ## Status
 
@@ -23,75 +163,22 @@ For migration status, known issues, and the phased roadmap see the [docs/](./doc
 | Tests | ✅ 22 tests with PDF structure validation on net8/9/10 |
 | Production use | ⚠️ Not recommended yet — FO coverage gaps; CJK needs validation |
 
-## What the cross-platform solution is
+Migration status, known issues, and roadmap: [docs/](./docs/).
 
-The main idea is to remove Windows-only GDI/font/image dependencies and replace them with **SkiaSharp**:
+### Known limitations
 
-- **Images**: image format detection and pixel extraction uses `SkiaSharp` (`SKCodec`, `SKBitmap`) rather than `System.Drawing` / Windows APIs. See `src/Genocs.Fonet/Image/ApocImage.cs`.
-- **Fonts**: font enumeration and typeface loading uses `SKFontManager.Default` + `SKTypeface` rather than GDI handles. See `src/Genocs.Fonet/Pdf/Gdi/FontManager.cs`, `src/Genocs.Fonet/Pdf/Gdi/GdiFont.cs`, `src/Genocs.Fonet/Pdf/Gdi/GdiFontEnumerator.cs`.
-- **Private/custom fonts**: font files can be registered via `PdfRendererOptions.AddPrivateFont(...)`, which also registers the file into the Skia-based `FontManager`. See `src/Genocs.Fonet/Pdf/Gdi/GdiPrivateFontCollection.cs`.
+Tracked in [docs/known-issues.md](./docs/known-issues.md) and [docs/migration-plan.md](./docs/migration-plan.md):
 
-## How the pipeline works (high level)
+1. **~87 unimplemented FO properties** — logged and ignored during layout
+2. **11 unimplemented FO elements** — parse but produce no layout
+3. **Side-float layout** — `fo:float` renders in flow; float/clear/z-index do not affect layout
+4. **System font discovery** — filesystem scan with filename matching; can be imprecise on Linux/macOS
+5. **CJK / complex scripts** — not validated with fixture tests yet
+6. **PDF encryption** — legacy RC4 only
 
-- Entry point: `Genocs.Fonet.FonetDriver` parses FO input and drives rendering. See `src/Genocs.Fonet/FonetDriver.cs`.
-- Rendering: `Fonet.Render.Pdf.PdfRenderer` outputs PDF; font setup is driven by `Fonet.Render.Pdf.FontSetup` which enumerates system fonts (via the Skia-backed GDI compatibility layer) and maps FO font triplets to PDF fonts. See `src/Genocs.Fonet/Render/Pdf/FontSetup.cs`.
-- Images: `<fo:external-graphic>` is loaded via `Fonet.Image.FonetImageFactory` and stored as a `Fonet.Image.FonetImage` which is embedded as a PDF XObject. See `src/Genocs.Fonet/Image/ApocImageFactory.cs` and `src/Genocs.Fonet/Pdf/PdfCreator.cs`.
+### Migration progress
 
-## Using a custom font (example: Nunito)
-
-```csharp
-using Genocs.Fonet;
-using Genocs.Fonet.Render.Pdf;
-
-var driver = FonetDriver.Make();
-driver.Options = new PdfRendererOptions();
-driver.Options.AddPrivateFont(new FileInfo("fonts/Nunito-Regular.ttf"));
-driver.Options.AddPrivateFont(new FileInfo("fonts/Nunito-Bold.ttf"));
-```
-
-Then reference it in FO:
-
-```xml
-<fo:block font-family="Nunito" font-size="16pt">
-  Hello Nunito
-</fo:block>
-```
-
-The test project carries Nunito font files and FO templates under `src/tests/Genocs.Fonet.Tests/fonts` and `src/tests/Genocs.Fonet.Tests/templates`.
-
-## Build / test
-
-```powershell
-dotnet build fonet.slnx -c Release
-dotnet test fonet.slnx -c Release
-```
-
-## PDF Web API
-
-`src/WebApi` is a Genocs minimal API that builds PDFs via the same `XslFoPdfService` pipeline as the Host console sample. Templates, fonts, and assets are loaded from configurable paths (Docker volumes in compose).
-
-```bash
-./scripts/build-images-docker-compose.sh
-# POST http://localhost:8080/api/pdf  (see src/WebApi/README.md)
-```
-
-## Known limitations
-
-These are actively tracked in [docs/known-issues.md](./docs/known-issues.md) and [docs/migration-plan.md](./docs/migration-plan.md):
-
-1. **~87 unimplemented FO properties** — log warnings and are ignored during layout.
-2. **11 unimplemented FO elements** — parse but produce no layout output.
-3. **Side-float layout** — `fo:float` renders in flow; `float`/`clear`/`z-index` parse but do not affect layout.
-4. **System font discovery** — recursive filesystem scan with filename matching; can be imprecise on Linux/macOS.
-5. **CJK / complex scripts** — not validated with fixture tests yet.
-6. **PDF encryption** — legacy RC4 only.
-
-## Migration progress
-
-**Phase 0 (stabilize)** — ✅ complete.
-
-**Phase 1 (font pipeline)** — ✅ complete. Glyph mapping, font table access, embedding/subsetting, and font descriptor metrics.
-
-**Phase 2 (quality)** — ✅ complete. Image spans, PDF encoding, namespace consolidation, error reporting.
-
-**Phase 3 (FO completeness)** — 🔄 in progress. Tier 1 properties and table captions done; side-float layout deferred.
+- **Phase 0 (stabilize)** — ✅ complete
+- **Phase 1 (font pipeline)** — ✅ complete
+- **Phase 2 (quality)** — ✅ complete
+- **Phase 3 (FO completeness)** — 🔄 in progress (Tier 1 properties and table captions done; side-float layout deferred)

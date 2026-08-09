@@ -1,5 +1,5 @@
-using Genocs.Fonet.XsltTransformer.Transformers;
 using System.Text.Json;
+using Genocs.Fonet.XsltTransformer.Transformers;
 
 namespace Genocs.Fonet.Host.Drivers;
 
@@ -15,10 +15,10 @@ public static class XsltDriver
         // Resolve assets relative to the executable so the app works from any working directory.
         string baseDirectory = AppContext.BaseDirectory;
         string modelPath = Path.Combine(baseDirectory, "models", "books.json");
-        string templatePath = Path.Combine(baseDirectory, "templates", "books.xslt");
+        string templatePath = Path.Combine(baseDirectory, "templates", "books.fo");
         string outputPath = Path.Combine(baseDirectory, "books.pdf");
 
-        XslFoPdfService xslFoPdfService = new();
+        XslFoPdfService xslFoPdfService = new(null);
 
         Stream pdfDocument = xslFoPdfService.Print(
             document: PrintableDocument(modelPath)!,

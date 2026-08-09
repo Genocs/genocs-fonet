@@ -1,11 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net10.0</TargetFramework>
-        <RootNamespace>Genocs.Fonet.Host</RootNamespace>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <RootNamespace>Genocs.Fonet.Console</RootNamespace>
+        <AssemblyName>Genocs.Fonet.Console</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -34,19 +33,19 @@
         <None Update="models\books.xml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="templates\book-row-template.xsl">
+        <None Update="templates\book-row-template.fo">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="templates\books.xslt">
+        <None Update="templates\books.fo">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="templates\browserstack-logo.svg">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="templates\footer.xsl">
+        <None Update="templates\footer.fo">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="templates\header.xsl">
+        <None Update="templates\header.fo">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="templates\NunitoSample.fo">

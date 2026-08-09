@@ -9,11 +9,11 @@ using Genocs.Fonet.Render.Pdf;
 namespace Genocs.Fonet;
 
 /// <summary>
-/// This class acts as a bridge between the XML:FO parser and the 
-/// formatting/rendering classes. It will queue PageSequences up until 
-/// all the IDs required by them are satisfied, at which time it will 
+/// This class acts as a bridge between the XML:FO parser and the
+/// formatting/rendering classes. It will queue PageSequences up until
+/// all the IDs required by them are satisfied, at which time it will
 /// Render the pages.
-/// StreamRenderer is created by Driver and called from FOTreeBuilder 
+/// StreamRenderer is created by Driver and called from FOTreeBuilder
 /// when a PageSequence is created, and AreaTree when a Page is formatted.
 /// </summary>
 internal class StreamRenderer(PdfRenderer renderer)
@@ -21,17 +21,17 @@ internal class StreamRenderer(PdfRenderer renderer)
     /// <summary>
     /// Keep track of the number of pages rendered.
     /// </summary>
-    private int pageCount = 0;
+    private int _pageCount = 0;
 
     /// <summary>
     /// The renderer being used.
     /// </summary>
-    private readonly PdfRenderer renderer = renderer;
+    private readonly PdfRenderer _renderer = renderer;
 
     /// <summary>
     /// The formatting results to be handed back to the caller.
     /// </summary>
-    private FormattingResults results = new();
+    private FormattingResults _results = new();
 
     /// <summary>
     /// The FontInfo for this renderer.
@@ -64,16 +64,14 @@ internal class StreamRenderer(PdfRenderer renderer)
     }
 
     public FormattingResults getResults()
-    {
-        return this.results;
-    }
+        => _results;
 
     public void StartRenderer()
     {
-        pageCount = 0;
+        _pageCount = 0;
 
-        renderer.SetupFontInfo(fontInfo);
-        renderer.StartRenderer();
+        _renderer.SetupFontInfo(fontInfo);
+        _renderer.StartRenderer();
     }
 
     public void StopRenderer()
@@ -81,7 +79,7 @@ internal class StreamRenderer(PdfRenderer renderer)
         // Force the processing of any more queue elements, even if they 
         // are not resolved.
         ProcessQueue(true);
-        renderer.StopRenderer();
+        _renderer.StopRenderer();
     }
 
     /// <summary>
@@ -102,13 +100,11 @@ internal class StreamRenderer(PdfRenderer renderer)
 
         pageSequence.Format(a);
 
-        FonetDriver.ActiveDriver?.FireFonetInfo(string.Format("Rendered Page Sequence Output in [{0}] seconds.", sw.Elapsed.TotalSeconds));
+        FonetDriver.ActiveDriver?.FireFonetInfo($"Rendered Page Sequence Output in [{sw.Elapsed.TotalSeconds}] seconds.");
 
+        _results.HaveFormattedPageSequence(pageSequence);
 
-        this.results.HaveFormattedPageSequence(pageSequence);
-
-        FonetDriver.ActiveDriver?.FireFonetInfo(
-            "Last page-sequence produced " + pageSequence.PageCount + " page(s).");
+        FonetDriver.ActiveDriver?.FireFonetInfo($"Last page-sequence produced {pageSequence.PageCount} page(s).");
     }
 
     public void QueuePage(Page page)
@@ -120,6 +116,7 @@ internal class StreamRenderer(PdfRenderer renderer)
             currentPageSequence = pageSequence;
             currentPageSequenceMarkers = null;
         }
+
         ArrayList markers = page.getMarkers();
         if (markers != null)
         {
@@ -135,20 +132,19 @@ internal class StreamRenderer(PdfRenderer renderer)
             }
         }
 
-
-        // Try to optimise on the common case that there are no pages pending 
-        // and that all ID references are valid on the current pages. This 
+        // Try to optimise on the common case that there are no pages pending
+        // and that all ID references are valid on the current pages. This
         // short-cuts the pipeline and renders the area immediately.
         if ((renderQueue.Count == 0) && idReferences.IsEveryIdValid())
         {
-            renderer.Render(page);
+            _renderer.Render(page);
         }
         else
         {
             AddToRenderQueue(page);
         }
 
-        pageCount++;
+        _pageCount++;
     }
 
     private void AddToRenderQueue(Page page)
@@ -156,14 +152,14 @@ internal class StreamRenderer(PdfRenderer renderer)
         RenderQueueEntry entry = new RenderQueueEntry(this, page);
         renderQueue.Add(entry);
 
-        // The just-added entry could (possibly) resolve the waiting entries, 
+        // The just-added entry could (possibly) resolve the waiting entries,
         // so we try to process the queue now to see.
         ProcessQueue(false);
     }
 
     /// <summary>
-    /// Try to process the queue from the first entry forward.  If an 
-    /// entry can't be processed, then the queue can't move forward, 
+    /// Try to process the queue from the first entry forward. If an
+    /// entry can't be processed, then the queue can't move forward,
     /// so return.
     /// </summary>
     /// <param name="force"></param>
@@ -172,19 +168,19 @@ internal class StreamRenderer(PdfRenderer renderer)
         while (renderQueue.Count > 0)
         {
             RenderQueueEntry entry = (RenderQueueEntry)renderQueue[0];
-            if ((!force) && (!entry.isResolved()))
+            if ((!force) && (!entry.IsResolved()))
             {
                 break;
             }
 
-            renderer.Render(entry.getPage());
+            _renderer.Render(entry.Page);
             renderQueue.RemoveAt(0);
         }
     }
 
     /// <summary>
-    /// A RenderQueueEntry consists of the Page to be queued, plus a list 
-    /// of outstanding ID references that need to be resolved before the 
+    /// A RenderQueueEntry consists of the Page to be queued, plus a list
+    /// of outstanding ID references that need to be resolved before the
     /// Page can be renderered.
     /// </summary>
     private class RenderQueueEntry
@@ -192,53 +188,48 @@ internal class StreamRenderer(PdfRenderer renderer)
         /// <summary>
         /// The Page that has outstanding ID references.
         /// </summary>
-        private readonly Page page;
+        public Page Page { get; }
 
-        private readonly StreamRenderer outer;
+        private readonly StreamRenderer _outer;
 
         /// <summary>
         /// A list of ID references (names).
         /// </summary>
-        private readonly ArrayList unresolvedIdReferences = new();
+        private readonly ArrayList _unresolvedIdReferences = [];
 
         public RenderQueueEntry(StreamRenderer outer, Page page)
         {
-            this.outer = outer;
-            this.page = page;
+            _outer = outer;
+            Page = page;
 
-            foreach (object o in outer.idReferences.GetInvalidElements())
+            foreach (object o in _outer.idReferences.GetInvalidElements())
             {
-                unresolvedIdReferences.Add(o);
+                _unresolvedIdReferences.Add(o);
             }
         }
 
-        public Page getPage()
-        {
-            return page;
-        }
-
         /// <summary>
-        /// See if the outstanding references are resolved in the current 
+        /// See if the outstanding references are resolved in the current
         /// copy of IDReferences.
         /// </summary>
-        /// <returns></returns>
-        public bool isResolved()
+        /// <returns>True if all references are resolved, false otherwise.</returns>
+        public bool IsResolved()
         {
-            if ((unresolvedIdReferences.Count == 0) || outer.idReferences.IsEveryIdValid())
+            if ((_unresolvedIdReferences.Count == 0) || _outer.idReferences.IsEveryIdValid())
             {
                 return true;
             }
 
             // See if any of the unresolved references are still unresolved.
-            foreach (string s in unresolvedIdReferences)
+            foreach (string s in _unresolvedIdReferences)
             {
-                if (!outer.idReferences.DoesIDExist(s))
+                if (!_outer.idReferences.DoesIDExist(s))
                 {
                     return false;
                 }
             }
 
-            unresolvedIdReferences.RemoveRange(0, unresolvedIdReferences.Count);
+            _unresolvedIdReferences.RemoveRange(0, _unresolvedIdReferences.Count);
             return true;
         }
     }
@@ -246,7 +237,7 @@ internal class StreamRenderer(PdfRenderer renderer)
     /// <summary>
     /// Auxillary function for retrieving markers.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The list of markers for the current page sequence.</returns>
     public ArrayList? GetDocumentMarkers()
     {
         return documentMarkers;
@@ -255,7 +246,7 @@ internal class StreamRenderer(PdfRenderer renderer)
     /// <summary>
     /// Auxillary function for retrieving markers.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The current page sequence.</returns>
     public PageSequence? GetCurrentPageSequence()
     {
         return currentPageSequence;
@@ -264,7 +255,7 @@ internal class StreamRenderer(PdfRenderer renderer)
     /// <summary>
     /// Auxillary function for retrieving markers.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The list of markers for the current page sequence.</returns>
     public ArrayList? GetCurrentPageSequenceMarkers()
     {
         return currentPageSequenceMarkers;

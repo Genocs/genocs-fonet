@@ -5,7 +5,7 @@
 	xmlns:svg="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink">
 	<xsl:variable name="logo" select="utilityExtension:MapPath('./data/templates/browserstack-logo.svg')"/>
-
+	
 	<xsl:template name="header-first-page-template">
 		<fo:static-content flow-name="header-first-region">
 			<fo:block font-size="6.5pt">
@@ -20,7 +20,7 @@
 										Genocs
 									</fo:block>
 									<fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-										 Software Technology and many more
+										Software Technology and many more
 									</fo:block>
 									<fo:block margin-top="0.1cm" margin-bottom="0.1cm">
 										Tech company specialized in software development and IT consulting
@@ -68,7 +68,7 @@
 			</fo:block>
 		</fo:static-content>
 	</xsl:template>
-
+	
 	<xsl:template name="header-other-pages-template">
 		<fo:static-content flow-name="header-other-region">
 			<fo:block font-size="8pt" space-after="2pt">

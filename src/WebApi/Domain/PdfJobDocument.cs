@@ -4,7 +4,6 @@ using MongoDB.Bson;
 
 namespace Genocs.Fonet.WebApi.Domain;
 
-
 /// <summary>
 /// Represents a PDF job document in the MongoDB collection "pdf_jobs".
 /// </summary>

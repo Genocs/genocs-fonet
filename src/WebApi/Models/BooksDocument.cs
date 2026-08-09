@@ -4,7 +4,7 @@ using Genocs.Fonet.XsltTransformer.Transformers;
 namespace Genocs.Fonet.WebApi.Models;
 
 /// <summary>
-/// Printable model matching the Host <c>books.xslt</c> XPath
+/// Printable model matching the Host <c>books.fo</c> XPath
 /// <c>/PdfPrinter/Books/BookList/Book</c>.
 /// </summary>
 [XmlRoot("Books")]
@@ -20,9 +20,24 @@ public sealed class BooksDocument : IPrintableDocument
         => ObjectXmlSerializer.SerializeObjectToXmlFormattedString(this);
 }
 
+/// <summary>
+/// Printable model matching the Host <c>books.fo</c> XPath
+/// <c>/PdfPrinter/Books/BookList/Book</c>.
+/// </summary>
 public sealed class BookItem
 {
-    public string? Title { get; set; }
-    public string? Author { get; set; }
-    public string? Description { get; set; }
+    /// <summary>
+    /// Gets or sets the book title.
+    /// </summary>
+    public string? Title { get; init; }
+
+    /// <summary>
+    /// Gets or sets the book author.
+    /// </summary>
+    public string? Author { get; init; }
+
+    /// <summary>
+    /// Gets or sets the book description.
+    /// </summary>
+    public string? Description { get; init; }
 }

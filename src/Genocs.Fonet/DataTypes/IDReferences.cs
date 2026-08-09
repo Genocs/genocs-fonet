@@ -45,7 +45,7 @@ internal class IDReferences
         => _idReferences.Remove(id);
 
     public bool IsEveryIdValid()
-        => (_idValidation.Count == 0);
+        => _idValidation.Count == 0;
     public bool DoesIDExist(string id)
         => _idReferences.ContainsKey(id);
 
@@ -54,22 +54,24 @@ internal class IDReferences
 
     public void CreateID(string id)
     {
-        if (!string.IsNullOrWhiteSpace(id))
+        if (string.IsNullOrWhiteSpace(id))
         {
-            if (DoesUnvalidatedIDExist(id))
-            {
-                RemoveFromUnvalidatedIDList(id);
-                RemoveFromIdValidationList(id);
-            }
-            else if (DoesIDExist(id))
-            {
-                throw new FonetException($"The id '{id}' already exists in this document");
-            }
-            else
-            {
-                CreateNewId(id);
-                RemoveFromIdValidationList(id);
-            }
+            return;
+        }
+
+        if (DoesUnvalidatedIDExist(id))
+        {
+            RemoveFromUnvalidatedIDList(id);
+            RemoveFromIdValidationList(id);
+        }
+        else if (DoesIDExist(id))
+        {
+            throw new FonetException($"The id '{id}' already exists in this document");
+        }
+        else
+        {
+            CreateNewId(id);
+            RemoveFromIdValidationList(id);
         }
     }
 

@@ -1,15 +1,15 @@
-using Genocs.Fonet.Fo;
-
 namespace Genocs.Fonet.Fo;
 
 internal class CharacterProperty : Property
 {
     internal class Maker : PropertyMaker
     {
-        public Maker(string propName) : base(propName) { }
+        public Maker(string propName)
+            : base(propName)
+        {
+        }
 
-        public override Property Make(
-            PropertyList propertyList, string value, FObj fo)
+        public override Property Make(PropertyList propertyList, string value, FObj? fo)
         {
             char c = value[0];
             return new CharacterProperty(c);
@@ -17,25 +17,25 @@ internal class CharacterProperty : Property
 
     }
 
-    private char character;
+    private readonly char _character;
 
     public CharacterProperty(char character)
     {
-        this.character = character;
+        _character = character;
     }
 
     public override object GetObject()
     {
-        return character;
+        return _character;
     }
 
     public override char GetCharacter()
     {
-        return this.character;
+        return this._character;
     }
 
     public override string GetString()
     {
-        return character.ToString();
+        return _character.ToString();
     }
 }

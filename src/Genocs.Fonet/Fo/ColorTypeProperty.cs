@@ -8,14 +8,14 @@ internal class ColorTypeProperty(ColorType colorType) : Property
 
     internal class Maker(string propName) : PropertyMaker(propName)
     {
-        public override Property ConvertProperty(Property p, PropertyList propertyList, FObj fo)
+        public override Property? ConvertProperty(Property? p, PropertyList propertyList, FObj? fo)
         {
             if (p is ColorTypeProperty)
             {
                 return p;
             }
 
-            ColorType val = p.GetColorType();
+            ColorType? val = p.GetColorType();
             if (val != null)
             {
                 return new ColorTypeProperty(val);
@@ -23,7 +23,6 @@ internal class ColorTypeProperty(ColorType colorType) : Property
 
             return ConvertPropertyDataType(p, propertyList, fo);
         }
-
     }
 
     public override ColorType GetColorType()

@@ -12,7 +12,7 @@ public sealed class TemplateDocument : IMongoEntity
     /// <summary>Business key used by the API (e.g. "books").</summary>
     public string TemplateId { get; set; } = string.Empty;
 
-    /// <summary>File name under the templates volume (e.g. "books.xslt").</summary>
+    /// <summary>File name under the templates volume (e.g. "books.fo").</summary>
     public string FileName { get; set; } = string.Empty;
 
     /// <summary>Optional localization resources file name.</summary>

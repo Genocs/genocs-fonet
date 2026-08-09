@@ -7,9 +7,6 @@ namespace Genocs.Fonet.XsltTransformer.Transformers;
 /// <summary>
 /// PdfPrinterDriver is a <see cref="FonetDriver"/> wrapper.
 /// </summary>
-/// <remarks>
-/// Author:
-/// </remarks>
 public static class PdfPrinterDriver
 {
     /// <summary>
@@ -17,6 +14,7 @@ public static class PdfPrinterDriver
     /// </summary>
     /// <param name="xslFoDocument">XSL-FO document.</param>
     /// <param name="outputFileAbsolutePath">Output PDF absolute file path.</param>
+    /// <param name="fontDir">Optional font directory path.</param>
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static void MakePdf(XmlDocument xslFoDocument, string outputFileAbsolutePath, string? fontDir = null)
     {
@@ -25,7 +23,7 @@ public static class PdfPrinterDriver
     }
 
     /// <summary>
-    /// Generates a PDF from XSL-FO document and sends it to the output stream
+    /// Generates a PDF from XSL-FO document and sends it to the output stream.
     /// </summary>
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static void MakePdf(XmlDocument xslFoDocument, Stream outputStream, string? fontDir = null)
@@ -33,22 +31,6 @@ public static class PdfPrinterDriver
         var driver = InitFonetDriver();
         SetupFonts(fontDir, driver);
         driver.Render(xslFoDocument, outputStream);
-    }
-
-    private static void SetupFonts(string? fontDir, FonetDriver driver)
-    {
-        if (!string.IsNullOrWhiteSpace(fontDir))
-        {
-            var files = new DirectoryInfo(fontDir).GetFiles();
-
-            // Embed the font program into the PDF so it renders identically everywhere.
-            driver.Options!.FontType = FontType.Embed;
-
-            foreach (var file in files)
-            {
-                driver.Options!.AddPrivateFont(file);
-            }
-        }
     }
 
     /// <summary>
@@ -59,7 +41,7 @@ public static class PdfPrinterDriver
     {
         var driver = InitFonetDriver();
 
-        var pdfBytes = Array.Empty<byte>();
+        byte[] pdfBytes = [];
 
         using (var ms = new MemoryStream())
         {
@@ -88,6 +70,22 @@ public static class PdfPrinterDriver
         return ms;
     }
 
+    private static void SetupFonts(string? fontDir, FonetDriver driver)
+    {
+        if (!string.IsNullOrWhiteSpace(fontDir))
+        {
+            var files = new DirectoryInfo(fontDir).GetFiles();
+
+            // Embed the font program into the PDF so it renders identically everywhere.
+            driver.Options!.FontType = FontType.Embed;
+
+            foreach (var file in files)
+            {
+                driver.Options!.AddPrivateFont(file);
+            }
+        }
+    }
+
     /// <summary>
     /// Initializes FonetDriver.
     /// </summary>
@@ -114,12 +112,13 @@ public static class PdfPrinterDriver
 
     /// <summary>
     /// Handles OnInfo events triggered by FonetDriver.
-    /// </summary>   
+    /// </summary>
     /// <param name="driver">The FonetDriver instance.</param>
     /// <param name="e">The FonetEventArgs containing event data.</param>
     private static void OnInfo(object driver, FonetEventArgs e)
     {
-        //Log.InfoFormat("PdfPrinter: {0}", e.GetMessage());
+        // Get the Log instance from the driver if available, otherwise use a default logger.
+        // Logger.InfoFormat("PdfPrinter: {0}", e.GetMessage());
     }
 
     /// <summary>
@@ -129,11 +128,11 @@ public static class PdfPrinterDriver
     /// <param name="e">The FonetEventArgs containing event data.</param>
     private static void OnWarning(object driver, FonetEventArgs e)
     {
-        //Log.WarnFormat("PdfPrinter: {0}", e.GetMessage());
+        // Logger.WarnFormat("PdfPrinter: {0}", e.GetMessage());
     }
 
     /// <summary>
-    /// leave Fonet default management, simply return null
+    /// Leave Fonet default management, simply return null.
     /// </summary>
     /// <param name="src">The source string to analyze.</param>
     /// <returns>A byte array if the source is a valid base64 image, otherwise null.</returns>
@@ -153,7 +152,7 @@ public static class PdfPrinterDriver
         if (!src.StartsWith("data:image") || !src.Contains("base64"))
             return null;
 
-        var base64String = src.Split(',').LastOrDefault();
+        string? base64String = src.Split(',').LastOrDefault();
         if (string.IsNullOrWhiteSpace(base64String))
             return null;
 
@@ -163,7 +162,7 @@ public static class PdfPrinterDriver
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("Error: " + ex);
+            System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
             return null;
         }
     }

@@ -8,13 +8,13 @@ public sealed class PdfStorageOptions
     public const string SectionName = "pdfStorage";
 
     /// <summary>Absolute or relative path to XSLT/FO templates.</summary>
-    public string TemplatesPath { get; set; } = "data/templates";
+    public string TemplatesPath { get; init; } = "data/templates";
 
     /// <summary>Absolute or relative path to private fonts.</summary>
-    public string FontsPath { get; set; } = "data/fonts";
+    public string FontsPath { get; init; } = "data/fonts";
 
     /// <summary>Absolute or relative path to images and other assets.</summary>
-    public string AssetsPath { get; set; } = "data/assets";
+    public string AssetsPath { get; init; } = "data/assets";
 
     public string ResolveTemplatesPath() => Resolve(TemplatesPath);
 

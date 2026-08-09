@@ -6,34 +6,40 @@ using System.Xml.Xsl;
 namespace Genocs.Fonet.XsltTransformer.Transformers;
 
 /// <summary>
-/// XmlTransformationManager handles transformation between XML culture and XSLT.    
+/// XmlTransformationManager handles transformation between XML culture and XSLT.
 /// </summary>
 public class XmlTransformationManager
 {
+    private const string XsltExtensionsNamespace = "pdfprinter:extensions:utility";
+
     /// <summary>
     /// XSLT extensions, used to extend the functionality of style sheets.
     /// </summary>
-    public XsltArgumentList XsltExtensions;
+    private readonly XsltArgumentList _xsltExtensions;
 
     /// <summary>
     /// Transformation style sheet.
     /// </summary>
-    public IXPathNavigable XsltStyleSheet;
+    private readonly IXPathNavigable _xsltStyleSheet;
 
     /// <summary>
     /// Localization resource XML.
     /// </summary>
-    public IXPathNavigable? LocalizedXml;
+    private readonly IXPathNavigable? _localizedXml;
 
     /// <summary>
     /// IPrintableDocument instance.
     /// </summary>
-    public IPrintableDocument Document { get; set; }
+    private readonly IPrintableDocument _document;
 
     /// <summary>
     /// Creates a new instance of XmlTransformationManager with <see cref="IPrintableDocument"/> and a trasformation style sheet.
     /// </summary>
-    public XmlTransformationManager(IPrintableDocument document, IXPathNavigable xsltStyleSheet) : this(document, xsltStyleSheet, null) { }
+    public XmlTransformationManager(IPrintableDocument document, IXPathNavigable xsltStyleSheet)
+        : this(document, xsltStyleSheet, null)
+    {
+
+    }
 
     /// <summary>
     /// Creates a new instance of XmlTransformationManager with <see cref="IPrintableDocument"/>, a transformation style sheet and a localized XML.
@@ -43,14 +49,14 @@ public class XmlTransformationManager
         if (document == null || xsltStyleSheet == null)
             throw new ArgumentException("Invalid arguments");
 
-        Document = document;
-        XsltStyleSheet = xsltStyleSheet;
-        LocalizedXml = localizedXml;
+        _document = document;
+        _xsltStyleSheet = xsltStyleSheet;
+        _localizedXml = localizedXml;
 
-        XsltExtensions = new XsltArgumentList();
+        _xsltExtensions = new XsltArgumentList();
 
         // Add the XsltExtensionService to the XsltArgumentList with the namespace "pdfprinter:extensions:utility"
-        XsltExtensions.AddExtensionObject("pdfprinter:extensions:utility", new XsltExtensions());
+        _xsltExtensions.AddExtensionObject(XsltExtensionsNamespace, new XsltExtensions());
     }
 
     /// <summary>
@@ -58,21 +64,21 @@ public class XmlTransformationManager
     /// <code>
     /// XML + IPrintableDocument.ToXml() -> XSLT -> Ouput XmlDocument
     /// </code>
-    /// </summary>        
+    /// </summary>
     public XmlDocument Transform()
     {
         var content = new StringBuilder();
         content.Append("<PdfPrinter>");
 
-        if (LocalizedXml != null)
-            content.Append(LocalizedXml.CreateNavigator()?.InnerXml);
+        if (_localizedXml != null)
+            content.Append(_localizedXml.CreateNavigator()?.InnerXml);
 
-        content.Append(Document.ToXml());
+        content.Append(_document.ToXml());
         content.Append("</PdfPrinter>");
 
         var xmlContent = new XPathDocument(new XmlTextReader(new StringReader(content.ToString()))).CreateNavigator();
 
-        return Transform(XsltStyleSheet, xmlContent, this.XsltExtensions);
+        return Transform(_xsltStyleSheet, xmlContent, _xsltExtensions);
     }
 
     /// <summary>
@@ -105,7 +111,7 @@ public class XmlTransformationManager
             xwriter.Flush();
         }
 
-        var transformedXml = Encoding.UTF8.GetString(xslFoStream.ToArray());
+        string transformedXml = Encoding.UTF8.GetString(xslFoStream.ToArray());
         var transformedXmlDoc = new XmlDocument();
         transformedXmlDoc.LoadXml(transformedXml);
 

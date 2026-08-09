@@ -13,24 +13,16 @@ namespace Genocs.Fonet;
 /// methodology is the same regardless of how FO.NET is embedded in your
 /// system (ASP.NET, WinForm, Web Service, etc).
 /// </remarks>
-/// <example>
 /// <code lang="csharp">
 /// // This example demonstrates rendering an XSL-FO file to a PDF file.
 /// <code>
 /// FonetDriver driver = FonetDriver.Make();
 /// driver.Render(
-/// new FileStream("readme.fo", FileMode.Open), 
+/// new FileStream("readme.fo", FileMode.Open),
 /// new FileStream("readme.pdf", FileMode.Create));
 /// </code>
-/// <code lang="vb">
-/// // This example demonstrates rendering an XSL-FO file to a PDF file.
-/// Dim driver As FonetDriver = FonetDriver.Make
-/// driver.Render( _
-/// New FileStream("readme.fo", FileMode.Open), _
-/// New FileStream("readme.pdf", FileMode.Create))
-/// </code>
 /// <code lang="csharp">
-/// // This example demonstrates using an XmlDocument as the source of the 
+/// // This example demonstrates using an XmlDocument as the source of the
 /// // XSL-FO tree.  The XmlDocument could easily be dynamically generated.
 /// XmlDocument doc = new XmlDocument()
 /// doc.Load("reader.fo");
@@ -38,16 +30,6 @@ namespace Genocs.Fonet;
 /// FonetDriver driver = FonetDriver.Make();
 /// driver.Render(doc, new FileStream("readme.pdf", FileMode.Create));
 /// </code>
-/// <code lang="vb">
-/// // This example demonstrates using an XmlDocument as the source of the 
-/// // XSL-FO tree.  The XmlDocument could easily be dynamically generated.
-/// Dim doc As XmlDocument = New XmlDocument()
-/// doc.Load("reader.fo")
-///
-/// Dim driver As FonetDriver = FonetDriver.Make
-/// driver.Render(doc, New FileStream("readme.pdf", FileMode.Create))
-/// </code>
-/// </example>
 public class FonetDriver
 {
     /// <summary>
@@ -105,8 +87,8 @@ public class FonetDriver
     /// the active FonetDriver.  The <paramref name="e"/> parameter will
     /// contain a human-readable error message.
     /// </remarks>
-    /// <param name="driver">A reference to the active FonetDriver</param>
-    /// <param name="e">Encapsulates a human readable error message</param>
+    /// <param name="driver">A reference to the active FonetDriver.</param>
+    /// <param name="e">Encapsulates a human readable error message.</param>
     public delegate void FonetEventHandler(object driver, FonetEventArgs e);
 
     /// <summary>
@@ -263,8 +245,8 @@ public class FonetDriver
     /// reader, converting it to a format dictated by the renderer and
     /// writing it to the supplied output stream.
     /// </summary>
-    /// <param name="inputReader">A character orientated stream</param>
-    /// <param name="outputStream">Any subclass of the Stream class</param>
+    /// <param name="inputReader">A character orientated stream.</param>
+    /// <param name="outputStream">Any subclass of the Stream class.</param>
     public virtual void Render(TextReader inputReader, Stream outputStream)
         => Render(CreateXmlTextReader(inputReader), outputStream);
 
@@ -279,8 +261,8 @@ public class FonetDriver
     /// generate a variety of exceptions.  See <see cref="FileStream"/>
     /// for a complete list.<br/>
     /// </remarks>
-    /// <param name="inputFile">Path to an XSL-FO file</param>
-    /// <param name="outputFile">Path to a file</param>
+    /// <param name="inputFile">Path to an XSL-FO file.</param>
+    /// <param name="outputFile">Path to a file.</param>
     public virtual void Render(string inputFile, string outputFile)
         => Render(CreateXmlTextReader(inputFile), new FileStream(outputFile, FileMode.Create, FileAccess.Write));
 
@@ -305,20 +287,20 @@ public class FonetDriver
         => Render(CreateXmlTextReader(inputStream), outputStream);
 
     /// <summary>
-    /// Executes the conversion reading the source tree from the input 
-    /// reader, converting it to a format dictated by the Render and 
+    /// Executes the conversion reading the source tree from the input
+    /// reader, converting it to a format dictated by the Render and
     /// writing it to the supplied output stream.
     /// </summary>
     /// <remarks>
     /// The evaluation copy of this class will output an evaluation
-    /// banner to standard out
+    /// banner to standard out.
     /// </remarks>
     /// <param name="inputReader">
-    /// Reader that provides fast, non-cached, forward-only access 
-    /// to XML data
+    /// Reader that provides fast, non-cached, forward-only access
+    /// to XML data.
     /// </param>
     /// <param name="outputStream">
-    /// Any subclass of the Stream class, e.g. FileStream
+    /// Any subclass of the Stream class, e.g. FileStream.
     /// </param>
     public void Render(XmlReader inputReader, Stream outputStream)
     {
@@ -362,12 +344,12 @@ public class FonetDriver
     /// </summary>
     /// <remarks>
     /// If there are no listeners, a <see cref="SystemException"/> is
-    /// thrown immediately halting execution
+    /// thrown immediately halting execution.
     /// </remarks>
-    /// <param name="message">Any error message, which may be null</param>
+    /// <param name="message">Any error message, which may be null.</param>
     /// <exception cref="SystemException">
     /// If no listener is registered for this event, a SystemException
-    /// will be thrown
+    /// will be thrown.
     /// </exception>
     internal void FireFonetError(string message)
     {
@@ -377,20 +359,20 @@ public class FonetDriver
         }
         else
         {
-            Console.WriteLine("[ERRO] {0}", message);
+            Console.WriteLine("[ERROR] {0}", message);
 
             // throw new SystemException(message);
         }
     }
 
     /// <summary>
-    /// Sends a 'warning' event to all registered listeners
+    /// Sends a 'warning' event to all registered listeners.
     /// </summary>
     /// <remarks>
-    /// If there are no listeners, <i>message</i> is written out 
-    /// to the console instead
+    /// If there are no listeners, <i>message</i> is written out
+    /// to the console instead.
     /// </remarks>
-    /// <param name="message">Any warning message, which may be null</param>
+    /// <param name="message">Any warning message, which may be null.</param>
     internal void FireFonetWarning(string message)
     {
         if (OnWarning != null)
@@ -404,13 +386,13 @@ public class FonetDriver
     }
 
     /// <summary>
-    /// Sends an 'info' event to all registered lisetners
+    /// Sends an 'info' event to all registered lisetners.
     /// </summary>
     /// <remarks>
-    /// If there are no listeners, <i>message</i> is written out 
-    /// to the console instead
+    /// If there are no listeners, <i>message</i> is written out
+    /// to the console instead.
     /// </remarks>
-    /// <param name="message">An info message, which may be null</param>
+    /// <param name="message">An info message, which may be null.</param>
     internal void FireFonetInfo(string message)
     {
         if (OnInfo != null)
@@ -425,30 +407,30 @@ public class FonetDriver
 
     /// <summary>
     /// Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
-    /// for the supplied file
+    /// for the supplied file.
     /// </summary>
     /// <remarks>
-    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
+    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace.
     /// </remarks>
     private static XmlTextReader CreateXmlTextReader(string inputFile)
         => new(inputFile);
 
     /// <summary>
     /// Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
-    /// for the supplied file
+    /// for the supplied file.
     /// </summary>
     /// <remarks>
-    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
+    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace.
     /// </remarks>
     private static XmlTextReader CreateXmlTextReader(Stream inputStream)
         => new(inputStream);
 
     /// <summary>
     /// Utility method that creates an <see cref="System.Xml.XmlTextReader"/>
-    /// for the supplied file
+    /// for the supplied file.
     /// </summary>
     /// <remarks>
-    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace
+    /// The returned <see cref="System.Xml.XmlReader"/> interprets all whitespace.
     /// </remarks>
     private static XmlTextReader CreateXmlTextReader(TextReader inputReader)
         => new(inputReader);

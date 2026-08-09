@@ -13,9 +13,6 @@
         <WebConfigTransformEnabled>false</WebConfigTransformEnabled>
         <!-- Avoid CS1591 noise until public APIs are fully documented -->
         <NoWarn>$(NoWarn);1591</NoWarn>
-
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -58,19 +55,19 @@
       <None Update="data\fonts\Nunito-Regular.ttf">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="data\templates\book-row-template.xsl">
+      <None Update="data\templates\book-row-template.fo">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="data\templates\books.xslt">
+      <None Update="data\templates\books.fo">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="data\templates\browserstack-logo.svg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="data\templates\footer.xsl">
+      <None Update="data\templates\footer.fo">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="data\templates\header.xsl">
+      <None Update="data\templates\header.fo">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="data\templates\NunitoSample.fo">

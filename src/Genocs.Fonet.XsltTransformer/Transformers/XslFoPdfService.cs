@@ -1,11 +1,19 @@
-﻿namespace Genocs.Fonet.XsltTransformer.Transformers;
+﻿using Microsoft.Extensions.Logging;
 
+namespace Genocs.Fonet.XsltTransformer.Transformers;
 
 /// <summary>
 /// The XslFoPdfService class implements the IPdfWriterService interface to generate a PDF stream from a document, template, and resources using XSL-FO transformation.
 /// </summary>
 public class XslFoPdfService : IPdfWriterService
 {
+    private readonly ILogger _logger;
+
+    public XslFoPdfService(ILogger<XslFoPdfService> logger)
+    {
+        _logger = logger;
+    }
+
     /// <summary>
     /// Generates a PDF stream from the specified document, template, and resources using XSL-FO transformation.
     /// </summary>
@@ -23,13 +31,16 @@ public class XslFoPdfService : IPdfWriterService
             throw new ArgumentNullException(nameof(templateName));
         }
 
+#if DEBUG
         string debug = document.ToXml();
+        _logger.LogDebug("Document XML: {DocumentXml}", debug);
+#endif
 
         var xsltStyleSheet = ResourceManager.GetXsltFileContent(templateName, countryId);
 
         var localizedXml = ResourceManager.GetLocalizedXmlFileContent(resourcesName, countryId);
 
-        var fontDir = XsltExtensions.GetExecutingFolder(fontsDirectory);
+        string? fontDir = XsltExtensions.GetExecutingFolder(fontsDirectory);
         var transformer = new XmlTransformationManager(document, xsltStyleSheet, localizedXml);
         var xslFoDocument = transformer.Transform();
         var stream = PdfPrinterDriver.MakePdfStream(xslFoDocument, fontDir);

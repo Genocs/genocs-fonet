@@ -8,7 +8,7 @@ internal class Float : FObjMixed
     public static FObj.Maker CreateMaker()
         => FObj.Maker.For((parent, props) => new Float(parent, props));
 
-    protected Float(FObj parent, PropertyList propertyList)
+    protected Float(FObj? parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
         Name = "fo:float";

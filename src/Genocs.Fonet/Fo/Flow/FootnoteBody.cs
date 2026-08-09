@@ -19,13 +19,11 @@ internal class FootnoteBody : FObj
 
     private int textIndent = 0;
 
-
-
-    public FootnoteBody(FObj parent, PropertyList propertyList)
+    public FootnoteBody(FObj? parent, PropertyList propertyList)
         : base(parent, propertyList)
     {
         Name = "fo:footnote-body";
-        _areaClass = AreaClass.SetAreaClass(AreaClass.XSL_FOOTNOTE);
+        AreaClass = Fonet.Layout.AreaClass.SetAreaClass(Fonet.Layout.AreaClass.XSL_FOOTNOTE);
     }
 
     public override Status Layout(Area area)

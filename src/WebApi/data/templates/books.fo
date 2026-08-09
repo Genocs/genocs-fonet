@@ -1,9 +1,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format">
 	
 	<!--Import static content of template-->
-	<xsl:import href="header.xsl" />
-	<xsl:import href="footer.xsl" />
-	<xsl:import href="book-row-template.xsl" />
+	<xsl:import href="header.fo" />
+	<xsl:import href="footer.fo" />
+	<xsl:import href="book-row-template.fo" />
 	
 	<xsl:output encoding="utf-8" indent="yes" method="xml" omit-xml-declaration="yes" />
 	

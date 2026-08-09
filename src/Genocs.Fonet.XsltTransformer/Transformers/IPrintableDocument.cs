@@ -1,7 +1,7 @@
 ﻿namespace Genocs.Fonet.XsltTransformer.Transformers;
 
 /// <summary>
-/// IPrintableDocument interface
+/// IPrintableDocument interface.
 /// </summary>
 public interface IPrintableDocument
 {

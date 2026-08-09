@@ -75,13 +75,13 @@ internal class PropertyMaker
         => null;
 
     /// <summary>
-    /// Return a property value for the given component of a compound 
+    /// Return a property value for the given component of a compound
     /// property.
     /// </summary>
     /// <remarks>
-    /// NOTE: this is only to ease porting when calls are made to 
+    /// NOTE: this is only to ease porting when calls are made to
     /// PropertyList.get() using a component name of a compound property,
-    /// such as get("space.optimum"). 
+    /// such as get("space.optimum").
     /// The recommended technique is: get("space").getOptimum().
     /// Overridden by property maker subclasses which handle compound properties.
     /// </remarks>
@@ -240,7 +240,7 @@ internal class PropertyMaker
     /// It is overridden by subclasses when the property specification in
     /// foproperties.xml specifies conversion rules.
     /// </summary>
-    /// <param name="property">The Property object return by the expression parser</param>
+    /// <param name="property">The Property object return by the expression parser.</param>
     /// <param name="propertyList">The PropertyList object being built for this FO.</param>
     /// <param name="fo">The current FO whose properties are being set.</param>
     /// <returns>
@@ -250,7 +250,7 @@ internal class PropertyMaker
     public virtual Property? ConvertProperty(Property? property, PropertyList propertyList, FObj? fo)
         => null;
 
-    protected virtual Property? ConvertPropertyDataType(Property property, PropertyList propertyList, FObj? fo)
+    protected virtual Property? ConvertPropertyDataType(Property? property, PropertyList propertyList, FObj? fo)
         => null;
 
     /// <summary>

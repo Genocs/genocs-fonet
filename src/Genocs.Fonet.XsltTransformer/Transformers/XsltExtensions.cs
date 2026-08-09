@@ -1,11 +1,12 @@
 ﻿using System.Globalization;
 using System.Reflection;
-using Genocs.Fonet.XsltTransformer.Options;
+using Genocs.Fonet.XsltTransformer.Configurations;
 
 namespace Genocs.Fonet.XsltTransformer.Transformers;
 
 /// <summary>
-/// XsltExtensionService is a container of helper methods used to extend the functionality of style sheets.
+/// XsltExtensions is a container of helper methods used to extend the functionality of style sheets.
+/// This class is used as an extension object in the XsltArgumentList of the XmlTransformationManager.
 /// </summary>
 public class XsltExtensions
 {
@@ -65,7 +66,7 @@ public class XsltExtensions
     /// returns: 'supercal ifragili stichesp iralitos o'.
     /// </paragraph>
     /// </summary>
-    /// <param name="longWord">The word to break</param>
+    /// <param name="longWord">The word to break.</param>
     /// <param name="breakLen">The maximum length of each sub-word within the 'longWord'.</param>
     private static string BreakWords(string longWord, int breakLen)
     {
@@ -90,7 +91,9 @@ public class XsltExtensions
             BreakWord(longWord.Substring(breakLen), breakLen, words);
         }
         else
+        {
             words.Add(longWord);
+        }
     }
 
     /// <summary>
@@ -106,7 +109,6 @@ public class XsltExtensions
 
     /// <summary>
     /// Formats date string according to the date format string defined on web.config.
-    /// See <see cref="PdfPrinterSettingsElement"/>.
     /// </summary>
     private static string FormatDateTime(string dateAsString)
     {
@@ -130,7 +132,7 @@ public class XsltExtensions
     }
 
     /// <summary>
-    /// Parses decimal string according to the current thread culture
+    /// Parses decimal string according to the current thread culture.
     /// </summary>
     private static bool ParseDecimalString(string decimalValue, out decimal d)
     {
@@ -141,7 +143,7 @@ public class XsltExtensions
     }
 
     /// <summary>
-    /// Parses integer string according to the current thread culture
+    /// Parses integer string according to the current thread culture.
     /// </summary>
     private static bool ParseIntString(string intValue, out int i)
     {
@@ -153,7 +155,6 @@ public class XsltExtensions
 
     /// <summary>
     /// Formats decimal value according to the culture defined on web.config.
-    /// See <see cref="PdfPrinterSettingsElement"/>.
     /// </summary>
     private string FormatDecimal(string decimalValue)
     {
@@ -179,7 +180,6 @@ public class XsltExtensions
 
     /// <summary>
     /// Formats integer value according to the culture defined on web.config.
-    /// See <see cref="PdfPrinterSettingsElement"/>.
     /// </summary>
     private static string FormatInteger(string intValue)
     {

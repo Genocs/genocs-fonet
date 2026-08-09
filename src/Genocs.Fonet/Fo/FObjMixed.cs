@@ -4,11 +4,15 @@ namespace Genocs.Fonet.Fo;
 
 internal class FObjMixed : FObj
 {
-    protected TextState _textState;
+    /// <summary>
+    /// TODO: The text state is not set in the current implementation.
+    /// It should be set based on the properties of the parent element or the current element.
+    /// </summary>
+    protected TextState? _textState;
 
     new internal class Maker : FObj.Maker
     {
-        public override FObj Make(FObj parent, PropertyList propertyList)
+        public override FObj Make(FObj? parent, PropertyList propertyList)
         {
             return new FObjMixed(parent, propertyList);
         }
@@ -19,18 +23,20 @@ internal class FObjMixed : FObj
         return new Maker();
     }
 
-    protected FObjMixed(FObj parent, PropertyList propertyList)
-        : base(parent, propertyList) { }
+    protected FObjMixed(FObj? parent, PropertyList propertyList)
+        : base(parent, propertyList)
+    {
+    }
 
-    public TextState GetTextState()
+    public TextState? GetTextState()
         => _textState;
 
     protected internal override void AddCharacters(char[] data, int start, int length)
     {
         FOText ft = new FOText(data, start, length, this);
-        ft.setUnderlined(_textState.getUnderlined());
-        ft.setOverlined(_textState.getOverlined());
-        ft.setLineThrough(_textState.getLineThrough());
+        ft.setUnderlined(_textState?.getUnderlined()?? false);
+        ft.setOverlined(_textState?.getOverlined()?? false);
+        ft.setLineThrough(_textState?.getLineThrough()?? false);
         AddChild(ft);
     }
 
@@ -43,10 +49,10 @@ internal class FObjMixed : FObj
 
         if (Properties != null)
         {
-            Property prop = Properties.GetProperty("id");
+            Property? prop = Properties.GetProperty("id");
             if (prop != null)
             {
-                string id = prop.GetString();
+                string? id = prop.GetString();
 
                 if (_marker == MarkerStart)
                 {
@@ -72,6 +78,7 @@ internal class FObjMixed : FObj
                 return status;
             }
         }
+
         return new Status(Status.OK);
     }
 }

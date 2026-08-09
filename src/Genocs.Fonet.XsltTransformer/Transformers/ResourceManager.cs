@@ -1,7 +1,7 @@
-﻿using Genocs.Fonet.XsltTransformer.Options;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.XPath;
+using Genocs.Fonet.XsltTransformer.Configurations;
 
 namespace Genocs.Fonet.XsltTransformer.Transformers;
 
@@ -14,29 +14,27 @@ public static class ResourceManager
     /// <summary>
     /// Returns XSLT file as <see cref="IXPathNavigable"/>.
     /// </summary>
-    /// <param name="filename">The XSLT file name. XSLT folder path is defined in web.config. See <see cref=""/>PdfPrinterSettingsElement</param>
+    /// <param name="fileName">The XSLT file name. XSLT folder path is defined in web.config. See <see cref=""/>PdfPrinterSettingsElement</param>
     /// <param name="culture">The XSLT file culture.</param>
-    public static IXPathNavigable GetXsltFileContent(string filename, string? culture = null)
+    public static IXPathNavigable GetXsltFileContent(string fileName, string? culture = null)
     {
-        if (!filename.EndsWith(".xslt"))
-            filename += ".xslt";
+        if (!fileName.EndsWith(".fo"))
+            fileName += ".fo";
 
         if (string.IsNullOrWhiteSpace(culture))
         {
             culture = GlobalSettings.DefaultCulture;
         }
 
-        var resourceAbsolutePath = $"{filename}";
+        string resourceAbsolutePath = XsltExtensions.MapPath($"{fileName}");
 
-        resourceAbsolutePath = XsltExtensions.MapPath(resourceAbsolutePath);
-
-        return GetXmlContent(resourceAbsolutePath);
+        return GetFileContent(resourceAbsolutePath);
     }
 
     /// <summary>
     /// Returns XML file as <see cref="IXPathNavigable"/>.
     /// </summary>
-    /// <param name="filename">The XML file name. XML folder path is defined in web.config. See <see cref=""/>PdfPrinterSettingsElement</param>
+    /// <param name="fileName">The XML file name. XML folder path is defined in web.config. See <see cref=""/>PdfPrinterSettingsElement</param>
     /// <param name="culture">The XML file culture.</param>
     public static IXPathNavigable? GetLocalizedXmlFileContent(string? fileName, string? culture = null)
     {
@@ -50,23 +48,16 @@ public static class ResourceManager
             resourceAbsolutePath = $"{culture}/{fileName}";
         }
 
-        if(!File.Exists(XsltExtensions.MapPath(resourceAbsolutePath)))
+        if (!File.Exists(XsltExtensions.MapPath(resourceAbsolutePath)))
         {
             resourceAbsolutePath = $"{fileName}";
         }
 
-        return GetXmlContent(resourceAbsolutePath);
-    }
-
-
-    [MethodImpl(MethodImplOptions.Synchronized)]
-    private static IXPathNavigable GetXmlContent(string resourceAbsolutePath)
-    {
-        return GetFileContent(resourceAbsolutePath, false);
+        return GetFileContent(resourceAbsolutePath);
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    private static IXPathNavigable GetFileContent(string filePath, bool editable)
+    private static IXPathNavigable GetFileContent(string filePath, bool editable = false)
     {
         if (!File.Exists(filePath))
             throw new FileNotFoundException("Unable to find the specified file", filePath);

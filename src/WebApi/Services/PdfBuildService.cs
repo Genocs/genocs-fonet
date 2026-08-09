@@ -24,20 +24,24 @@ public sealed class PdfBuildService(
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        if (string.IsNullOrWhiteSpace(request.TemplateId))
-        {
-            throw new ArgumentException("templateId is required.", nameof(request));
-        }
+        var validator = new PrintPdfRequestValidator();
+        var result = validator.Validate(request);
 
-        if (request.Model.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+        if (!result.IsValid)
         {
-            throw new ArgumentException("model is required.", nameof(request));
+            foreach (var error in result.Errors)
+            {
+                logger.LogError($"{error.PropertyName}: {error.ErrorMessage}");
+            }
+
+            throw new ArgumentException("Invalid request parameters.", nameof(request));
         }
 
         var storage = storageOptions.Value;
-        var template = await ResolveTemplateAsync(request.TemplateId, cancellationToken);
+        var template = (await ResolveTemplateAsync(request.TemplateId, cancellationToken))
+            ?? throw new InvalidOperationException($"Template '{request.TemplateId}' was not found or is inactive.");
 
-        var templatePath = Path.Combine(storage.ResolveTemplatesPath(), template.FileName);
+        string? templatePath = Path.Combine(storage.ResolveTemplatesPath(), template.FileName);
         if (!File.Exists(templatePath))
         {
             throw new FileNotFoundException(
@@ -45,7 +49,7 @@ public sealed class PdfBuildService(
                 templatePath);
         }
 
-        var fontsDirectory = storage.ResolveFontsPath();
+        string? fontsDirectory = storage.ResolveFontsPath();
         if (!Directory.Exists(fontsDirectory))
         {
             throw new DirectoryNotFoundException($"Fonts directory '{fontsDirectory}' was not found.");
@@ -77,7 +81,7 @@ public sealed class PdfBuildService(
                 pdfStream.Position = 0;
             }
 
-            var size = pdfStream.CanSeek ? pdfStream.Length : 0L;
+            long size = pdfStream.CanSeek ? pdfStream.Length : 0L;
             job.Status = "Completed";
             job.SizeBytes = size;
             job.CompletedAtUtc = DateTime.UtcNow;
@@ -107,19 +111,13 @@ public sealed class PdfBuildService(
         }
     }
 
-    private async Task<TemplateDocument> ResolveTemplateAsync(string templateId, CancellationToken cancellationToken)
+    private async Task<TemplateDocument?> ResolveTemplateAsync(string templateId, CancellationToken cancellationToken)
     {
         var matches = await templates.FindAsync(
             t => t.TemplateId == templateId && t.Active,
             cancellationToken);
 
-        var template = matches.FirstOrDefault();
-        if (template is null)
-        {
-            throw new KeyNotFoundException($"Active template '{templateId}' was not found.");
-        }
-
-        return template;
+        return matches.FirstOrDefault();
     }
 
     private static IPrintableDocument CreatePrintableDocument(TemplateDocument template, JsonElement model)
@@ -133,7 +131,7 @@ public sealed class PdfBuildService(
             return books;
         }
 
-        var documentName = TryReadDocumentName(model) ?? template.TemplateId;
+        string documentName = TryReadDocumentName(model) ?? template.TemplateId;
         return new JsonPrintableDocument(model, rootElementName: "Document")
         {
             DocumentName = documentName

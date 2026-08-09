@@ -15,7 +15,9 @@ internal class FObj : FONode
     {
         private readonly Func<FObj?, PropertyList, FObj>? _factory;
 
-        public Maker() { }
+        public Maker()
+        {
+        }
 
         private Maker(Func<FObj?, PropertyList, FObj> factory)
         {
@@ -41,8 +43,7 @@ internal class FObj : FONode
     public static Maker CreateMaker()
         => new();
 
-
-    protected FObj(FObj parent, PropertyList propertyList)
+    protected FObj(FObj? parent, PropertyList propertyList)
         : base(parent)
     {
         propertyList.FObj = this;
@@ -111,6 +112,7 @@ internal class FObj : FONode
         {
             ;
         }
+
         Properties.SetWritingMode(p.GetProperty("writing-mode").GetEnum());
     }
 
@@ -135,7 +137,6 @@ internal class FObj : FONode
                 { markerClassName, string.Empty }
             };
         }
-
         else if (!_markerClassNames.ContainsKey(markerClassName))
         {
             _markerClassNames.Add(markerClassName, string.Empty);

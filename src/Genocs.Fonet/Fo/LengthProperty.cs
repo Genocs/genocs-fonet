@@ -12,11 +12,11 @@ internal class LengthProperty(Length length) : Property
         protected virtual bool IsAutoLengthAllowed()
             => false;
 
-        public override Property ConvertProperty(Property p, PropertyList propertyList, FObj fo)
+        public override Property? ConvertProperty(Property? p, PropertyList propertyList, FObj? fo)
         {
             if (IsAutoLengthAllowed())
             {
-                string pval = p.GetString();
+                string? pval = p?.GetString();
                 if (pval != null && pval.Equals("auto"))
                 {
                     return new LengthProperty(new AutoLength());
@@ -28,7 +28,7 @@ internal class LengthProperty(Length length) : Property
                 return p;
             }
 
-            Length val = p.GetLength();
+            Length? val = p?.GetLength();
             if (val != null)
             {
                 return new LengthProperty(val);
@@ -38,8 +38,8 @@ internal class LengthProperty(Length length) : Property
         }
     }
 
-    public override Numeric GetNumeric()
-        => _length.AsNumeric(); 
+    public override Numeric? GetNumeric()
+        => _length.AsNumeric();
 
     public override Length GetLength()
         => _length;
