@@ -1,0 +1,28 @@
+###############################################################################
+# Use this file inside Visual Studio code with 'REST Client' plugin 
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+###############################################################################
+
+
+@url = http://localhost:5080
+### Welcome message
+GET {{url}}
+
+### Check the health of the service
+GET {{url}}/health
+
+
+### Check the health of the service
+POST {{url}}/api/pdf
+
+{
+    "templateId": "books",
+    "model": {
+        "bookList": [
+            {
+                "title": "Pinocchio",
+                "author": "Carlo Collodi"
+            }
+        ]
+    }
+}

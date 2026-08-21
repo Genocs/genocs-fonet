@@ -1,18 +1,23 @@
-# Genocs.Fonet (genocs-fonet)
+# Genocs Fonet
 
-Genocs.Fonet is a .NET port of **Fonet**, an XSL-FO formatter that produces PDF. The original library depended on **Windows GDI** for fonts, metrics, glyph mapping, and image decoding. This port targets **modern .NET without Windows graphics dependencies**, using SkiaSharp for cross-platform font and image handling.
+Genocs Fonet is a .NET port of **Fonet**, an XSL-FO formatter that produces PDF. The original library depended on **Windows GDI** for fonts, metrics, glyph mapping, and image decoding.
+This port targets **modern .NET without Windows graphics dependencies**, using SkiaSharp for cross-platform font and image handling.
 
 ![Genocs.Fonet](./assets/banner.png)
 
-> **Status:** Work in progress. Suitable for experimentation and evaluation; not recommended for production yet (FO coverage gaps remain). See [Status](#status) and [docs/](./docs/).
+> **Status:** Work in progress
+> 
+>  Suitable for experimentation and evaluation; not recommended for production yet (FO coverage gaps remain). 
+>
+> See [Status](#status) and [docs/](./docs/).
 
 ## Solution layout
 
 | Project | Role |
 |---------|------|
-| `src/Genocs.Fonet` | Core engine: XSL-FO → PDF |
-| `src/Genocs.Fonet.XsltTransformer` | Application layer: XML + XSLT → XSL-FO → PDF |
-| `src/tests/Genocs.Fonet.Tests` | Unit and FO fixture tests |
+| `src/Fonet` | Core engine: XSL-FO → PDF |
+| `src/Fonet.XsltTransformer` | Application layer: XML + XSLT → XSL-FO → PDF |
+| `src/tests/Fonet.Tests` | Unit and FO fixture tests |
 | `src/WebApi` | Sample minimal API that builds PDFs via `XslFoPdfService` |
 
 Targets: **.NET 8 / 9 / 10**.
@@ -107,7 +112,7 @@ using Stream pdf = PdfPrinterDriver.MakePdfStream(xslFoDocument, fontDir: "fonts
 | Ready XSL-FO | `Genocs.Fonet` alone |
 | Models + XSLT templates (+ optional localization) | `Genocs.Fonet.XsltTransformer` |
 
-More detail: [`src/Genocs.Fonet.XsltTransformer/README_NUGET.md`](./src/Genocs.Fonet.XsltTransformer/README_NUGET.md).
+More detail: [`src/XsltTransformer/README_NUGET.md`](./src/XsltTransformer/README_NUGET.md).
 
 ---
 
@@ -115,8 +120,8 @@ More detail: [`src/Genocs.Fonet.XsltTransformer/README_NUGET.md`](./src/Genocs.F
 
 Windows GDI dependencies are replaced with **SkiaSharp**:
 
-- **Images** — format detection and pixels via `SKCodec` / `SKBitmap` (`src/Genocs.Fonet/Image/ApocImage.cs`)
-- **Fonts** — enumeration and typefaces via `SKFontManager` / `SKTypeface` (GDI-compatible layer under `src/Genocs.Fonet/Pdf/Gdi/`)
+- **Images** — format detection and pixels via `SKCodec` / `SKBitmap` (`src/Fonet/Image/ApocImage.cs`)
+- **Fonts** — enumeration and typefaces via `SKFontManager` / `SKTypeface` (GDI-compatible layer under `src/Fonet/Pdf/Gdi/`)
 - **Private fonts** — `PdfRendererOptions.AddPrivateFont(...)` registers files into the Skia-backed font manager
 
 Then reference the family in FO:
@@ -127,7 +132,7 @@ Then reference the family in FO:
 </fo:block>
 ```
 
-Sample fonts and FO templates live under `src/tests/Genocs.Fonet.Tests/fonts` and `.../templates`.
+Sample fonts and FO templates live under `src/tests/Fonet.Tests/fonts` and `.../templates`.
 
 On Linux/Docker, reference `SkiaSharp.NativeAssets.Linux` on the executable project if `libSkiaSharp.so` is missing at runtime.
 

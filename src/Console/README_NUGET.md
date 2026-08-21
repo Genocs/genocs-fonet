@@ -1,3 +1,0 @@
-# Genocs.Fonet.WebApi
-
-placeholder

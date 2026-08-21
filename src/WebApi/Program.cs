@@ -34,7 +34,10 @@ IGenocsBuilder genocs = builder
     .AddWebApi()
     .AddOpenApiDocs();
 
-builder.Services.ConfigureSwaggerGen(options =>
+// add services to DI container
+var services = builder.Services;
+
+services.ConfigureSwaggerGen(options =>
     options.DocumentFilter<EndpointDescriptionsDocumentFilter>());
 
 var app = builder.Build();
@@ -46,6 +49,15 @@ app.UseOpenApiDocs();
 
 app.UseEndpoints(static endpoints =>
 {
+    endpoints.Get(
+        "/",
+        async context =>
+            await context.Response.Ok("Welcome to Genocs QRCode Library WebApi"),
+        endpoint: route => route
+            .WithSummary("Home")
+            .WithDescription("Returns the welcome message for the QRCode Web API.")
+            .WithTags("System"));
+
     endpoints.Get(
         "health",
         async context =>

@@ -13,18 +13,19 @@ on:
         description: "Image Version"
 
         # Default value if no value is explicitly provided
-        default: "1.0.0"
+        default: "3.0.0"
 
         # Input has to be provided for the workflow to run
         required: true
 
+
 jobs:
   build:
-    name: Publish Docker Image
+    name: Build Test and Publish on Dockerhub
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v6
 
       - name: Setup .NET
@@ -62,6 +63,6 @@ jobs:
 
       - name: Build and push image to Dockerhub
         run: |
-          docker build -f Dockerfile -t genocs/pdf-printer:${{ github.event.inputs.version }} -t genocs/pdf-printer:latest .
+          docker build -f .src/WebApi/Dockerfile -t genocs/pdf-printer:${{ github.event.inputs.version }} -t genocs/pdf-printer:latest .
           docker push genocs/pdf-printer:${{ github.event.inputs.version }}
           docker push genocs/pdf-printer:latest

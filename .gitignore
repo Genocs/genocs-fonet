@@ -10,6 +10,8 @@
 *.userosscache
 *.sln.docstates
 
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
 .env
 *.env
 
@@ -253,6 +255,8 @@ orleans.codegen.cs
 # (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
 #bower_components/
 
+# RIA/Silverlight projects
+Generated_Code/
 
 # Backup & report files from converting an old project file
 # to a newer Visual Studio version. Backup files are not needed,
@@ -297,6 +301,13 @@ node_modules/
 # Visual Studio 6 auto-generated workspace file (contains which files were open etc.)
 *.vbw
 
+# Visual Studio LightSwitch build output
+**/*.HTMLClient/GeneratedArtifacts
+**/*.DesktopClient/GeneratedArtifacts
+**/*.DesktopClient/ModelManifest.xml
+**/*.Server/GeneratedArtifacts
+**/*.Server/ModelManifest.xml
+_Pvt_Extensions
 
 # Paket dependency manager
 .paket/paket.exe
@@ -305,6 +316,12 @@ paket-files/
 # FAKE - F# Make
 .fake/
 
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# CodeRush
+.cr/
 
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
@@ -317,9 +334,14 @@ __pycache__/
 # Tabs Studio
 *.tss
 
+# Telerik's JustMock configuration file
+*.jmconfig
 
-
-
+# BizTalk build output
+*.btp.cs
+*.btm.cs
+*.odx.cs
+*.xsd.cs
 
 # OpenCover UI analysis results
 OpenCover/
@@ -333,6 +355,8 @@ ASALocalRun/
 # NVidia Nsight GPU debugger configuration file
 *.nvuser
 
+# MFractors (Xamarin productivity tool) working folder 
+.mfractor/
 
 logs/
 

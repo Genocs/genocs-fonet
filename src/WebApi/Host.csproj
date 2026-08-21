@@ -2,11 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
+        <PackageId>Genocs.Fonet.WebApi</PackageId>
         <AssemblyName>Genocs.Fonet.WebApi</AssemblyName>
         <RootNamespace>Genocs.Fonet.WebApi</RootNamespace>
+        <Title>The PDF builder webapi service.</Title>
+        <Description>The PDF builder webapi service.</Description>
         <UserSecretsId>Genocs</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileContext>..\..</DockerfileContext>
+
         <IsPackable>false</IsPackable>
         <!-- Disable web.config transformation for Docker builds -->
         <TransformWebConfigEnabled>false</TransformWebConfigEnabled>
@@ -24,13 +28,13 @@
 
         <PackageReference Include="FluentResults" Version="4.0.0" />
         <PackageReference Include="MediatR" Version="14.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
         <!-- Ensure libSkiaSharp.so is copied into Docker publish output (native assets are not always transitive) -->
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.150.1" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Genocs.Fonet.XsltTransformer\Genocs.Fonet.XsltTransformer.csproj" />
+        <ProjectReference Include="..\XsltTransformer\XsltTransformer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -40,42 +44,48 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="data\assets\icon.jpg">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\assets\icon.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\fonts\Nunito-Bold.ttf">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\fonts\Nunito-Italic.ttf">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\fonts\Nunito-Regular.ttf">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\templates\book-row-template.fo">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\templates\books.fo">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\templates\browserstack-logo.svg">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\templates\footer.fo">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\templates\header.fo">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\templates\NunitoSample.fo">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\templates\test.svg">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+        <None Update="data\assets\icon.jpg">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\assets\icon.png">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\fonts\Nunito-Bold.ttf">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\fonts\Nunito-Italic.ttf">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\fonts\Nunito-Regular.ttf">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\book-row-template.fo">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\books.fo">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\books.resources.xml">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\browserstack-logo.svg">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\footer.fo">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\header.fo">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\NunitoSample.fo">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\test.svg">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\templates\watermark-specimen.svg">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

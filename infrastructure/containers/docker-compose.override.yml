@@ -1,5 +1,6 @@
 services:
-  pdf-builder:
+
+  pdf-service:
     build:
       context: ../../
       dockerfile: ./src/WebApi/Dockerfile

@@ -1,26 +1,30 @@
 <Solution>
-  <Configurations>
-    <Platform Name="Any CPU" />
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Folder Name="/Console/">
-    <Project Path="src/Console/Host.csproj" />
-  </Folder>
+
   <Folder Name="/WebApi/">
     <Project Path="src/WebApi/Host.csproj" />
-  </Folder>  
-  <Folder Name="/tests/">
-    <Project Path="src/tests/Genocs.Fonet.Tests/Genocs.Fonet.Tests.csproj" />
   </Folder>
-  <Project Path="src/Genocs.Fonet.XsltTransformer/Genocs.Fonet.XsltTransformer.csproj" Id="c6c7e766-11cc-446f-8eb5-d7700217f9a1" />
-  <Project Path="src/Genocs.Fonet/Genocs.Fonet.csproj" />
-  
+
+  <Folder Name="/tests/Fonet/">
+    <Project Path="src/tests/Fonet.Tests/Tests.csproj" />
+  </Folder>
+
   <Folder Name="/_Solution Items/">
     <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="dotnet.ruleset" />
+    <File Path="global.json" />
+    <File Path="infrastructure/containers/docker-compose.override.yml" />
+    <File Path="infrastructure/containers/docker-compose.yml" />
+    <File Path="launchSettings.json" />
+    <File Path="Makefile" />
     <File Path="README.md" />
-	<File Path="Directory.Build.props" />
-	<File Path="Directory.Build.targets" />
-	
+    <File Path="src/WebApi/web-api.rest" />
+    <File Path="stylecop.json" />
   </Folder>
+
+  <Folder Name="/tests/" />
+  <Project Path="src/Fonet/Fonet.csproj" />
+  <Project Path="src/XsltTransformer/XsltTransformer.csproj" />
+  
 </Solution>

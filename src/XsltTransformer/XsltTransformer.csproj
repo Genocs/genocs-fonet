@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
+        <PackageId>Genocs.Fonet.XsltTransformer</PackageId>
+        <RootNamespace>Genocs.Fonet.XsltTransformer</RootNamespace>
+        <AssemblyName>Genocs.Fonet.XsltTransformer</AssemblyName>
+        <Title>Genocs Fonet XSLT to PDF Transformer library</Title>
+        <Description>Fonet XSLT to PDF Transformer library.</Description>
+        <Summary>The library used to transform XML documents using XSLT and generate PDFs.</Summary>
+        <PackageTags>genocs fonet xslt transformer pdf</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Genocs.Core" Version="9.0.1" />
+        <PackageReference Include="Genocs.Logging" Version="9.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Fonet\Fonet.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Genocs.Fonet.UnitTests" />
+    </ItemGroup>
+
+</Project>

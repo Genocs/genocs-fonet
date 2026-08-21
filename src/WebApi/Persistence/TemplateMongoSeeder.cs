@@ -14,12 +14,18 @@ public sealed class TemplateMongoSeeder : IMongoSeeder
     {
         var templates = database.GetCollection<TemplateDocument>("templates");
 
+        const string resourcesName = "books.resources.xml";
+
         bool existing = await templates
             .Find(t => t.TemplateId == "books")
             .AnyAsync(cancellationToken);
 
         if (existing)
         {
+            await templates.UpdateManyAsync(
+                t => t.TemplateId == "books" && (t.ResourcesName == null || t.ResourcesName == ""),
+                Builders<TemplateDocument>.Update.Set(t => t.ResourcesName, resourcesName),
+                cancellationToken: cancellationToken);
             return;
         }
 
@@ -28,6 +34,7 @@ public sealed class TemplateMongoSeeder : IMongoSeeder
             {
                 TemplateId = "books",
                 FileName = "books.fo",
+                ResourcesName = resourcesName,
                 ModelType = "Books",
                 Description = "Host sample books catalog template",
                 Active = true,

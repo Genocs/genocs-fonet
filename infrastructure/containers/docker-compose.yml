@@ -1,9 +1,9 @@
 services:
 
-  pdf-builder:
+  pdf-service:
     image: genocs/pdf-builder:local
-    hostname: pdf-builder
-    container_name: pdf-builder
+    hostname: pdf-service
+    container_name: pdf-service
     ports:
       - 5080:8080
     environment:
