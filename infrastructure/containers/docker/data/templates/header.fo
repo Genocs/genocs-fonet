@@ -7,14 +7,15 @@
     <xsl:variable name="logo" select="utilityExtension:MapPath('./data/templates/browserstack-logo.svg')"/>
     <xsl:variable name="watermark" select="utilityExtension:MapPath('./data/templates/watermark-specimen.svg')"/>
     <xsl:variable name="qrcodeRootUrl" select="normalize-space(/PdfPrinter/Resources/QrCodeRootUrl)"/>
-    <xsl:variable name="qrcodePayload" select="'BCD%0A001%0A2%0ASCT%0ABFSWDE33BER%0AWikimedia%20F%C3%B6rdergesellschaft%0ADE33100205000001194700%0AEUR10.00'"/>
+    <xsl:variable name="qrcodePayload" select="'12547852-12547852'"/>
     <xsl:variable name="qrcode" select="utilityExtension:MapPath(concat($qrcodeRootUrl, '?payload=', $qrcodePayload))"/>
 
+    <!-- The watermark template-->
     <xsl:template name="watermark-specimen-template">
         <fo:static-content flow-name="watermark-region">
             <fo:block-container absolute-position="absolute"
-                                left="-10mm"
-                                top="-10mm"
+                                left="20mm"
+                                top="50mm"
                                 width="210mm"
                                 height="297mm"
                                 overflow="visible">
@@ -30,39 +31,38 @@
         </fo:static-content>
     </xsl:template>
 
+    <!-- The first page header template-->
     <xsl:template name="header-first-page-template">
         <fo:static-content flow-name="header-first-region">
-            <fo:block font-size="6.5pt">
+            <fo:block font-family="Nunito">
                 <fo:table>
-                    <fo:table-column column-width="130mm"/>
-                    <fo:table-column column-width="50mm"/>
+                    <fo:table-column column-width="40mm"/>
+                    <fo:table-column column-width="proportional-column-width(1)"/>
                     <fo:table-body>
                         <fo:table-row>
-                            <fo:table-cell>
-                                <fo:block font-size="8pt" text-align="left">
-                                    <fo:block margin-bottom="0.1cm" font-size="14pt" font-weight="bold">
-                                        Genocs
-                                    </fo:block>
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        Software Technology and many more
-                                    </fo:block>
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        Tech company specialized in software development and IT consulting
-                                    </fo:block>
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        Via Trasimeno 40/10 - 20128 Milano (MI)
-                                    </fo:block>
-                                    <fo:block margin-top="0.2cm" margin-bottom="0.1cm">
-                                        P.IVA: 03518950757
-                                    </fo:block>
-
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        <fo:basic-link external-destination="https://www.genocs.com" color="blue">https://www.genocs.com</fo:basic-link>
-                                    </fo:block>
-                                </fo:block>
-                            </fo:table-cell>
                             <fo:table-cell text-align="left">
-                                <fo:external-graphic src="url('{$qrcode}')" width="32mm" height="32mm" scaling="uniform" scaling-method="resample-any-method"/>
+                                <fo:external-graphic src="url('{$qrcode}')" width="32mm" height="32mm" />
+                            </fo:table-cell>
+
+                            <fo:table-cell text-align="right">
+                                <fo:block color="rgb(80, 80, 250)" font-size="24pt" font-weight="bold">
+                                    Genocs
+                                </fo:block>
+                                <fo:block>
+                                    Software Technology
+                                </fo:block>
+                                <fo:block>
+                                    Your technology partner in software development and IT consulting
+                                </fo:block>
+                                <fo:block>
+                                    Via Trasimeno 40/10 - 20128 Milano (MI)
+                                </fo:block>
+                                <fo:block>
+                                    P.IVA: 03518950757
+                                </fo:block>
+                                <fo:block>
+                                    <fo:basic-link external-destination="https://www.genocs.com" color="blue">https://www.genocs.com</fo:basic-link>
+                                </fo:block>
                             </fo:table-cell>
                         </fo:table-row>
                     </fo:table-body>
@@ -71,6 +71,7 @@
         </fo:static-content>
     </xsl:template>
 
+    <!-- The others page header template-->
     <xsl:template name="header-other-pages-template">
         <fo:static-content flow-name="header-other-region">
             <fo:block font-size="8pt" space-after="2pt">

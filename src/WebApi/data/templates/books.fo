@@ -36,6 +36,8 @@
 			</fo:layout-master-set>
 			
 			<fo:page-sequence initial-page-number="2" master-reference="document-master">
+
+				<!-- Watermark -->
 				<xsl:call-template name="watermark-specimen-template" />
 
 				<!-- First page header -->
@@ -56,20 +58,25 @@
 							table-omit-footer-at-break="true">
 							
 							<!-- Column definition -->
-							<fo:table-column column-width="190mm"/>
+							<fo:table-column column-width="100mm"/>
+							<fo:table-column column-width="90mm"/>
 							
 							<!-- Table header -->
 							<fo:table-header>
-								<fo:table-row background-color="rgb(205, 205, 205)"
+								<fo:table-row background-color="rgb(245, 245, 245)"
 									display-align="center" 
 									height="0.5cm"
 									text-align="center">
 									<fo:table-cell padding-top="4pt"
-										padding-left="1.1pt"
-										padding-bottom="3pt">
-										This is the Table Header
+										padding-left="1.1pt" padding-bottom="3pt">
 										<fo:block font-weight="bold" text-align="left">
-											This is the Table Header
+											Title
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell padding-top="4pt"
+										padding-left="1.1pt" padding-bottom="3pt">
+										<fo:block font-weight="bold" text-align="left">
+											Author
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>

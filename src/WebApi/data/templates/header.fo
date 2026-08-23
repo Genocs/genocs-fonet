@@ -34,35 +34,33 @@
         <fo:static-content flow-name="header-first-region">
             <fo:block font-size="6.5pt">
                 <fo:table>
-                    <fo:table-column column-width="130mm"/>
-                    <fo:table-column column-width="50mm"/>
+                    <fo:table-column column-width="70mm"/>
+                    <fo:table-column column-width="110mm"/>
                     <fo:table-body>
                         <fo:table-row>
-                            <fo:table-cell>
-                                <fo:block font-size="8pt" text-align="left">
-                                    <fo:block margin-bottom="0.1cm" font-size="14pt" font-weight="bold">
-                                        Genocs
-                                    </fo:block>
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        Software Technology and many more
-                                    </fo:block>
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        Tech company specialized in software development and IT consulting
-                                    </fo:block>
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        Via Trasimeno 40/10 - 20128 Milano (MI)
-                                    </fo:block>
-                                    <fo:block margin-top="0.2cm" margin-bottom="0.1cm">
-                                        P.IVA: 03518950757
-                                    </fo:block>
-
-                                    <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
-                                        <fo:basic-link external-destination="https://www.genocs.com" color="blue">https://www.genocs.com</fo:basic-link>
-                                    </fo:block>
-                                </fo:block>
+                            <fo:table-cell text-align="right">
+                                <fo:external-graphic src="url('{$qrcode}')" width="32mm" height="32mm" />
                             </fo:table-cell>
-                            <fo:table-cell text-align="left">
-                                <fo:external-graphic src="url('{$qrcode}')" width="32mm" height="32mm" scaling="uniform" scaling-method="resample-any-method"/>
+
+                            <fo:table-cell text-align="right">
+                                <fo:block font-family="Nunito" font-size="48pt" font-weight="bold" color="rgb(80, 80, 250)">
+                                    Genocs
+                                </fo:block>
+                                <fo:block margin-bottom="10mm">
+                                    Software Technology
+                                </fo:block>
+                                <fo:block margin-top="10mm" margin-bottom="10mm">
+                                    Your technology partner in software development and IT consulting
+                                </fo:block>
+                                <fo:block margin-top="10mm" margin-bottom="10mm">
+                                    Via Trasimeno 40/10 - 20128 Milano (MI)
+                                </fo:block>
+                                <fo:block margin-top="20mm" margin-bottom="20mm">
+                                    P.IVA: 03518950757
+                                </fo:block>
+                                <fo:block margin-top="0.1cm" margin-bottom="0.1cm">
+                                    <fo:basic-link external-destination="https://www.genocs.com" color="blue">https://www.genocs.com</fo:basic-link>
+                                </fo:block>
                             </fo:table-cell>
                         </fo:table-row>
                     </fo:table-body>

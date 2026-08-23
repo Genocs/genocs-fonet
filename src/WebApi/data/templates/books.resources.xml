@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Resources>
   <!-- Base URL of the QR-code endpoint. Payload is appended by the XSLT template. -->
-  <QrCodeRootUrl>http://localhost:5070/BuildQrCode</QrCodeRootUrl>
+  <QrCodeRootUrl>http://coder-service:8080/BuildQrCode</QrCodeRootUrl>
 </Resources>
