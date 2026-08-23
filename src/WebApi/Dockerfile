@@ -42,9 +42,9 @@ COPY src/WebApi/Host.csproj src/WebApi/
 RUN dotnet restore src/WebApi/Host.csproj
 
 # Copy the rest of the source code
-COPY src/WebApi/ src/WebApi/
 COPY src/Fonet/ src/Fonet/
 COPY src/XsltTransformer/ src/XsltTransformer/
+COPY src/WebApi/ src/WebApi/
 
 WORKDIR "/src/src/WebApi"
 RUN dotnet build "Host.csproj" -c $BUILD_CONFIGURATION -o /app/build
