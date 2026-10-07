@@ -5,7 +5,7 @@
   </Folder>
 
   <Folder Name="/tests/Fonet/">
-    <Project Path="src/tests/Fonet.Tests/Tests.csproj" />
+    <Project Path="tests/Fonet.Tests/Tests.csproj" />
   </Folder>
 
   <Folder Name="/_Solution Items/">

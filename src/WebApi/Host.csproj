@@ -19,17 +19,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Genocs.Core" Version="9.0.1" />
-        <PackageReference Include="Genocs.Logging" Version="9.0.1" />
-        <PackageReference Include="Genocs.Persistence.MongoDB" Version="9.0.1" />
-        <PackageReference Include="Genocs.WebApi" Version="9.0.1" />
-        <PackageReference Include="Genocs.WebApi.OpenApi" Version="9.0.1" />
+        <PackageReference Include="Genocs.Core" Version="9.0.2" />
+        <PackageReference Include="Genocs.Logging" Version="9.0.2" />
+        <PackageReference Include="Genocs.Persistence.MongoDB" Version="9.0.2" />
+        <PackageReference Include="Genocs.WebApi" Version="9.0.2" />
+        <PackageReference Include="Genocs.WebApi.OpenApi" Version="9.0.2" />
 
         <PackageReference Include="FluentResults" Version="4.0.0" />
         <PackageReference Include="MediatR" Version="14.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
         <!-- Ensure libSkiaSharp.so is copied into Docker publish output (native assets are not always transitive) -->
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.153.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -85,6 +85,10 @@
         <None Update="data\templates\watermark-specimen.svg">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Roslynator.Analyzers" Version="5.0.1" />
     </ItemGroup>
 
 </Project>

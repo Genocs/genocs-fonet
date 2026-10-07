@@ -16,7 +16,7 @@ services:
       pdfStorage__assetsPath: /app/data/assets
       logger__console__enabled: "true"
     networks:
-      - genocs      
+      - genocs
     volumes:
       # Persist / swap templates, fonts, and assets without rebuilding the image
       - ./docker/data/templates:/app/data/templates:ro

@@ -16,13 +16,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="SkiaSharp" Version="4.151.1" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.151.1" />
-        <PackageReference Include="Svg.Skia" Version="5.2.1" />
+        <PackageReference Include="SkiaSharp" Version="4.153.1" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.1" />
+        <PackageReference Include="Svg.Skia" Version="5.2.3" />
     </ItemGroup>
 
     <ItemGroup>
         <InternalsVisibleTo Include="Genocs.Fonet.UnitTests" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Roslynator.Analyzers" Version="5.0.1" />
     </ItemGroup>
 
 </Project>
