@@ -10,7 +10,7 @@ Current test state, gaps, and recommended testing layers for the migration.
 
 | Attribute | Value |
 |-----------|-------|
-| Project | `src/tests/Genocs.Fonet.Tests/` |
+| Project | `tests/Genocs.Fonet.Tests/` |
 | Framework | xUnit 2.9.3 |
 | Target | `net8.0`, `net9.0`, `net10.0` |
 | Test count | 22 |
@@ -30,7 +30,7 @@ Current test state, gaps, and recommended testing layers for the migration.
 ### FO Templates Available
 
 ```
-src/tests/Genocs.Fonet.Tests/templates/
+tests/Genocs.Fonet.Tests/templates/
 ├── StarWarsMovies.fo
 ├── NunitoFontTest.fo
 ├── NunitoFontCustomTest.fo
@@ -52,17 +52,17 @@ src/tests/Genocs.Fonet.Tests/templates/
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Layer 4: Visual Regression (Phase 4)                     │
+│  Layer 4: Visual Regression (Phase 4)                       │
 │  PDF → rasterize → pixel diff against baseline              │
 ├─────────────────────────────────────────────────────────────┤
-│  Layer 3: Integration Tests (Phase 1–3)                    │
+│  Layer 3: Integration Tests (Phase 1–3)                     │
 │  FO template → PDF → structural/content validation          │
 ├─────────────────────────────────────────────────────────────┤
-│  Layer 2: Component Tests (Phase 1–2)                      │
+│  Layer 2: Component Tests (Phase 1–2)                       │
 │  Font metrics, glyph mapping, table parsing, layout units   │
 ├─────────────────────────────────────────────────────────────┤
-│  Layer 1: Unit Tests (Phase 0–1)                           │
-│  DataTypes, expressions, property parsing, PDF object model   │
+│  Layer 1: Unit Tests (Phase 0–1)                            │
+│  DataTypes, expressions, property parsing, PDF object model │
 └─────────────────────────────────────────────────────────────┘
 ```
 

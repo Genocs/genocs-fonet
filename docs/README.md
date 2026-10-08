@@ -43,5 +43,5 @@ This folder tracks the assessment, concerns, and migration plan for porting the 
 ## Related Resources
 
 - Root [README.md](../README.md) — build instructions and cross-platform notes
-- Test templates: `src/tests/Genocs.Fonet.Tests/templates/`
+- Test templates: `tests/Genocs.Fonet.Tests/templates/`
 - Entry point: `src/Genocs.Fonet/FonetDriver.cs`

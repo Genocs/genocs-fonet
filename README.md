@@ -17,7 +17,7 @@ This port targets **modern .NET without Windows graphics dependencies**, using S
 |---------|------|
 | `src/Fonet` | Core engine: XSL-FO → PDF |
 | `src/Fonet.XsltTransformer` | Application layer: XML + XSLT → XSL-FO → PDF |
-| `src/tests/Fonet.Tests` | Unit and FO fixture tests |
+| `tests/Fonet.Tests` | Unit and FO fixture tests |
 | `src/WebApi` | Sample minimal API that builds PDFs via `XslFoPdfService` |
 
 Targets: **.NET 8 / 9 / 10**.
@@ -68,8 +68,7 @@ Use this when PDF generation is driven by **document models**, **XSLT templates*
 **Pipeline**
 
 ```text
-IPrintableDocument.ToXml()
-        + optional localization XML
+IPrintableDocument.ToXml() + optional localization XML
         ↓
    XSLT template (*.fo)
         ↓
@@ -132,7 +131,7 @@ Then reference the family in FO:
 </fo:block>
 ```
 
-Sample fonts and FO templates live under `src/tests/Fonet.Tests/fonts` and `.../templates`.
+Sample fonts and FO templates live under `tests/Fonet.Tests/fonts` and `.../templates`.
 
 On Linux/Docker, reference `SkiaSharp.NativeAssets.Linux` on the executable project if `libSkiaSharp.so` is missing at runtime.
 
